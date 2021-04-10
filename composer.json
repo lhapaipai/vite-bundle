@@ -1,0 +1,21 @@
+{
+    "name": "pentatrion/vite-bundle",
+    "description": "Integration with your Symfony app & Vite",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hugues Tavernier",
+            "email": "hugues.tavernier@protonmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.2.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pentatrion\\ViteBundle\\": "src/"
+        }
+    }
+}

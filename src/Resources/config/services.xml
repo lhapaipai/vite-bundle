@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+  <services>
+    <defaults public="false" />
+
+    <service id="vite.manifest_lookup" class="Pentatrion\ViteBundle\Asset\ManifestLookup">
+      <argument>%kernel.project_dir%/public/assets/manifest.json</argument>
+      <argument>/assets/</argument>
+    </service>
+
+    <service id="vite.tag_renderer" class="Pentatrion\ViteBundle\Asset\TagRenderer">
+      <argument type="service" id="vite.manifest_lookup" />
+    </service>
+
+    <service id="vite.twig_entry_files_extension" class="Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension">
+      <tag name="twig.extension" />
+      <argument type="service" id="vite.tag_renderer" />
+    </service>
+
+  </services>
+</container>

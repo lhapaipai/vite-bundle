@@ -1,6 +1,6 @@
 <?php
 
-namespace Lhapaipai\ViteBundle\DependencyInjection;
+namespace Pentatrion\ViteBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -9,7 +9,7 @@ class Configuration implements ConfigurationInterface
 {
   public function getConfigTreeBuilder()
   {
-    $treeBuilder = new TreeBuilder('lhapaipai_vite');
+    $treeBuilder = new TreeBuilder('pentatrion_vite');
     $rootNode = $treeBuilder->getRootNode();
 
     $rootNode

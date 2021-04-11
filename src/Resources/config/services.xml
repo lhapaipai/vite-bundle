@@ -8,19 +8,26 @@
   <services>
     <defaults public="false" />
 
-    <service id="vite.manifest_lookup" class="Lhapaipai\ViteBundle\Asset\ManifestLookup">
-      <argument>%kernel.project_dir%/public%lhapaipai_vite.base%manifest.json</argument>
-      <argument>%lhapaipai_vite.base%</argument>
-      <argument>%lhapaipai_vite.server%</argument>
+    <service id="vite.manifest_lookup" class="Pentatrion\ViteBundle\Asset\ManifestLookup">
+      <argument>%kernel.project_dir%/public%pentatrion_vite.base%manifest.json</argument>
+      <argument>%pentatrion_vite.base%</argument>
+      <argument>%pentatrion_vite.server%</argument>
     </service>
 
-    <service id="vite.tag_renderer" class="Lhapaipai\ViteBundle\Asset\TagRenderer">
+    <service id="vite.entrypoint_renderer" class="Pentatrion\ViteBundle\Asset\EntrypointRenderer">
       <argument type="service" id="vite.manifest_lookup" />
+      <argument type="service" id="vite.tag_renderer" />
+      <argument>%pentatrion_vite.base%</argument>
+      <argument>%pentatrion_vite.server%</argument>
     </service>
 
-    <service id="vite.twig_entry_files_extension" class="Lhapaipai\ViteBundle\Twig\EntryFilesTwigExtension">
+
+    <service id="vite.tag_renderer" class="Pentatrion\ViteBundle\Asset\TagRenderer">
+    </service>
+
+    <service id="vite.twig_entry_files_extension" class="Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension">
       <tag name="twig.extension" />
-      <argument type="service" id="vite.tag_renderer" />
+      <argument type="service" id="vite.entrypoint_renderer" />
     </service>
 
   </services>

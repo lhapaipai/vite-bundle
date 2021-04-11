@@ -1,63 +1,65 @@
 <?php
 
-namespace Lhapaipai\ViteBundle\Asset;
+namespace Pentatrion\ViteBundle\Asset;
 
 class TagRenderer
 {
-  private $manifestLookup;
-
-  public function __construct($manifestLookup)
+  public function renderScriptFile($fileName)
   {
-    $this->manifestLookup = $manifestLookup;
+    $attributes = [
+      'src' => $fileName,
+      'type' => 'module'
+    ];
+    return sprintf(
+      '<script %s></script>',
+      $this->convertArrayToAttributes($attributes)  
+    );
   }
 
-  public function renderViteScriptTags(string $entryName)
+  public function renderReactRefreshInline()
   {
-    $scriptTags = [];
-    foreach ($this->manifestLookup->getJavascriptFiles($entryName) as $filename) {
-      $attributes = [
-        'src' => $filename,
-        'type' => 'module'
-      ];
-      $scriptTags[] = sprintf(
-        '<script %s></script>',
-        $this->convertArrayToAttributes($attributes)  
-      );
-    }
-    return implode('', $scriptTags);
+    return '  <script type="module">
+    import RefreshRuntime from "/@react-refresh"
+    RefreshRuntime.injectIntoGlobalHook(window)
+    window.$RefreshReg$ = () => {}
+    window.$RefreshSig$ = () => (type) => type
+    window.__vite_plugin_react_preamble_installed__ = true
+    </script>';
   }
 
-  public function renderViteLinkTags(string $entryName)
+  public function renderLinkStylesheet($fileName)
   {
-    $linkTags = [];
-    foreach ($this->manifestLookup->getCSSFiles($entryName) as $filename) {
-      $attributes = [
-        'rel' => 'stylesheet',
-        'href' => $filename
-      ];
-      $linkTags[] = sprintf(
-        '<link %s>',
-        $this->convertArrayToAttributes($attributes)  
-      );
-    }
-    foreach ($this->manifestLookup->getJavascriptDependencies($entryName) as $filename) {
-      $attributes = [
-        'rel' => 'modulepreload',
-        'href' => $filename
-      ];
-      $linkTags[] = sprintf(
-        '<link %s>',
-        $this->convertArrayToAttributes($attributes)  
-      );
-    }
-    return implode('', $linkTags);
+    $attributes = [
+      'rel' => 'stylesheet',
+      'href' => $fileName
+    ];
+    return sprintf(
+      '<link %s>',
+      $this->convertArrayToAttributes($attributes)  
+    );
+  }
+
+  public function renderLinkPreload($fileName)
+  {
+    $attributes = [
+      'rel' => 'modulepreload',
+      'href' => $fileName
+    ];
+    return sprintf(
+      '<link %s>',
+      $this->convertArrayToAttributes($attributes)  
+    );
   }
 
   private function convertArrayToAttributes(array $attributes): string
   {
     return implode(' ', array_map(
       function ($key, $value) {
+        if ($value === true) {
+          return sprintf('%s', $key, htmlentities($value));
+        } else {
           return sprintf('%s="%s"', $key, htmlentities($value));
+        }
       },
       array_keys($attributes),
       $attributes

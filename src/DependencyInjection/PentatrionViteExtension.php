@@ -1,5 +1,5 @@
 <?php
-namespace Lhapaipai\ViteBundle\DependencyInjection;
+namespace Pentatrion\ViteBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -7,7 +7,7 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-class LhapaipaiViteExtension extends Extension
+class PentatrionViteExtension extends Extension
 {
   public function load(array $configs, ContainerBuilder $container)
   {
@@ -19,8 +19,8 @@ class LhapaipaiViteExtension extends Extension
       $configs
     );
 
-    $container->setParameter('lhapaipai_vite.base', $config['base']);
+    $container->setParameter('pentatrion_vite.base', $config['base']);
     $server = ($config['server']['https'] ? 'https://' : 'http://').$config['server']['host'].':'.$config['server']['port'];
-    $container->setParameter('lhapaipai_vite.server', $server);
+    $container->setParameter('pentatrion_vite.server', $server);
   }
 }

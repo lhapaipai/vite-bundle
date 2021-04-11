@@ -1,21 +1,19 @@
 <?php
 
-namespace Lhapaipai\ViteBundle\Asset;
+namespace Pentatrion\ViteBundle\Asset;
 
 class ManifestLookup
 {
   private $manifestPath;
+  private $publicPath;
+
   private $entriesData;
   private $isProd;
-  private $publicPath;
-  private $urlServer;
-  private $hasReturnedViteClient = false;
 
-  public function __construct($manifestPath, $publicPath, $urlServer)
+  public function __construct($manifestPath, $publicPath)
   {
     $this->manifestPath = $manifestPath;
     $this->publicPath = $publicPath;
-    $this->urlServer = $urlServer;
 
     $this->isProd = file_exists($this->manifestPath);
     if ($this->isProd) {
@@ -23,36 +21,46 @@ class ManifestLookup
     }
   }
 
-  public function getJavascriptFiles($entryName)
+  public function isProd() {
+    return $this->isProd;
+  }
+
+  public function getJSFiles($entryName)
   {
-    if ($this->isProd && !isset($this->entriesData[$entryName])) {
-      return [];
-    }
-    if ($this->isProd) {
+    if ($this->isProd && isset($this->entriesData[$entryName])) {
       return [$this->publicPath.$this->entriesData[$entryName]['file']];
     } else {
-      if (!$this->hasReturnedViteClient) {
-        $files = [$this->urlServer.$this->publicPath.'@vite/client'];
-        $this->hasReturnedViteClient = true;
-      } else {
-        $files = [];
-      }
-      $files[] = $this->urlServer.$this->publicPath.$entryName;
-      return $files;
+      return [];
     }
+
+    // if ($this->isProd && !isset($this->entriesData[$entryName])) {
+    //   return [];
+    // }
+    // if ($this->isProd) {
+    //   return [$this->entriesData[$entryName]['file']];
+    // } else {
+    //   if (!$this->hasReturnedViteClient) {
+    //     $files = [$this->urlServer.'@vite/client'];
+    //     $this->hasReturnedViteClient = true;
+    //   } else {
+    //     $files = [];
+    //   }
+    //   $files[] = $this->urlServer.$entryName;
+    //   return $files;
+    // }
   }
 
   public function getCSSFiles($entryName)
   {
-    if (!$this->isProd || !isset($this->entriesData[$entryName])) {
+    if ($this->isProd && isset($this->entriesData[$entryName])) {
+      $files = [];
+      foreach ($this->entriesData[$entryName]['css'] as $file) {
+        $files[] = $this->publicPath.$file;
+      }
+      return $files;
+    } else {
       return [];
     }
-
-    $files = [];
-    foreach ($this->entriesData[$entryName]['css'] as $file) {
-      $files[] = $this->publicPath.$file;
-    }
-    return $files;
   }
 
   public function getJavascriptDependencies($entryName)

@@ -1,12 +1,52 @@
 # ViteBundle : Symfony integration with Vite
 
 This bundle helping you render all of the dynamic `script` and `link` tags needed.
+Essentially, he provide two twig functions to load the correct scripts into your templates.
 
-Install the bundle with
+```twig
+{# any template or base layout where you need to include a JavaScript entry #}
+
+{% block stylesheets %}
+    {{ vite_entry_link_tags('app.js') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ vite_entry_script_tags('app.js') }}
+{% endblock %}
+```
+
+would render in dev:
+```html
+<!--Nothing with vite_entry_link_tags('app.js') -->
+
+<!-- vite_entry_script_tags('app.js') -->
+<script src="http://localhost:3000/build/@vite/client" type="module"></script>
+<script src="http://localhost:3000/build/app.js" type="module"></script>
+```
+
+would render in prod:
+```html
+<!-- vite_entry_link_tags('app.js') -->
+<link rel="stylesheet" href="/build/app.[hash].css">
+<link rel="modulepreload" href="/build/vendor.[hash].js">
+
+<!-- vite_entry_script_tags('app.js') -->
+<script src="/build/app.[hash].js" type="module"></script>
+```
+
+if you are using React, you have to add this option in order to have FastRefresh.
+
+```twig
+{{ vite_entry_script_tags('app.js', { dependency: 'react' }) }}
+```
+
+## Installation
+
+<!-- Install the bundle with
 
 ```
-composer require lhapaipai/vite-bundle
-```
+composer require pentatrion/vite-bundle
+``` -->
 
 create a directory structure for your js/css files:
 ```
@@ -92,8 +132,8 @@ export default {
 default configuration
 
 ```yaml
-# config/packages/lhapaipai_vite.yaml
-lhapaipai_vite:
+# config/packages/pentatrion_vite.yaml
+pentatrion_vite:
   # Base public path when served in development or production
   base: /build/
 
@@ -106,20 +146,3 @@ lhapaipai_vite:
 ```
 
 
-## Usage
-
-```twig
-{# any template or base layout where you need to include a JavaScript entry #}
-
-{% block javascripts %}
-    {{ parent() }}
-
-    {{ vite_entry_script_tags('app.js') }}
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-
-    {{ vite_entry_link_tags('app.js') }}
-{% endblock %}
-```

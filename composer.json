@@ -1,5 +1,5 @@
 {
-    "name": "lhapaipai/vite-bundle",
+    "name": "pentatrion/vite-bundle",
     "description": "Integration with your Symfony app & Vite",
     "type": "symfony-bundle",
     "license": "MIT",
@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Lhapaipai\\ViteBundle\\": "src/"
+            "Pentatrion\\ViteBundle\\": "src/"
         }
     }
 }

@@ -1,18 +1,18 @@
 <?php
 
-namespace Lhapaipai\ViteBundle\Twig;
+namespace Pentatrion\ViteBundle\Twig;
 
-use Lhapaipai\ViteBundle\Asset\TagRenderer;
+use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class EntryFilesTwigExtension extends AbstractExtension
 {
-  private $tagRenderer;
+  private $entrypointRenderer;
 
-  public function __construct(TagRenderer $tagRenderer)
+  public function __construct(EntrypointRenderer $entrypointRenderer)
   {
-    $this->tagRenderer = $tagRenderer;
+    $this->entrypointRenderer = $entrypointRenderer;
   }
 
   public function getFunctions()
@@ -23,13 +23,13 @@ class EntryFilesTwigExtension extends AbstractExtension
     ];
   }
 
-  public function renderViteScriptTags(string $entryName): string
+  public function renderViteScriptTags(string $entryName, array $options = []): string
   {
-    return $this->tagRenderer->renderViteScriptTags($entryName);
+    return $this->entrypointRenderer->renderScripts($entryName, $options);
   }
 
-  public function renderViteLinkTags(string $entryName): string
+  public function renderViteLinkTags(string $entryName, array $options = []): string
   {
-    return $this->tagRenderer->renderViteLinkTags($entryName);
+    return $this->entrypointRenderer->renderLinks($entryName, $options);
   }
 }

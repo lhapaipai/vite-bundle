@@ -42,11 +42,11 @@ if you are using React, you have to add this option in order to have FastRefresh
 
 ## Installation
 
-<!-- Install the bundle with
+Install the bundle with
 
 ```
 composer require pentatrion/vite-bundle
-``` -->
+```
 
 create a directory structure for your js/css files:
 ```

@@ -1,6 +1,7 @@
 {
     "name": "pentatrion/vite-bundle",
     "description": "Integration with your Symfony app & Vite",
+    "keywords": [ "bundle", "symfony", "vite", "vitejs" ],
     "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
@@ -9,7 +10,6 @@
             "email": "hugues.tavernier@protonmail.com"
         }
     ],
-    "minimum-stability": "dev",
     "require": {
         "php": "^7.2.5"
     },

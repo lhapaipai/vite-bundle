@@ -1,0 +1,30 @@
+<?php
+
+namespace Lhapaipai\ViteBundle\DependencyInjection;
+
+use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\ConfigurationInterface;
+
+class Configuration implements ConfigurationInterface
+{
+  public function getConfigTreeBuilder()
+  {
+    $treeBuilder = new TreeBuilder('lhapaipai_vite');
+    $rootNode = $treeBuilder->getRootNode();
+
+    $rootNode
+      ->children()
+        ->scalarNode('base')->defaultValue('/build/')->end()
+        ->arrayNode('server')
+          ->addDefaultsIfNotSet()
+          ->children()
+            ->scalarNode('host')->defaultValue('localhost')->end()
+            ->integerNode('port')->defaultValue(3000)->end()
+            ->booleanNode('https')->defaultFalse()->end()
+          ->end()          
+      ->end()
+    ;
+
+    return $treeBuilder;
+  }
+}

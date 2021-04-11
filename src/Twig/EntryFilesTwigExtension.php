@@ -1,8 +1,8 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Twig;
+namespace Lhapaipai\ViteBundle\Twig;
 
-use Pentatrion\ViteBundle\Asset\TagRenderer;
+use Lhapaipai\ViteBundle\Asset\TagRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

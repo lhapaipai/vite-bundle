@@ -1,19 +1,21 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Asset;
+namespace Lhapaipai\ViteBundle\Asset;
 
 class ManifestLookup
 {
   private $manifestPath;
   private $entriesData;
   private $isProd;
-  private $assetsWebPath;
+  private $publicPath;
+  private $urlServer;
   private $hasReturnedViteClient = false;
 
-  public function __construct($manifestPath, $assetsWebPath)
+  public function __construct($manifestPath, $publicPath, $urlServer)
   {
     $this->manifestPath = $manifestPath;
-    $this->assetsWebPath = $assetsWebPath;
+    $this->publicPath = $publicPath;
+    $this->urlServer = $urlServer;
 
     $this->isProd = file_exists($this->manifestPath);
     if ($this->isProd) {
@@ -27,15 +29,15 @@ class ManifestLookup
       return [];
     }
     if ($this->isProd) {
-      return [$this->assetsWebPath.$this->entriesData[$entryName]['file']];
+      return [$this->publicPath.$this->entriesData[$entryName]['file']];
     } else {
       if (!$this->hasReturnedViteClient) {
-        $files = ['http://localhost:3000/assets/@vite/client'];
+        $files = [$this->urlServer.$this->publicPath.'@vite/client'];
         $this->hasReturnedViteClient = true;
       } else {
         $files = [];
       }
-      $files[] = 'http://localhost:3000/assets/'.$entryName;
+      $files[] = $this->urlServer.$this->publicPath.$entryName;
       return $files;
     }
   }
@@ -48,19 +50,22 @@ class ManifestLookup
 
     $files = [];
     foreach ($this->entriesData[$entryName]['css'] as $file) {
-      $files[] = $this->assetsWebPath.$file;
+      $files[] = $this->publicPath.$file;
     }
     return $files;
   }
 
   public function getJavascriptDependencies($entryName)
   {
-    if (!$this->isProd || !isset($this->entriesData[$entryName])) {
+    if (
+      !$this->isProd
+      || !isset($this->entriesData[$entryName])
+      || !isset($this->entriesData[$entryName]['imports'])) {
       return [];
     }
     $files = [];
     foreach ($this->entriesData[$entryName]['imports'] as $key) {
-      $files[] = $this->assetsWebPath.$this->entriesData[$key]['file'];
+      $files[] = $this->publicPath.$this->entriesData[$key]['file'];
     }
     return $files;
   }

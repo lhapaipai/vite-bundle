@@ -1,6 +1,6 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Asset;
+namespace Lhapaipai\ViteBundle\Asset;
 
 class TagRenderer
 {

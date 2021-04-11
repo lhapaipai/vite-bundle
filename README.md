@@ -10,19 +10,18 @@ composer require lhapaipai/vite-bundle
 
 create a directory structure for your js/css files:
 ```
-|-assets
-| |-app.js
-| |-app.css
-|...
-|-public
-|-composer.json
-|-package.json
-|-vite.config.js
+├──assets
+│ ├──app.js
+│ ├──app.css
+│...
+├──public
+├──composer.json
+├──package.json
+├──vite.config.js
 ```
 
 create or complete your `package.json`
 ```json
-// package.json
 {
   "scripts": {
     "dev": "vite",
@@ -36,7 +35,7 @@ create or complete your `package.json`
 
 create a `vite.config.js` file on your project root directory.
 the symfonyPlugin and the `manifest: true` are required for the bundle to work. when you run the `npm run dev` the plugin remove the manifest.json file so ViteBundle know that he must return the served files.
-when you run the `npm run build` the manifest.json is constructed and ViteBundle read is content to return the build files.
+when you run the `npm run build` the manifest.json is constructed and ViteBundle read his content to return the build files.
 ```js
 // vite.config.js
 import { resolve } from 'path';
@@ -115,12 +114,12 @@ lhapaipai_vite:
 {% block javascripts %}
     {{ parent() }}
 
-    {{ vite_entry_script_tags('entry1') }}
+    {{ vite_entry_script_tags('app.js') }}
 {% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
 
-    {{ vite_entry_link_tags('entry1') }}
+    {{ vite_entry_link_tags('app.js') }}
 {% endblock %}
 ```

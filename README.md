@@ -1,3 +1,8 @@
+<p align="center">
+  <img width="100" src="https://raw.githubusercontent.com/lhapaipai/vite-bundle/main/docs/symfony.svg" alt="Symfony logo">
+  <img width="100" src="https://raw.githubusercontent.com/lhapaipai/vite-bundle/main/docs/vitejs.svg" alt="Vite logo">
+</p>
+
 # ViteBundle : Symfony integration with Vite
 
 This bundle helping you render all of the dynamic `script` and `link` tags needed.

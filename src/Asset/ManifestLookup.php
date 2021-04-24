@@ -37,10 +37,21 @@ class ManifestLookup
   public function getCSSFiles($entryName)
   {
     if ($this->isProd && isset($this->entriesData[$entryName])) {
+      $entry = $this->entriesData[$entryName];
       $files = [];
-      if (isset($this->entriesData[$entryName]['css'])) {
-        foreach ($this->entriesData[$entryName]['css'] as $file) {
+      if (isset($entry['css'])) {
+        foreach ($entry['css'] as $file) {
           $files[] = $this->publicPath.$file;
+        }
+      }
+      if (isset($entry['imports'])) {
+        foreach($entry['imports'] as $importName) {
+          $importEntry = $this->entriesData[$importName];
+          if (isset($importEntry['css'])) {
+            foreach ($importEntry['css'] as $file) {
+              $files[] = $this->publicPath.$file;
+            }
+          }
         }
       }
       return $files;

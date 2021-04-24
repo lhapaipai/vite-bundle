@@ -32,30 +32,16 @@ class ManifestLookup
     } else {
       return [];
     }
-
-    // if ($this->isProd && !isset($this->entriesData[$entryName])) {
-    //   return [];
-    // }
-    // if ($this->isProd) {
-    //   return [$this->entriesData[$entryName]['file']];
-    // } else {
-    //   if (!$this->hasReturnedViteClient) {
-    //     $files = [$this->urlServer.'@vite/client'];
-    //     $this->hasReturnedViteClient = true;
-    //   } else {
-    //     $files = [];
-    //   }
-    //   $files[] = $this->urlServer.$entryName;
-    //   return $files;
-    // }
   }
 
   public function getCSSFiles($entryName)
   {
     if ($this->isProd && isset($this->entriesData[$entryName])) {
       $files = [];
-      foreach ($this->entriesData[$entryName]['css'] as $file) {
-        $files[] = $this->publicPath.$file;
+      if (isset($this->entriesData[$entryName]['css'])) {
+        foreach ($this->entriesData[$entryName]['css'] as $file) {
+          $files[] = $this->publicPath.$file;
+        }
       }
       return $files;
     } else {

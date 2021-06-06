@@ -16,10 +16,10 @@ class TagRenderer
     );
   }
 
-  public function renderReactRefreshInline()
+  public function renderReactRefreshInline($devServerUrl)
   {
     return '  <script type="module">
-    import RefreshRuntime from "/@react-refresh"
+    import RefreshRuntime from "'.$devServerUrl.'@react-refresh"
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type

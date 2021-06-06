@@ -30,7 +30,7 @@ class EntrypointRenderer
       if (!$this->hasReturnedViteClient) {
         $scriptTags[] = $this->tagRenderer->renderScriptFile($this->urlServer.$this->publicPath.'@vite/client');
         if (isset($options['dependency']) && $options['dependency'] === 'react') {
-          $scriptTags[] = $this->tagRenderer->renderReactRefreshInline();
+          $scriptTags[] = $this->tagRenderer->renderReactRefreshInline($this->urlServer.$this->publicPath);
         }
         $this->hasReturnedViteClient = true;
       }

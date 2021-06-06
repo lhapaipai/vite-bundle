@@ -51,7 +51,7 @@ if you are using React, you have to add this option in order to have FastRefresh
 
 Install the bundle with
 
-```
+```console
 composer require pentatrion/vite-bundle
 ```
 
@@ -91,6 +91,9 @@ when you run the `npm run build` the manifest.json is constructed and ViteBundle
 import { resolve } from "path";
 import { unlinkSync, existsSync } from "fs";
 
+/* if you're using React */
+// import reactRefresh from "@vitejs/plugin-react-refresh";
+
 const symfonyPlugin = {
   name: "symfony",
   configResolved(config) {
@@ -113,7 +116,10 @@ const symfonyPlugin = {
 };
 
 export default {
-  plugins: [symfonyPlugin],
+  plugins: [
+    /* reactRefresh(), // if you're using React */
+    symfonyPlugin,
+  ],
   server: {
     watch: {
       disableGlobbing: false,

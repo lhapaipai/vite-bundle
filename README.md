@@ -12,6 +12,7 @@ Essentially, he provide two twig functions to load the correct scripts into your
 {# any template or base layout where you need to include a JavaScript entry #}
 
 {% block stylesheets %}
+    {# specify here your entry point relative to the assets directory #}
     {{ vite_entry_link_tags('app.js') }}
 {% endblock %}
 
@@ -72,13 +73,13 @@ create or complete your `package.json`
 
 ```json
 {
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build"
-  },
-  "devDependencies": {
-    "vite": "^2.1.5"
-  }
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build"
+    },
+    "devDependencies": {
+        "vite": "^2.1.5"
+    }
 }
 ```
 
@@ -95,47 +96,51 @@ import { unlinkSync, existsSync } from "fs";
 // import reactRefresh from "@vitejs/plugin-react-refresh";
 
 const symfonyPlugin = {
-  name: "symfony",
-  configResolved(config) {
-    if (config.env.DEV && config.build.manifest) {
-      let buildDir = resolve(config.root, config.build.outDir, "manifest.json");
-      existsSync(buildDir) && unlinkSync(buildDir);
-    }
-  },
-  configureServer(devServer) {
-    let { watcher, ws } = devServer;
-    watcher.add(resolve("templates/**/*.twig"));
-    watcher.on("change", function (path) {
-      if (path.endsWith(".twig")) {
-        ws.send({
-          type: "full-reload",
+    name: "symfony",
+    configResolved(config) {
+        if (config.env.DEV && config.build.manifest) {
+            let buildDir = resolve(
+                config.root,
+                config.build.outDir,
+                "manifest.json"
+            );
+            existsSync(buildDir) && unlinkSync(buildDir);
+        }
+    },
+    configureServer(devServer) {
+        let { watcher, ws } = devServer;
+        watcher.add(resolve("templates/**/*.twig"));
+        watcher.on("change", function (path) {
+            if (path.endsWith(".twig")) {
+                ws.send({
+                    type: "full-reload",
+                });
+            }
         });
-      }
-    });
-  },
+    },
 };
 
 export default {
-  plugins: [
-    /* reactRefresh(), // if you're using React */
-    symfonyPlugin,
-  ],
-  server: {
-    watch: {
-      disableGlobbing: false,
+    plugins: [
+        /* reactRefresh(), // if you're using React */
+        symfonyPlugin,
+    ],
+    server: {
+        watch: {
+            disableGlobbing: false,
+        },
     },
-  },
-  root: "./assets",
-  base: "/build/",
-  build: {
-    manifest: true,
-    emptyOutDir: true,
-    assetsDir: "",
-    outDir: "../public/build/",
-    rollupOptions: {
-      input: ["./assets/app.js"],
+    root: "./assets",
+    base: "/build/",
+    build: {
+        manifest: true,
+        emptyOutDir: true,
+        assetsDir: "",
+        outDir: "../public/build/",
+        rollupOptions: {
+            input: ["./assets/app.js"],
+        },
     },
-  },
 };
 ```
 
@@ -146,12 +151,12 @@ default configuration
 ```yaml
 # config/packages/pentatrion_vite.yaml
 pentatrion_vite:
-  # Base public path when served in development or production
-  base: /build/
+    # Base public path when served in development or production
+    base: /build/
 
-  # Server options
-  server:
-    host: localhost
-    port: 3000
-    https: false
+    # Server options
+    server:
+        host: localhost
+        port: 3000
+        https: false
 ```

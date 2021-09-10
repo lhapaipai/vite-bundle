@@ -56,9 +56,11 @@ Install the bundle with
 composer require pentatrion/vite-bundle
 ```
 
-and it's over if you activate pentatrion/vite-bundle community recipe. Otherwise see manual installation at the end
+and it's over if you activate pentatrion/vite-bundle community recipe. Otherwise see manual installation at the end.
 
 ## Configuration
+
+If you choose a custom configuration of your `vite.config.js` file, you probably need to create a `config/packages/pentatrion_vite.yaml` file.
 
 default configuration
 

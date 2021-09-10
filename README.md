@@ -56,7 +56,32 @@ Install the bundle with
 composer require pentatrion/vite-bundle
 ```
 
-create a directory structure for your js/css files:
+and it's over if you activate pentatrion/vite-bundle community recipe. Otherwise see manual installation at the end
+
+## Configuration
+
+default configuration
+
+```yaml
+# config/packages/pentatrion_vite.yaml
+pentatrion_vite:
+    # Base public path when served in development or production
+    base: /build/
+
+    # Server options
+    server:
+        host: localhost
+        port: 3000
+        https: false
+```
+
+## Manual installation
+
+```console
+composer require pentatrion/vite-bundle
+```
+
+if you do not want to use the recipe or want to see in depth what is modified by it, create a directory structure for your js/css files:
 
 ```
 ├──assets
@@ -142,21 +167,4 @@ export default {
         },
     },
 };
-```
-
-## Configuration
-
-default configuration
-
-```yaml
-# config/packages/pentatrion_vite.yaml
-pentatrion_vite:
-    # Base public path when served in development or production
-    base: /build/
-
-    # Server options
-    server:
-        host: localhost
-        port: 3000
-        https: false
 ```

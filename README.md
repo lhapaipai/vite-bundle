@@ -6,11 +6,68 @@
 # ViteBundle : Symfony integration with Vite
 
 This bundle helping you render all of the dynamic `script` and `link` tags needed.
-Essentially, he provide two twig functions to load the correct scripts into your templates.
+Essentially, he provides two twig functions to load the correct scripts into your templates.
+
+## Installation
+
+Install the bundle with
+
+```console
+composer require pentatrion/vite-bundle
+```
+
+if you don't have a `package.json` file already you can execute the `pentatrion/vite-bundle` community recipe. Otherwise see [manual installation](#manual-installation) at the end.
+
+```bash
+npm install
+
+# start your vite dev server
+npm run dev
+```
+
+Add this twig functions in any template or base layout where you need to include a JavaScript entry.
 
 ```twig
-{# any template or base layout where you need to include a JavaScript entry #}
+{% block stylesheets %}
+    {# specify here your entry point relative to the assets directory #}
+    {{ vite_entry_link_tags('app.js') }}
+{% endblock %}
 
+{% block javascripts %}
+    {{ vite_entry_script_tags('app.js') }}
+{% endblock %}
+```
+
+note : In your twig functions, you have to specify your entrypoint relative to your assets directory. Be careful to **put the .js extension** for both functions.
+
+if you are using React, you have to add this option in order to have FastRefresh.
+
+```twig
+{{ vite_entry_script_tags('app.js', { dependency: 'react' }) }}
+```
+
+## Configuration
+
+If you choose a custom configuration of your `vite.config.js` file, you probably need to create a `config/packages/pentatrion_vite.yaml` file.
+
+default configuration
+
+```yaml
+# config/packages/pentatrion_vite.yaml
+pentatrion_vite:
+    # Base public path when served in development or production
+    base: /build/
+
+    # Server options
+    server:
+        host: localhost
+        port: 3000
+        https: false
+```
+
+## Explication
+
+```twig
 {% block stylesheets %}
     {# specify here your entry point relative to the assets directory #}
     {{ vite_entry_link_tags('app.js') }}
@@ -40,41 +97,6 @@ would render in prod:
 
 <!-- vite_entry_script_tags('app.js') -->
 <script src="/build/app.[hash].js" type="module"></script>
-```
-
-if you are using React, you have to add this option in order to have FastRefresh.
-
-```twig
-{{ vite_entry_script_tags('app.js', { dependency: 'react' }) }}
-```
-
-## Installation
-
-Install the bundle with
-
-```console
-composer require pentatrion/vite-bundle
-```
-
-and it's over if you activate pentatrion/vite-bundle community recipe. Otherwise see manual installation at the end.
-
-## Configuration
-
-If you choose a custom configuration of your `vite.config.js` file, you probably need to create a `config/packages/pentatrion_vite.yaml` file.
-
-default configuration
-
-```yaml
-# config/packages/pentatrion_vite.yaml
-pentatrion_vite:
-    # Base public path when served in development or production
-    base: /build/
-
-    # Server options
-    server:
-        host: localhost
-        port: 3000
-        https: false
 ```
 
 ## Manual installation

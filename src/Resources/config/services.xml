@@ -30,5 +30,15 @@
       <argument type="service" id="vite.entrypoint_renderer" />
     </service>
 
+    <service id="vite.controller" alias="Pentatrion\ViteBundle\Controller\ViteController" public="true" />
+    <service id="Pentatrion\ViteBundle\Controller\ViteController" public="true">
+      <tag name="controller.service_arguments" />
+      <argument>%pentatrion_vite.server%</argument>
+      <argument>%pentatrion_vite.base%</argument>
+      <argument type="service" id=".debug.http_client" />
+    </service>
+
+
+
   </services>
 </container>

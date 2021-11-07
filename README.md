@@ -65,7 +65,114 @@ pentatrion_vite:
         https: false
 ```
 
-## Explication
+## Usage tips
+
+### Migration from Webpack Encore
+
+If you come from Webpack pay attention to some differences with the name of the entry points.
+
+```js
+Encore.addEntry("app", "./assets/app.js");
+```
+
+```twig
+{% block stylesheets %}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ encore_entry_script_tags('app') }}
+{% endblock %}
+```
+
+will become
+
+```js
+// vite.config.js
+export default {
+    // ...
+    build: {
+        rollupOptions: {
+            input: ["./assets/app.js"],
+        },
+    },
+};
+```
+
+```twig
+{% block javascripts %}
+    {# 1. you need to add the extension
+       2. you specify the entry point relative to the root option specified in the vite.config.js ("./assets") #}
+    {{ vite_entry_script_tags("app.js") }}
+{% endblock %}
+
+{% block stylesheets %}
+    {# 1. be careful it's not app.css !!
+       2. you specify the entry point relative to the root option specified in the vite.config.js ("./assets") #}
+    {{ vite_entry_link_tags("app.js") }}
+{% endblock %}
+```
+
+### https / http in Development
+
+By default, your Vite dev server don't use https and can cause unwanted reload if you serve your application with https. I advise you to choose between the 2 protocols and apply that same choice for your Vite dev server and Symfony local server
+
+```console
+npm run dev
+symfony serve --no-tls
+```
+
+browse : `http://127.0.0.1:8000`
+
+or
+
+```js
+// vite.config.js
+export default defineConfig({
+    // ...
+    server: {
+        https: true,
+    },
+});
+```
+
+```yaml
+# config/packages/pentatrion_vite.yaml
+pentatrion_vite:
+    # Server options
+    server:
+        https: true
+```
+
+```console
+npm run dev
+symfony serve
+```
+
+browse : `https://127.0.0.1:8000`
+
+### Dependency Pre-Bundling
+
+Initially in a Vite project, `index.html` is the entry point to your application. When you run your dev serve, Vite will crawl your source code and automatically discover dependency imports.
+
+Because we don't have any `index.html`, Vite can't do this Pre-bundling step when he starts but when you browse a page where he finds a package he does not already have cached. Vite will re-run the dep bundling process and reload the page.
+
+this behavior can be annoying if you have a lot of dependencies because it creates a lot of page reloads before getting to the final render.
+
+you can limit this by declaring in the `vite.config.js` the most common dependencies of your project.
+
+```js
+// vite.config.js
+
+export default defineConfig({
+    // ...
+    optimizeDeps: {
+        include: ["my-package"],
+    },
+});
+```
+
+## How this bundle works
 
 ```twig
 {% block stylesheets %}
@@ -99,6 +206,8 @@ would render in prod:
 <script src="/build/app.[hash].js" type="module"></script>
 ```
 
+In development environment, the bundle also acts as a proxy by forwarding requests that are not intended for it to the Vite dev server.
+
 ## Manual installation
 
 ```console
@@ -116,6 +225,15 @@ if you do not want to use the recipe or want to see in depth what is modified by
 ├──composer.json
 ├──package.json
 ├──vite.config.js
+```
+
+add vite route to your dev Symfony app.
+
+```yaml
+# config/routes/dev/pentatrion_vite.yaml
+_pentatrion_vite:
+    prefix: /build
+    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
 ```
 
 create or complete your `package.json`

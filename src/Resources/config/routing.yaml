@@ -1,0 +1,6 @@
+pentatrion_vite_build_proxy:
+    path: /{path}
+    defaults:
+        _controller: Pentatrion\ViteBundle\Controller\ViteController::proxyBuild
+    requirements:
+        path: ".+"

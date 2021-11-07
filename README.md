@@ -91,6 +91,7 @@ will become
 // vite.config.js
 export default {
     // ...
+    root: "./assets",
     build: {
         rollupOptions: {
             input: ["./assets/app.js"],

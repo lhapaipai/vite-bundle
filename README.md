@@ -30,20 +30,18 @@ Add this twig functions in any template or base layout where you need to include
 ```twig
 {% block stylesheets %}
     {# specify here your entry point relative to the assets directory #}
-    {{ vite_entry_link_tags('app.js') }}
+    {{ vite_entry_link_tags('app') }}
 {% endblock %}
 
 {% block javascripts %}
-    {{ vite_entry_script_tags('app.js') }}
+    {{ vite_entry_script_tags('app') }}
 {% endblock %}
 ```
-
-note : In your twig functions, you have to specify your entrypoint relative to your assets directory. Be careful to **put the .js extension** for both functions.
 
 if you are using React, you have to add this option in order to have FastRefresh.
 
 ```twig
-{{ vite_entry_script_tags('app.js', { dependency: 'react' }) }}
+{{ vite_entry_script_tags('app', { dependency: 'react' }) }}
 ```
 
 ## Configuration
@@ -94,7 +92,9 @@ export default {
     root: "./assets",
     build: {
         rollupOptions: {
-            input: ["./assets/app.js"],
+            input: {
+                app: "./assets/app.js"
+            },
         },
     },
 };
@@ -102,15 +102,11 @@ export default {
 
 ```twig
 {% block javascripts %}
-    {# 1. you need to add the extension
-       2. you specify the entry point relative to the root option specified in the vite.config.js ("./assets") #}
-    {{ vite_entry_script_tags("app.js") }}
+    {{ vite_entry_script_tags("app") }}
 {% endblock %}
 
 {% block stylesheets %}
-    {# 1. be careful it's not app.css !!
-       2. you specify the entry point relative to the root option specified in the vite.config.js ("./assets") #}
-    {{ vite_entry_link_tags("app.js") }}
+    {{ vite_entry_link_tags("app") }}
 {% endblock %}
 ```
 
@@ -178,20 +174,20 @@ export default defineConfig({
 ```twig
 {% block stylesheets %}
     {# specify here your entry point relative to the assets directory #}
-    {{ vite_entry_link_tags('app.js') }}
+    {{ vite_entry_link_tags('app') }}
 {% endblock %}
 
 {% block javascripts %}
-    {{ vite_entry_script_tags('app.js') }}
+    {{ vite_entry_script_tags('app') }}
 {% endblock %}
 ```
 
 would render in dev:
 
 ```html
-<!--Nothing with vite_entry_link_tags('app.js') -->
+<!--Nothing with vite_entry_link_tags('app') -->
 
-<!-- vite_entry_script_tags('app.js') -->
+<!-- vite_entry_script_tags('app') -->
 <script src="http://localhost:3000/build/@vite/client" type="module"></script>
 <script src="http://localhost:3000/build/app.js" type="module"></script>
 ```
@@ -199,11 +195,11 @@ would render in dev:
 would render in prod:
 
 ```html
-<!-- vite_entry_link_tags('app.js') -->
+<!-- vite_entry_link_tags('app') -->
 <link rel="stylesheet" href="/build/app.[hash].css" />
 <link rel="modulepreload" href="/build/vendor.[hash].js" />
 
-<!-- vite_entry_script_tags('app.js') -->
+<!-- vite_entry_script_tags('app') -->
 <script src="/build/app.[hash].js" type="module"></script>
 ```
 
@@ -257,48 +253,33 @@ when you run the `npm run build` the manifest.json is constructed and ViteBundle
 
 ```js
 // vite.config.js
+import {defineConfig} from "vite";
+import symfonyPlugin from "vite-plugin-symfony";
+
 import { resolve } from "path";
 import { unlinkSync, existsSync } from "fs";
 
 /* if you're using React */
 // import reactRefresh from "@vitejs/plugin-react-refresh";
 
-const symfonyPlugin = {
-    name: "symfony",
-    configResolved(config) {
-        if (config.env.DEV && config.build.manifest) {
-            let buildDir = resolve(
-                config.root,
-                config.build.outDir,
-                "manifest.json"
-            );
-            existsSync(buildDir) && unlinkSync(buildDir);
-        }
-    },
-    configureServer(devServer) {
-        let { watcher, ws } = devServer;
-        watcher.add(resolve("templates/**/*.twig"));
-        watcher.on("change", function (path) {
-            if (path.endsWith(".twig")) {
-                ws.send({
-                    type: "full-reload",
-                });
-            }
-        });
-    },
-};
-
 export default {
     plugins: [
         /* reactRefresh(), // if you're using React */
-        symfonyPlugin,
+        symfonyPlugin(),
     ],
     server: {
         watch: {
             disableGlobbing: false,
         },
+        /* you need to authorize Vite to have a build 
+           directory outside your root directory */
+        fs: {
+            strict: false,
+            allow: [".."],
+        },
     },
     root: "./assets",
+    /* your outDir web path prefix */
     base: "/build/",
     build: {
         manifest: true,
@@ -306,8 +287,43 @@ export default {
         assetsDir: "",
         outDir: "../public/build/",
         rollupOptions: {
-            input: ["./assets/app.js"],
+            input: {
+              app: "./assets/app.ts"
+            },
         },
     },
 };
+```
+
+## Migration from v0.2.x to v1.x
+
+In version v0.2.x, you have to specify your entry points in an array in your `vite.config.js` file. in v1.x you need to specify your entry points in an object.
+
+```diff
+-input: ["./assets/app.js"],
++input: {
++  app: "./assets/app.js"
++},
+```
+
+this way you need to specify the named entry point in your twig functions.
+
+```diff
+-{{ vite_entry_script_tags('app.js') }}
++{{ vite_entry_script_tags('app') }}
+-{{ vite_entry_link_tags('app.js') }}
++{{ vite_entry_link_tags('app') }}
+```
+
+In v1.x, your symfonyPlugin is a **function** and come from the `vite-plugin-symfony` package.
+
+```diff
++ import symfonyPlugin from 'vite-plugin-symfony';
+
+    // ...
+    plugins: [
+        /* reactRefresh(), // if you're using React */
+-       symfonyPlugin,
++       symfonyPlugin(),
+    ],
 ```

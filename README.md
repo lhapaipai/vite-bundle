@@ -1,6 +1,5 @@
 <p align="center">
-  <img width="100" src="https://raw.githubusercontent.com/lhapaipai/vite-bundle/main/docs/symfony.svg" alt="Symfony logo">
-  <img width="100" src="https://raw.githubusercontent.com/lhapaipai/vite-bundle/main/docs/vitejs.svg" alt="Vite logo">
+  <img width="100" src="https://raw.githubusercontent.com/lhapaipai/vite-bundle/main/docs/symfony-vite.svg" alt="Symfony logo">
 </p>
 
 # ViteBundle : Symfony integration with Vite
@@ -16,7 +15,7 @@ Install the bundle with
 composer require pentatrion/vite-bundle
 ```
 
-if you don't have a `package.json` file already you can execute the `pentatrion/vite-bundle` community recipe. Otherwise see [manual installation](#manual-installation) at the end.
+if you don't have a `package.json` file already you can execute the `pentatrion/vite-bundle` community recipe. Otherwise see [manual installation](https://github.com/lhapaipai/vite-bundle/blob/main/docs/manual-installation.md).
 
 ```bash
 npm install
@@ -137,6 +136,23 @@ export default defineConfig({
     },
 });
 ```
+### One file by entry point
+
+Vite try to split your js files into multiple smaller files shared between entry points. In some cases, it's not a good choise and you can prefer output one js file by entry point.
+
+```js
+// vite.config.js
+
+export default defineConfig({
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
+});
+```
 
 ### https / http in Development
 
@@ -223,6 +239,41 @@ export default {
 ```
 
 
+
+## Migration from v0.2.x to v1.x
+
+In version v0.2.x, you have to specify your entry points in an array in your `vite.config.js` file. in v1.x you need to specify your entry points in an object.
+
+```diff
+-input: ["./assets/app.js"],
++input: {
++  app: "./assets/app.js"
++},
+```
+
+this way you need to specify the named entry point in your twig functions.
+
+```diff
+-{{ vite_entry_script_tags('app.js') }}
++{{ vite_entry_script_tags('app') }}
+-{{ vite_entry_link_tags('app.js') }}
++{{ vite_entry_link_tags('app') }}
+```
+
+In v1.x, your symfonyPlugin is a **function** and come from the `vite-plugin-symfony` package.
+
+```diff
++ import symfonyPlugin from 'vite-plugin-symfony';
+
+    // ...
+    plugins: [
+        /* reactRefresh(), // if you're using React */
+-       symfonyPlugin,
++       symfonyPlugin(),
+    ],
+```
+
+
 ## How this bundle works
 
 ```twig
@@ -259,113 +310,3 @@ would render in prod:
 
 In development environment, the bundle also acts as a proxy by forwarding requests that are not intended for it to the Vite dev server.
 
-## Manual installation
-
-```console
-composer require pentatrion/vite-bundle
-```
-
-if you do not want to use the recipe or want to see in depth what is modified by it, create a directory structure for your js/css files:
-
-```
-├──assets
-│ ├──app.js
-│ ├──app.css
-│...
-├──public
-├──composer.json
-├──package.json
-├──vite.config.js
-```
-
-add vite route to your dev Symfony app.
-
-```yaml
-# config/routes/dev/pentatrion_vite.yaml
-_pentatrion_vite:
-    prefix: /build
-    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
-```
-
-create or complete your `package.json`
-
-```json
-{
-    "scripts": {
-        "dev": "vite",
-        "build": "vite build"
-    },
-    "devDependencies": {
-        "vite": "^2.6",
-        "vite-plugin-symfony": "^0.1.2"
-    }
-}
-```
-
-create a `vite.config.js` file on your project root directory.
-the symfonyPlugin and the `manifest: true` are required for the bundle to work. when you run the `npm run dev` the plugin remove the manifest.json file so ViteBundle know that he must return the served files.
-when you run the `npm run build` the manifest.json is constructed and ViteBundle read his content to return the build files.
-
-```js
-// vite.config.js
-import {defineConfig} from "vite";
-import symfonyPlugin from "vite-plugin-symfony";
-
-/* if you're using React */
-// import reactRefresh from "@vitejs/plugin-react-refresh";
-
-export default defineConfig({
-    plugins: [
-        /* reactRefresh(), // if you're using React */
-        symfonyPlugin(),
-    ],
-    root: "./assets",
-
-    /* your outDir prefix relative to web path */
-    base: "/build/",
-    build: {
-        manifest: true,
-        emptyOutDir: true,
-        assetsDir: "",
-        outDir: "../public/build/",
-        rollupOptions: {
-            input: {
-              app: "./assets/app.ts"
-            },
-        },
-    },
-});
-```
-
-## Migration from v0.2.x to v1.x
-
-In version v0.2.x, you have to specify your entry points in an array in your `vite.config.js` file. in v1.x you need to specify your entry points in an object.
-
-```diff
--input: ["./assets/app.js"],
-+input: {
-+  app: "./assets/app.js"
-+},
-```
-
-this way you need to specify the named entry point in your twig functions.
-
-```diff
--{{ vite_entry_script_tags('app.js') }}
-+{{ vite_entry_script_tags('app') }}
--{{ vite_entry_link_tags('app.js') }}
-+{{ vite_entry_link_tags('app') }}
-```
-
-In v1.x, your symfonyPlugin is a **function** and come from the `vite-plugin-symfony` package.
-
-```diff
-+ import symfonyPlugin from 'vite-plugin-symfony';
-
-    // ...
-    plugins: [
-        /* reactRefresh(), // if you're using React */
--       symfonyPlugin,
-+       symfonyPlugin(),
-    ],
-```

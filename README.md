@@ -42,6 +42,7 @@ if you are using React, you have to add this option in order to have FastRefresh
 ```twig
 {{ vite_entry_script_tags('app', { dependency: 'react' }) }}
 ```
+If you come from Webpack Encore, check the [differences between Webpack Encore Bundle and Vite Bundle](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md)
 
 ## Bundle Configuration
 
@@ -90,22 +91,21 @@ export default defineConfig({
     ],
     root: "./assets",      /* DO NOT CHANGE */
 
-    /* your outDir prefix relative to web path */
-    base: "/build/",
     build: {
+        rollupOptions: {
+            input: {
+                app: "./assets/app.ts"
+            },
+        },
+        outDir: "../public/build/",
+
         manifest: true,    /* DO NOT CHANGE */
         emptyOutDir: true, /* DO NOT CHANGE */
         assetsDir: "",     /* DO NOT CHANGE */
-
-        /* do not put any files in outDir since it will be cleaned 
-           after each build */
-        outDir: "../public/build/",
-        rollupOptions: {
-            input: {
-              app: "./assets/app.ts"
-            },
-        },
     },
+
+    /* your outDir prefix relative to web path */
+    base: "/build/",
 });
 ```
 
@@ -192,52 +192,6 @@ symfony serve
 ```
 
 browse : `https://127.0.0.1:8000`
-
-### Migration from Webpack Encore
-
-If you come from Webpack pay attention to some differences with the name of the entry points.
-
-```js
-Encore.addEntry("app", "./assets/app.js");
-```
-
-```twig
-{% block stylesheets %}
-    {{ encore_entry_link_tags('app') }}
-{% endblock %}
-
-{% block javascripts %}
-    {{ encore_entry_script_tags('app') }}
-{% endblock %}
-```
-
-will become
-
-```js
-// vite.config.js
-export default {
-    // ...
-    root: "./assets",
-    build: {
-        rollupOptions: {
-            input: {
-                app: "./assets/app.js"
-            },
-        },
-    },
-};
-```
-
-```twig
-{% block javascripts %}
-    {{ vite_entry_script_tags("app") }}
-{% endblock %}
-
-{% block stylesheets %}
-    {{ vite_entry_link_tags("app") }}
-{% endblock %}
-```
-
 
 
 ## Migration from v0.2.x to v1.x

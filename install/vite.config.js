@@ -1,4 +1,4 @@
-import {defineConfig} from "vite";
+import { defineConfig } from "vite";
 import symfonyPlugin from "vite-plugin-symfony";
 
 /* if you're using React */

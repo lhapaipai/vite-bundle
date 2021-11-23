@@ -44,9 +44,9 @@ if you are using React, you have to add this option in order to have FastRefresh
 {{ vite_entry_script_tags('app', { dependency: 'react' }) }}
 ```
 
-## Configuration
+## Bundle Configuration
 
-If you choose a custom configuration of your `vite.config.js` file, you probably need to create a `config/packages/pentatrion_vite.yaml` file.
+If you change some properties in your `vite.config.js` file, you probably need to create a `config/packages/pentatrion_vite.yaml` file to postpone these changes. it concerns `server.host`, `server.port`, `server.https` and `build.outdir` (and also `base`).
 
 default configuration
 
@@ -63,7 +63,119 @@ pentatrion_vite:
         https: false
 ```
 
+As long as the symfony recipe update has not yet been merged add manually vite route to your dev Symfony app. Modify if necessary the prefix by following the `base` property without final slash.
+```yaml
+# config/routes/dev/pentatrion_vite.yaml
+_pentatrion_vite:
+    prefix: /build
+    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
+```
+
+
+## Vite config
+
+For the transparency, I decided not to create an overlay of the config file `vite.config.js`. However some config properties must not be modified for the bundle to work.
+
+```js
+// vite.config.js
+import {defineConfig} from "vite";
+import symfonyPlugin from "vite-plugin-symfony";
+
+/* if you're using React */
+// import reactRefresh from "@vitejs/plugin-react-refresh";
+
+export default defineConfig({
+    plugins: [
+        /* reactRefresh(), // if you're using React */
+        symfonyPlugin(),
+    ],
+    root: "./assets",      /* DO NOT CHANGE */
+
+    /* your outDir prefix relative to web path */
+    base: "/build/",
+    build: {
+        manifest: true,    /* DO NOT CHANGE */
+        emptyOutDir: true, /* DO NOT CHANGE */
+        assetsDir: "",     /* DO NOT CHANGE */
+
+        /* do not put any files in outDir since it will be cleaned 
+           after each build */
+        outDir: "../public/build/",
+        rollupOptions: {
+            input: {
+              app: "./assets/app.ts"
+            },
+        },
+    },
+});
+```
+
+
 ## Usage tips
+
+### Dependency Pre-Bundling
+
+Initially in a Vite project, `index.html` is the entry point to your application. When you run your dev serve, Vite will crawl your source code and automatically discover dependency imports.
+
+Because we don't have any `index.html`, Vite can't do this Pre-bundling step when he starts but when you browse a page where he finds a package he does not already have cached. Vite will re-run the dep bundling process and reload the page.
+
+this behavior can be annoying if you have a lot of dependencies because it creates a lot of page reloads before getting to the final render.
+
+you can limit this by declaring in the `vite.config.js` the most common dependencies of your project.
+
+```js
+// vite.config.js
+
+export default defineConfig({
+    server: {
+        //Set to true to force dependency pre-bundling.
+        force: true,
+    },
+    // ...
+    optimizeDeps: {
+        include: ["my-package"],
+    },
+});
+```
+
+### https / http in Development
+
+By default, your Vite dev server don't use https and can cause unwanted reload if you serve your application with https. I advise you to choose between the 2 protocols and apply that same choice for your Vite dev server and Symfony local server
+
+```console
+npm run dev
+symfony serve --no-tls
+```
+
+browse : `http://127.0.0.1:8000`
+
+or
+
+```js
+// vite.config.js
+export default defineConfig({
+
+    // ...
+    server: {
+        https: true,
+    },
+});
+```
+
+```yaml
+# config/packages/pentatrion_vite.yaml
+pentatrion_vite:
+    # Server options
+    server:
+        https: true
+```
+
+```console
+npm run dev
+symfony serve
+```
+
+browse : `https://127.0.0.1:8000`
 
 ### Migration from Webpack Encore
 
@@ -110,64 +222,6 @@ export default {
 {% endblock %}
 ```
 
-### https / http in Development
-
-By default, your Vite dev server don't use https and can cause unwanted reload if you serve your application with https. I advise you to choose between the 2 protocols and apply that same choice for your Vite dev server and Symfony local server
-
-```console
-npm run dev
-symfony serve --no-tls
-```
-
-browse : `http://127.0.0.1:8000`
-
-or
-
-```js
-// vite.config.js
-export default defineConfig({
-    // ...
-    server: {
-        https: true,
-    },
-});
-```
-
-```yaml
-# config/packages/pentatrion_vite.yaml
-pentatrion_vite:
-    # Server options
-    server:
-        https: true
-```
-
-```console
-npm run dev
-symfony serve
-```
-
-browse : `https://127.0.0.1:8000`
-
-### Dependency Pre-Bundling
-
-Initially in a Vite project, `index.html` is the entry point to your application. When you run your dev serve, Vite will crawl your source code and automatically discover dependency imports.
-
-Because we don't have any `index.html`, Vite can't do this Pre-bundling step when he starts but when you browse a page where he finds a package he does not already have cached. Vite will re-run the dep bundling process and reload the page.
-
-this behavior can be annoying if you have a lot of dependencies because it creates a lot of page reloads before getting to the final render.
-
-you can limit this by declaring in the `vite.config.js` the most common dependencies of your project.
-
-```js
-// vite.config.js
-
-export default defineConfig({
-    // ...
-    optimizeDeps: {
-        include: ["my-package"],
-    },
-});
-```
 
 ## How this bundle works
 
@@ -242,7 +296,8 @@ create or complete your `package.json`
         "build": "vite build"
     },
     "devDependencies": {
-        "vite": "^2.1.5"
+        "vite": "^2.6",
+        "vite-plugin-symfony": "^0.1.2"
     }
 }
 ```
@@ -256,30 +311,17 @@ when you run the `npm run build` the manifest.json is constructed and ViteBundle
 import {defineConfig} from "vite";
 import symfonyPlugin from "vite-plugin-symfony";
 
-import { resolve } from "path";
-import { unlinkSync, existsSync } from "fs";
-
 /* if you're using React */
 // import reactRefresh from "@vitejs/plugin-react-refresh";
 
-export default {
+export default defineConfig({
     plugins: [
         /* reactRefresh(), // if you're using React */
         symfonyPlugin(),
     ],
-    server: {
-        watch: {
-            disableGlobbing: false,
-        },
-        /* you need to authorize Vite to have a build 
-           directory outside your root directory */
-        fs: {
-            strict: false,
-            allow: [".."],
-        },
-    },
     root: "./assets",
-    /* your outDir web path prefix */
+
+    /* your outDir prefix relative to web path */
     base: "/build/",
     build: {
         manifest: true,
@@ -292,7 +334,7 @@ export default {
             },
         },
     },
-};
+});
 ```
 
 ## Migration from v0.2.x to v1.x

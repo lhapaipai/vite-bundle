@@ -6,11 +6,16 @@ class EntrypointsLookup
 {
 
   private $entriesData;
+  private $fileExist = false;
   private $isProd;
   private $viteServer = null;
 
   public function __construct($entrypointsFilePath)
   {
+    if (!file_exists($entrypointsFilePath)) {
+      return;
+    }
+    $this->fileExist = true;
     $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
 
     $this->isProd = $fileInfos['isProd'];
@@ -18,6 +23,11 @@ class EntrypointsLookup
     if (!$this->isProd) {
       $this->viteServer = $fileInfos['viteServer'];
     }
+  }
+
+  public function hasFile()
+  {
+    return $this->fileExist;
   }
 
   public function isProd()

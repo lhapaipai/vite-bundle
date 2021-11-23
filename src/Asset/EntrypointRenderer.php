@@ -17,6 +17,10 @@ class EntrypointRenderer
 
   public function renderScripts(string $entryName, array $options = [])
   {
+    if (!$this->entrypointsLookup->hasFile()) {
+      return '';
+    }
+
     $scriptTags = [];
     if (!$this->entrypointsLookup->isProd()) {
       $viteServer = $this->entrypointsLookup->getViteServer();
@@ -37,7 +41,7 @@ class EntrypointRenderer
 
   public function renderLinks(string $entryName)
   {
-    if (!$this->entrypointsLookup->isProd()) {
+    if (!$this->entrypointsLookup->hasFile() || !$this->entrypointsLookup->isProd()) {
       return '';
     }
 

@@ -1,6 +1,6 @@
 {
     "name": "pentatrion/vite-bundle",
-    "description": "Integration with your Symfony app & Vite",
+    "description": "Vite integration for your Symfony app",
     "keywords": [
         "bundle",
         "symfony",

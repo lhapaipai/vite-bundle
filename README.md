@@ -17,6 +17,16 @@ composer require pentatrion/vite-bundle
 
 if you don't have a `package.json` file already you can execute the `pentatrion/vite-bundle` community recipe. Otherwise see [manual installation](https://github.com/lhapaipai/vite-bundle/blob/main/docs/manual-installation.md).
 
+As long as the symfony recipe update has not yet been merged, add manually vite route to your dev Symfony app. Modify if necessary the prefix by following the `vite.config.js` `base` property without final slash.
+
+```yaml
+# config/routes/dev/pentatrion_vite.yaml
+_pentatrion_vite:
+    prefix: /build
+    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
+```
+
+
 ```bash
 npm install
 
@@ -28,7 +38,6 @@ Add this twig functions in any template or base layout where you need to include
 
 ```twig
 {% block stylesheets %}
-    {# specify here your entry point relative to the assets directory #}
     {{ vite_entry_link_tags('app') }}
 {% endblock %}
 
@@ -42,7 +51,7 @@ if you are using React, you have to add this option in order to have FastRefresh
 ```twig
 {{ vite_entry_script_tags('app', { dependency: 'react' }) }}
 ```
-If you come from Webpack Encore, check the [differences between Webpack Encore Bundle and Vite Bundle](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md)
+If you come from Webpack Encore, check the [differences between Webpack Encore Bundle and Vite Bundle](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md).
 
 ## Bundle Configuration
 
@@ -62,15 +71,6 @@ pentatrion_vite:
         port: 3000
         https: false
 ```
-
-As long as the symfony recipe update has not yet been merged add manually vite route to your dev Symfony app. Modify if necessary the prefix by following the `base` property without final slash.
-```yaml
-# config/routes/dev/pentatrion_vite.yaml
-_pentatrion_vite:
-    prefix: /build
-    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
-```
-
 
 ## Vite config
 
@@ -232,7 +232,6 @@ In v1.x, your symfonyPlugin is a **function** and come from the `vite-plugin-sym
 
 ```twig
 {% block stylesheets %}
-    {# specify here your entry point relative to the assets directory #}
     {{ vite_entry_link_tags('app') }}
 {% endblock %}
 

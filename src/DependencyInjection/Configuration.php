@@ -15,6 +15,7 @@ class Configuration implements ConfigurationInterface
     $rootNode
       ->children()
         ->scalarNode('base')->defaultValue('/build/')->end()
+        ->scalarNode('public_dir')->defaultValue('/public')->end()
         ->arrayNode('server')
           ->addDefaultsIfNotSet()
           ->children()

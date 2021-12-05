@@ -1,2 +1,5 @@
 /.vscode/
 /.local
+.idea
+composer.lock
+vendor

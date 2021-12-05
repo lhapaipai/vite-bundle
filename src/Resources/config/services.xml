@@ -9,7 +9,7 @@
     <defaults public="false" />
 
     <service id="vite.entrypoints_lookup" class="Pentatrion\ViteBundle\Asset\EntrypointsLookup">
-      <argument>%kernel.project_dir%/public%pentatrion_vite.base%entrypoints.json</argument>
+      <argument>%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json</argument>
     </service>
 
     <service id="vite.entrypoint_renderer" class="Pentatrion\ViteBundle\Asset\EntrypointRenderer">
@@ -26,6 +26,7 @@
       <tag name="controller.service_arguments" />
       <argument>%pentatrion_vite.server%</argument>
       <argument>%pentatrion_vite.base%</argument>
+      <argument>%pentatrion_vite.public_dir%</argument>
       <argument type="service" id="http_client" />
     </service>
 

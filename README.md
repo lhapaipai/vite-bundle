@@ -64,7 +64,8 @@ default configuration
 pentatrion_vite:
     # Base public path when served in development or production
     base: /build/
-
+    # path to the build folder relative to the Root directory
+    public_dir: /public
     # Server options
     server:
         host: localhost

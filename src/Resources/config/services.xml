@@ -26,7 +26,6 @@
       <tag name="controller.service_arguments" />
       <argument>%pentatrion_vite.server%</argument>
       <argument>%pentatrion_vite.base%</argument>
-      <argument>%pentatrion_vite.public_dir%</argument>
       <argument type="service" id="http_client" />
     </service>
 

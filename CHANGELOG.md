@@ -1,3 +1,15 @@
+## v1.1.0
+
+- Add public_dir conf
+
+## v1.0.2
+
+- fix vite.config path error with windows
+
+## v1.0.1 
+
+- fix exception when entrypoints.json is missing
+
 ## v1.0.0
 
 - Twig functions refer to named entry points not js file

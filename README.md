@@ -64,7 +64,7 @@ default configuration
 pentatrion_vite:
     # Base public path when served in development or production
     base: /build/
-    # path to the build folder relative to the root directory
+    # path to the web root relative to the Symfony project root directory
     public_dir: /public
     # Server options
     server:
@@ -95,7 +95,8 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: {
-                app: "./assets/app.ts"
+                app: "./app.ts" /* relative to the root option */
+                /* if you use vite-plugin-symfony < 0.2, it's "./assets/app.ts" */
             },
         },
         outDir: "../public/build/",
@@ -200,9 +201,9 @@ browse : `https://127.0.0.1:8000`
 In version v0.2.x, you have to specify your entry points in an array in your `vite.config.js` file. in v1.x you need to specify your entry points in an object.
 
 ```diff
--input: ["./assets/app.js"],
+-input: ["./app.js"],
 +input: {
-+  app: "./assets/app.js"
++  app: "./app.js"
 +},
 ```
 

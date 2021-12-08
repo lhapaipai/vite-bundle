@@ -6,7 +6,7 @@
     },
     "license": "UNLICENSED",
     "devDependencies": {
-        "vite": "^2.6",
-        "vite-plugin-symfony": "^0.1.2"
+        "vite": "~2.7",
+        "vite-plugin-symfony": "^0.2"
     }
 }

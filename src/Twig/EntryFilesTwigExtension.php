@@ -15,7 +15,7 @@ class EntryFilesTwigExtension extends AbstractExtension
     $this->entrypointRenderer = $entrypointRenderer;
   }
 
-  public function getFunctions()
+  public function getFunctions(): array
   {
     return [
       new TwigFunction('vite_entry_script_tags', [$this, 'renderViteScriptTags'], ['is_safe' => ['html']]),

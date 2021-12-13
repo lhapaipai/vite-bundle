@@ -46,6 +46,8 @@ Add this twig functions in any template or base layout where you need to include
 {% endblock %}
 ```
 
+if you experience unwanted reloads of your application, read the section [https/http in development](#https--http-in-development)
+
 if you are using React, you have to add this option in order to have FastRefresh.
 
 ```twig

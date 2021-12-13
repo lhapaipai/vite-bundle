@@ -9,13 +9,13 @@ Essentially, he provides two twig functions to load the correct scripts into you
 
 ## Installation
 
+If you come from Webpack Encore, check the [migration](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md) documentation.
+
 Install the bundle with
 
 ```console
 composer require pentatrion/vite-bundle
 ```
-
-if you don't have a `package.json` file already you can execute the `pentatrion/vite-bundle` community recipe. Otherwise see [manual installation](https://github.com/lhapaipai/vite-bundle/blob/main/docs/manual-installation.md).
 
 As long as the symfony recipe update has not yet been merged, add manually vite route to your dev Symfony app. Modify if necessary the prefix by following the `vite.config.js` `base` property without final slash.
 
@@ -51,7 +51,8 @@ if you are using React, you have to add this option in order to have FastRefresh
 ```twig
 {{ vite_entry_script_tags('app', { dependency: 'react' }) }}
 ```
-If you come from Webpack Encore, check the [differences between Webpack Encore Bundle and Vite Bundle](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md).
+
+If you want to install the bundle without the community recipe, check the [manual installation](https://github.com/lhapaipai/vite-bundle/blob/main/docs/manual-installation.md).
 
 ## Bundle Configuration
 
@@ -158,7 +159,7 @@ export default defineConfig({
 
 ### https / http in Development
 
-By default, your Vite dev server don't use https and can cause unwanted reload if you serve your application with https. I advise you to choose between the 2 protocols and apply that same choice for your Vite dev server and Symfony local server
+By default, your Vite dev server don't use https and can cause unwanted reload if you serve your application with https (probably due to invalid certificates ). Configuration is easier if you develop your application without https.
 
 ```console
 npm run dev
@@ -167,15 +168,29 @@ symfony serve --no-tls
 
 browse : `http://127.0.0.1:8000`
 
-or
+if you still want to use https you will need to generate certificates for your Vite dev server.
+
+you can use mkcert : https://github.com/FiloSottile/mkcert
+
+```console
+mkcert -install
+mkcert -key-file certs/vite.key.pem -cert-file certs/vite.crt.pem localhost 127.0.0.1
+
+```
 
 ```js
 // vite.config.js
+import fs from "fs";
+
 export default defineConfig({
 
     // ...
     server: {
-        https: true,
+        https: {
+          key: fs.readFileSync('certs/vite.key.pem'),
+          cert: fs.readFileSync('certs/vite.crt.pem'),
+        },
+        cors: true
     },
 });
 ```

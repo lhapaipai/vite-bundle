@@ -11,7 +11,7 @@ Essentially, he provides two twig functions to load the correct scripts into you
 
 If you come from Webpack Encore, check the [migration](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md) documentation.
 
-Install the bundle with
+Install the bundle with :
 
 ```console
 composer require pentatrion/vite-bundle
@@ -46,7 +46,7 @@ Add this twig functions in any template or base layout where you need to include
 {% endblock %}
 ```
 
-if you experience unwanted reloads of your application, read the section [https/http in development](#https--http-in-development)
+if you experience unwanted reloads of your application, read the section [https/http in development](#https--http-in-development).
 
 if you are using React, you have to add this option in order to have FastRefresh.
 

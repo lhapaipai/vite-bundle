@@ -17,8 +17,13 @@ if you do not want to use the recipe or want to see in depth what is modified by
 ├──vite.config.js
 ```
 
-add vite route to your dev Symfony app. [`config/routes/dev/pentatrion_vite.yaml`](https://github.com/lhapaipai/vite-bundle/blob/main/config/routes/dev/pentatrion_vite.yaml).
-
+add vite route to your dev Symfony app.
+```yaml
+# config/routes/dev/pentatrion_vite.yaml
+_pentatrion_vite:
+    prefix: /build
+    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
+```
 
 create or complete your [`package.json`](https://github.com/lhapaipai/vite-bundle/blob/main/install/package.json).
 

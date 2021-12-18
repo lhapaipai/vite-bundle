@@ -1,3 +1,7 @@
+## v1.1.4
+
+- add EntrypointsLookup / EntrypointsRenderer as a service.
+
 ## v1.1.0
 
 - Add public_dir conf

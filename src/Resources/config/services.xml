@@ -8,11 +8,13 @@
   <services>
     <defaults public="false" />
 
-    <service id="vite.entrypoints_lookup" class="Pentatrion\ViteBundle\Asset\EntrypointsLookup">
+    <service id="Pentatrion\ViteBundle\Asset\EntrypointsLookup" alias="vite.entrypoints_lookup" public="true" />
+    <service id="vite.entrypoints_lookup" class="Pentatrion\ViteBundle\Asset\EntrypointsLookup" public="true">
       <argument>%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json</argument>
     </service>
 
-    <service id="vite.entrypoint_renderer" class="Pentatrion\ViteBundle\Asset\EntrypointRenderer">
+    <service id="Pentatrion\ViteBundle\Asset\EntrypointRenderer" alias="vite.entrypoint_renderer" public="true" />
+    <service id="vite.entrypoint_renderer" class="Pentatrion\ViteBundle\Asset\EntrypointRenderer" public="true">
       <argument type="service" id="vite.entrypoints_lookup" />
     </service>
 
@@ -21,15 +23,12 @@
       <argument type="service" id="vite.entrypoint_renderer" />
     </service>
 
-    <service id="vite.controller" alias="Pentatrion\ViteBundle\Controller\ViteController" public="true" />
-    <service id="Pentatrion\ViteBundle\Controller\ViteController" public="true">
+    <service id="vite.controller" class="Pentatrion\ViteBundle\Controller\ViteController" public="true">
       <tag name="controller.service_arguments" />
       <argument>%pentatrion_vite.server%</argument>
       <argument>%pentatrion_vite.base%</argument>
       <argument type="service" id="http_client" />
     </service>
-
-
 
   </services>
 </container>

@@ -212,6 +212,25 @@ symfony serve
 
 browse : `https://127.0.0.1:8000`
 
+## Dependency injection
+
+if you want more control (like creating custom Twig functions),
+you can use dependency injection with EntrypointRenderer / EntrypointsLookup.
+
+```php
+use Twig\Extension\AbstractExtension;
+use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
+use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
+
+class YourTwigExtension extends AbstractExtension
+    public function __contruct(
+        private EntrypointsLookup $entrypointsLookup,
+        private EntrypointRenderer $entrypointsRenderer
+    ) {
+        // ...
+    }
+}
+```
 
 ## Migration from v0.2.x to v1.x
 

@@ -9,7 +9,7 @@ Essentially, he provides two twig functions to load the correct scripts into you
 
 ## Installation
 
-If you come from Webpack Encore, check the [migration](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md) documentation.
+Before you start, make sure you don't have a package.json file otherwise, ff you come from Webpack Encore, check the [migration](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration-webpack-encore.md) documentation.
 
 Install the bundle with :
 

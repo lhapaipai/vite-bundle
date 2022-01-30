@@ -1,0 +1,37 @@
+services:
+
+    vite.entrypoints_lookup:
+        class: Pentatrion\ViteBundle\Asset\EntrypointsLookup
+        arguments:
+            - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json"
+        public: true
+
+    Pentatrion\ViteBundle\Asset\EntrypointsLookup:
+        alias: "vite.entrypoints_lookup"
+        public: true
+
+
+    vite.entrypoint_renderer:
+        class: Pentatrion\ViteBundle\Asset\EntrypointRenderer
+        arguments:
+            - "@vite.entrypoints_lookup"
+        public: true
+    
+    Pentatrion\ViteBundle\Asset\EntrypointRenderer:
+        alias: "vite.entrypoint_renderer"
+        public: true
+
+
+    vite.twig_entry_files_extension:
+        class: Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension
+        tags: ["twig.extension"]
+        arguments:
+            - "@vite.entrypoint_renderer"
+
+    Pentatrion\ViteBundle\Controller\ViteController:
+        tags: ["controller.service_arguments"]
+        arguments:
+            - "%pentatrion_vite.server%"
+            - "%pentatrion_vite.base%"
+            - "@http_client"
+        public: true

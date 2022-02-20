@@ -17,15 +17,6 @@ Install the bundle with :
 composer require pentatrion/vite-bundle
 ```
 
-As long as the symfony recipe update has not yet been merged, add manually vite route to your dev Symfony app. Modify if necessary the prefix by following the `vite.config.js` `base` property without final slash.
-
-```yaml
-# config/routes/dev/pentatrion_vite.yaml
-_pentatrion_vite:
-    prefix: /build
-    resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
-```
-
 
 ```bash
 npm install
@@ -93,24 +84,22 @@ export default defineConfig({
         /* react(), // if you're using React */
         symfonyPlugin(),
     ],
-    root: "./assets",      /* DO NOT CHANGE */
-
-    build: {
-        rollupOptions: {
-            input: {
-                app: "./app.ts" /* relative to the root option */
-                /* if you use vite-plugin-symfony < 0.2, it's "./assets/app.ts" */
-            },
-        },
-        outDir: "../public/build/",
-
-        manifest: true,    /* DO NOT CHANGE */
-        emptyOutDir: true, /* DO NOT CHANGE */
-        assetsDir: "",     /* DO NOT CHANGE */
-    },
+    root: ".",      /* DO NOT CHANGE */
 
     /* your outDir prefix relative to web path */
     base: "/build/",
+
+    build: {
+        assetsDir: "",     /* DO NOT CHANGE */
+        emptyOutDir: true, /* DO NOT CHANGE */
+        manifest: true,    /* DO NOT CHANGE */
+        outDir: "./public/build",
+        rollupOptions: {
+            input: {
+                app: "./assets/app.ts" /* relative to the root option */
+            },
+        }
+    },
 });
 ```
 
@@ -237,9 +226,9 @@ class YourTwigExtension extends AbstractExtension
 In version v0.2.x, you have to specify your entry points in an array in your `vite.config.js` file. in v1.x you need to specify your entry points in an object.
 
 ```diff
--input: ["./app.js"],
+-input: ["./assets/app.js"],
 +input: {
-+  app: "./app.js"
++  app: "./assets/app.js"
 +},
 ```
 

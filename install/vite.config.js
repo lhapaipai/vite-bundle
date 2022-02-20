@@ -9,16 +9,16 @@ export default defineConfig({
         /* react(), // if you're using React */
         symfonyPlugin(),
     ],
-    root: "./assets",
+    root: ".",
     base: "/build/",
     build: {
         manifest: true,
         emptyOutDir: true,
         assetsDir: "",
-        outDir: "../public/build/",
+        outDir: "./public/build",
         rollupOptions: {
             input: {
-                app: "./app.js"
+                app: "./assets/app.js"
             },
         },
     },

@@ -89,6 +89,10 @@ export default defineConfig({
     /* your outDir prefix relative to web path */
     base: "/build/",
 
+    /* By default, Vite will copy all assets in /public to the build directory. */
+    /* no longer needed because your web server already does it */
+    publicDir: false,
+
     build: {
         assetsDir: "",     /* DO NOT CHANGE */
         emptyOutDir: true, /* DO NOT CHANGE */

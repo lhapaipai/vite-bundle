@@ -11,6 +11,7 @@ export default defineConfig({
     ],
     root: ".",
     base: "/build/",
+    publicDir: false,
     build: {
         manifest: true,
         emptyOutDir: true,

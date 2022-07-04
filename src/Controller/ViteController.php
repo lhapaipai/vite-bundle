@@ -7,10 +7,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ViteController
 {
-    public $viteDevServer;
+    public string $viteDevServer;
     public $httpClient;
+    public string $viteBase;
 
-    public function __construct($viteDevServer, $viteBase, HttpClientInterface $httpClient)
+    public function __construct(string $viteDevServer, string $viteBase, HttpClientInterface $httpClient)
     {
         $this->viteDevServer = $viteDevServer;
         $this->viteBase = $viteBase;

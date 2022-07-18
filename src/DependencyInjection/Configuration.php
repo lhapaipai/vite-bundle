@@ -20,7 +20,7 @@ class Configuration implements ConfigurationInterface
           ->addDefaultsIfNotSet()
           ->children()
             ->scalarNode('host')->defaultValue('localhost')->end()
-            ->integerNode('port')->defaultValue(3000)->end()
+            ->integerNode('port')->defaultValue(5173)->end()
             ->booleanNode('https')->defaultFalse()->end()
           ->end()          
       ->end()

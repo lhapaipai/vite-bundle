@@ -11,7 +11,6 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
     private string $entrypointsPath;
     private array $entrypointsData;
-    private string $assetsPath;
     private ?array $assetsData = null;
     private bool $strictMode;
 
@@ -19,10 +18,9 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
      * @param string $entrypointsPath Absolute path to the entrypoints file
      * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $entrypointsPath, string $assetsPath, bool $strictMode = true)
+    public function __construct(string $entrypointsPath, bool $strictMode = true)
     {
         $this->entrypointsPath = $entrypointsPath;
-        $this->assetsPath = $assetsPath;
         $this->strictMode = $strictMode;
 
         if (($scheme = parse_url($this->entrypointsPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
@@ -57,19 +55,11 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
             } catch (\JsonException $e) {
                 throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->entrypointsPath) . $e->getMessage(), previous: $e);
             }
-
-            if (is_file($this->assetsPath)) {
-                try {
-                    $this->assetsData = json_decode(file_get_contents($this->assetsPath), true, flags: \JSON_THROW_ON_ERROR);
-                } catch (Exception $e) {
-                    throw new RuntimeException(sprintf('Error parsing JSON from assets file "%s": ', $this->assetsPath) . $e->getMessage(), previous: $e);
-                }
-            }
         }
 
         if ($this->entrypointsData['isProd']) {
-            if (isset($this->assetsData[$path])) {
-                return $this->assetsData[$path];
+            if (isset($this->entrypointsData['assets'][$path])) {
+                return $this->entrypointsData['assets'][$path];
             }
         } else {
             return $this->entrypointsData['viteServer']['origin'] . $this->entrypointsData['viteServer']['base'] . $path;

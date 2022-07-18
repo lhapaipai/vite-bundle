@@ -39,5 +39,4 @@ services:
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
         arguments:
             - "%kernel.project_dir%/public%pentatrion_vite.base%entrypoints.json"
-            - "%kernel.project_dir%/public%pentatrion_vite.base%assets.json"
             - true

@@ -37,7 +37,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Install tools
+      - name: Install dependencies
         if: matrix.php-versions == 8.1
         run: composer install --no-interaction --no-ansi
 

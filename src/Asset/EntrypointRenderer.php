@@ -4,54 +4,56 @@ namespace Pentatrion\ViteBundle\Asset;
 
 class EntrypointRenderer
 {
-  private $entrypointsLookup;
-  private $tagRenderer;
+    private $entrypointsLookup;
+    private $tagRenderer;
 
-  private $hasReturnedViteClient = false;
+    private $hasReturnedViteClient = false;
 
-  public function __construct(EntrypointsLookup $entrypointsLookup)
-  {
-    $this->entrypointsLookup = $entrypointsLookup;
-    $this->tagRenderer = new TagRenderer();
-  }
-
-  public function renderScripts(string $entryName, array $options = [])
-  {
-    if (!$this->entrypointsLookup->hasFile()) {
-      return '';
+    public function __construct(EntrypointsLookup $entrypointsLookup)
+    {
+        $this->entrypointsLookup = $entrypointsLookup;
+        $this->tagRenderer = new TagRenderer();
     }
 
-    $scriptTags = [];
-    if (!$this->entrypointsLookup->isProd()) {
-      $viteServer = $this->entrypointsLookup->getViteServer();
-
-      if (!$this->hasReturnedViteClient) {
-        $scriptTags[] = $this->tagRenderer->renderScriptFile($viteServer['origin'] . $viteServer['base'] . '@vite/client');
-        if (isset($options['dependency']) && $options['dependency'] === 'react') {
-          $scriptTags[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'] . $viteServer['base']);
+    public function renderScripts(string $entryName, array $options = [])
+    {
+        if (!$this->entrypointsLookup->hasFile()) {
+            return '';
         }
-        $this->hasReturnedViteClient = true;
-      }
-    }
-    foreach ($this->entrypointsLookup->getJSFiles($entryName) as $fileName) {
-      $scriptTags[] = $this->tagRenderer->renderScriptFile($fileName);
-    }
-    return implode('', $scriptTags);
-  }
 
-  public function renderLinks(string $entryName)
-  {
-    if (!$this->entrypointsLookup->hasFile() || !$this->entrypointsLookup->isProd()) {
-      return '';
+        $scriptTags = [];
+        if (!$this->entrypointsLookup->isProd()) {
+            $viteServer = $this->entrypointsLookup->getViteServer();
+
+            if (!$this->hasReturnedViteClient) {
+                $scriptTags[] = $this->tagRenderer->renderScriptFile($viteServer['origin'].$viteServer['base'].'@vite/client');
+                if (isset($options['dependency']) && 'react' === $options['dependency']) {
+                    $scriptTags[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
+                }
+                $this->hasReturnedViteClient = true;
+            }
+        }
+        foreach ($this->entrypointsLookup->getJSFiles($entryName) as $fileName) {
+            $scriptTags[] = $this->tagRenderer->renderScriptFile($fileName);
+        }
+
+        return implode('', $scriptTags);
     }
 
-    $linkTags = [];
-    foreach ($this->entrypointsLookup->getCSSFiles($entryName) as $fileName) {
-      $linkTags[] = $this->tagRenderer->renderLinkStylesheet($fileName);
+    public function renderLinks(string $entryName)
+    {
+        if (!$this->entrypointsLookup->hasFile() || !$this->entrypointsLookup->isProd()) {
+            return '';
+        }
+
+        $linkTags = [];
+        foreach ($this->entrypointsLookup->getCSSFiles($entryName) as $fileName) {
+            $linkTags[] = $this->tagRenderer->renderLinkStylesheet($fileName);
+        }
+        foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName) as $fileName) {
+            $linkTags[] = $this->tagRenderer->renderLinkPreload($fileName);
+        }
+
+        return implode('', $linkTags);
     }
-    foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName) as $fileName) {
-      $linkTags[] = $this->tagRenderer->renderLinkPreload($fileName);
-    }
-    return implode('', $linkTags);
-  }
 }

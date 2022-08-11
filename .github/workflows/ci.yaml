@@ -1,0 +1,50 @@
+name: CI
+
+on: [ push, pull_request ]
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        php-versions: [ '8.0', '8.1' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+
+      - name: Lint PHP
+        run: find -L . -path ./vendor -prune -o -type f -name '*.php' -print0 | xargs -0 -n 1 -P $(nproc) php -l
+
+      - name: Declare variables
+        if: matrix.php-versions == 8.1
+        id: vars
+        run: |
+          echo "::set-output name=composer_cache_dir::$(composer config cache-files-dir)"
+
+      - name: Cache composer
+        if: matrix.php-versions == 8.1
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.vars.outputs.composer_cache_dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install tools
+        if: matrix.php-versions == 8.1
+        run: composer install --no-interaction --no-ansi
+
+      - name: Validate coding standards
+        if: matrix.php-versions == 8.1
+        run: php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose --diff --dry-run --stop-on-violation --using-cache=no
+
+      - name: Static analysis
+        if: matrix.php-versions == 8.1
+        run: php vendor/bin/phpstan analyse --configuration=phpstan.neon --verbose

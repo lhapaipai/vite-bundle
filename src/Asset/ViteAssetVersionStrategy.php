@@ -66,7 +66,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         }
 
         if ($this->strictMode) {
-            $message = sprintf('assets "%s" not found in assets file "%s".', $path, $this->assetsPath);
+            $message = sprintf('assets "%s" not found in entrypoints file "%s".', $path, $this->entrypointsPath);
             $alternatives = $this->findAlternatives($path, $this->assetsData);
             if (\count($alternatives) > 0) {
                 $message .= sprintf(' Did you mean one of these? "%s".', implode('", "', $alternatives));

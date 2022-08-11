@@ -1,5 +1,6 @@
 /.vscode/
 /.local
-.idea
-composer.lock
-vendor
+/.idea
+/composer.lock
+/vendor
+/.php-cs-fixer.cache

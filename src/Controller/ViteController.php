@@ -22,7 +22,7 @@ class ViteController
     {
         $response = $this->httpClient->request(
             'GET',
-            $this->viteDevServer . $this->viteBase . $path
+            $this->viteDevServer.$this->viteBase.$path
         );
 
         $content = $response->getContent();

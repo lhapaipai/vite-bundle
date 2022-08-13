@@ -3,9 +3,9 @@
 namespace Pentatrion\ViteBundle\Asset;
 
 use Exception;
-use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
+use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
@@ -16,7 +16,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     /**
      * @param string $entrypointsPath Absolute path to the entrypoints file
-     * @param bool   $strictMode   Throws an exception for unknown paths
+     * @param bool   $strictMode      Throws an exception for unknown paths
      */
     public function __construct(string $entrypointsPath, bool $strictMode = true)
     {
@@ -53,7 +53,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
             try {
                 $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
-                throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->entrypointsPath) . $e->getMessage(), 0, $e);
+                throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->entrypointsPath).$e->getMessage(), 0, $e);
             }
         }
 
@@ -62,11 +62,11 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
                 return $this->entrypointsData['assets'][$path];
             }
         } else {
-            return $this->entrypointsData['viteServer']['origin'] . $this->entrypointsData['viteServer']['base'] . $path;
+            return $this->entrypointsData['viteServer']['origin'].$this->entrypointsData['viteServer']['base'].$path;
         }
 
         if ($this->strictMode) {
-            $message = sprintf('assets "%s" not found in assets file "%s".', $path, $this->assetsPath);
+            $message = sprintf('assets "%s" not found in entrypoints file "%s".', $path, $this->entrypointsPath);
             $alternatives = $this->findAlternatives($path, $this->assetsData);
             if (\count($alternatives) > 0) {
                 $message .= sprintf(' Did you mean one of these? "%s".', implode('", "', $alternatives));
@@ -84,7 +84,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         $alternatives = [];
 
         if (is_null($assetsData)) {
-            return  $alternatives;
+            return $alternatives;
         }
 
         foreach ($assetsData as $key => $value) {

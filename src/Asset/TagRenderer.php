@@ -8,8 +8,9 @@ class TagRenderer
     {
         $attributes = [
             'src' => $fileName,
-            'type' => 'module'
+            'type' => 'module',
         ];
+
         return sprintf(
             '<script %s></script>',
             $this->convertArrayToAttributes($attributes)
@@ -19,7 +20,7 @@ class TagRenderer
     public function renderReactRefreshInline($devServerUrl)
     {
         return '  <script type="module">
-    import RefreshRuntime from "' . $devServerUrl . '@react-refresh"
+    import RefreshRuntime from "'.$devServerUrl.'@react-refresh"
     RefreshRuntime.injectIntoGlobalHook(window)
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type
@@ -31,8 +32,9 @@ class TagRenderer
     {
         $attributes = [
             'rel' => 'stylesheet',
-            'href' => $fileName
+            'href' => $fileName,
         ];
+
         return sprintf(
             '<link %s>',
             $this->convertArrayToAttributes($attributes)
@@ -43,8 +45,9 @@ class TagRenderer
     {
         $attributes = [
             'rel' => 'modulepreload',
-            'href' => $fileName
+            'href' => $fileName,
         ];
+
         return sprintf(
             '<link %s>',
             $this->convertArrayToAttributes($attributes)
@@ -55,7 +58,7 @@ class TagRenderer
     {
         return implode(' ', array_map(
             function ($key, $value) {
-                if ($value === true) {
+                if (true === $value) {
                     return sprintf('%s', $key);
                 } else {
                     return sprintf('%s="%s"', $key, htmlentities($value));

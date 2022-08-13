@@ -7,12 +7,12 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-  public function getConfigTreeBuilder(): TreeBuilder
-  {
-    $treeBuilder = new TreeBuilder('pentatrion_vite');
-    $rootNode = $treeBuilder->getRootNode();
+    public function getConfigTreeBuilder(): TreeBuilder
+    {
+        $treeBuilder = new TreeBuilder('pentatrion_vite');
+        $rootNode = $treeBuilder->getRootNode();
 
-    $rootNode
+        $rootNode
       ->children()
         ->scalarNode('base')->defaultValue('/build/')->end()
         ->scalarNode('public_dir')->defaultValue('/public')->end()
@@ -22,10 +22,10 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('host')->defaultValue('localhost')->end()
             ->integerNode('port')->defaultValue(5173)->end()
             ->booleanNode('https')->defaultFalse()->end()
-          ->end()          
+          ->end()
       ->end()
-    ;
+        ;
 
-    return $treeBuilder;
-  }
+        return $treeBuilder;
+    }
 }

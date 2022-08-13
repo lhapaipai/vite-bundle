@@ -51,9 +51,9 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
             }
 
             try {
-                $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, flags: \JSON_THROW_ON_ERROR);
+                $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
-                throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->entrypointsPath) . $e->getMessage(), previous: $e);
+                throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->entrypointsPath) . $e->getMessage(), 0, $e);
             }
         }
 

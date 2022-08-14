@@ -14,8 +14,14 @@ class EntrypointsLookup
         if (!file_exists($entrypointsFilePath)) {
             return;
         }
-        $this->fileExist = true;
+
         $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
+
+        if (!isset($fileInfos['isProd'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
+            return;
+        }
+
+        $this->fileExist = true;
 
         $this->isProd = $fileInfos['isProd'];
         $this->entriesData = $fileInfos['entryPoints'];

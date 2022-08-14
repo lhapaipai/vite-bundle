@@ -33,5 +33,13 @@
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.9",
         "phpstan/phpstan": "^1.8"
+    },
+    "scripts": {
+        "cs-fix": "@php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "ci-check": [
+            "find -L . -path ./vendor -prune -o -type f -name '*.php' -print0 | xargs -0 -n 1 -P $(nproc) php -l",
+            "@php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --diff --dry-run --stop-on-violation --using-cache=no",
+            "@php vendor/bin/phpstan analyse --configuration=phpstan.neon"
+        ]
     }
 }

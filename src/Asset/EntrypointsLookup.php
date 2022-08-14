@@ -41,28 +41,16 @@ class EntrypointsLookup
 
     public function getJSFiles($entryName)
     {
-        if (isset($this->entriesData[$entryName])) {
-            return $this->entriesData[$entryName]['js'];
-        } else {
-            return [];
-        }
+        return $this->entriesData[$entryName]['js'] ?? [];
     }
 
     public function getCSSFiles($entryName)
     {
-        if (isset($this->entriesData[$entryName])) {
-            return $this->entriesData[$entryName]['css'];
-        } else {
-            return [];
-        }
+        return $this->entriesData[$entryName]['css'] ?? [];
     }
 
     public function getJavascriptDependencies($entryName)
     {
-        if (isset($this->entriesData[$entryName])) {
-            return $this->entriesData[$entryName]['preload'];
-        } else {
-            return [];
-        }
+        return $this->entriesData[$entryName]['preload'] ?? [];
     }
 }

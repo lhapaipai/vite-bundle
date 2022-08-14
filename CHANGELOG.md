@@ -1,3 +1,7 @@
+## v2.1.0
+
+- add CSS Entrypoints management to prevent FOUC.
+
 ## v1.1.4
 
 - add EntrypointsLookup / EntrypointsRenderer as a service.

@@ -132,7 +132,13 @@ export default defineConfig({
         outDir: "./public/build",
         rollupOptions: {
             input: {
-                app: "./assets/app.ts" /* relative to the root option */
+                app: "./assets/app.ts", /* relative to the root option */
+
+                theme: "./assets/theme.css" /* you can provide css file and
+                it will be directly inserted in a link tag to prevent FOUC with the development server.
+                note : still add the 2 twig functions vite_entry_link_tags / vite_entry_script_tags
+                even if the entry point is a css file because ViteJs may need to insert his js code to
+                enable the hmr */
             },
         }
     },

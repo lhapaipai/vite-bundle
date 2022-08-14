@@ -42,7 +42,7 @@ class EntrypointRenderer
 
     public function renderLinks(string $entryName)
     {
-        if (!$this->entrypointsLookup->hasFile() || !$this->entrypointsLookup->isProd()) {
+        if (!$this->entrypointsLookup->hasFile()) {
             return '';
         }
 
@@ -50,8 +50,11 @@ class EntrypointRenderer
         foreach ($this->entrypointsLookup->getCSSFiles($entryName) as $fileName) {
             $linkTags[] = $this->tagRenderer->renderLinkStylesheet($fileName);
         }
-        foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName) as $fileName) {
-            $linkTags[] = $this->tagRenderer->renderLinkPreload($fileName);
+
+        if ($this->entrypointsLookup->isProd()) {
+            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName) as $fileName) {
+                $linkTags[] = $this->tagRenderer->renderLinkPreload($fileName);
+            }
         }
 
         return implode('', $linkTags);

@@ -1,3 +1,7 @@
+## v2.1.1
+
+- update documentation, update with vite-plugin-symfony v0.6.0
+
 ## v2.1.0
 
 - add CSS Entrypoints management to prevent FOUC.

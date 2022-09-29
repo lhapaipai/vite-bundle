@@ -17,7 +17,9 @@ class EntrypointsLookup
 
         $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
 
-        if (!isset($fileInfos['isProd'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
+        $requiredKeysDiff = array_diff(['isProd', 'entryPoints', 'viteServer'], array_keys($fileInfos));
+
+        if (\count($requiredKeysDiff) > 0) {
             return;
         }
 

@@ -5,6 +5,13 @@ services:
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json"
         public: true
+    
+    vite.tag_renderer:
+        class: Pentatrion\ViteBundle\Asset\TagRenderer
+        arguments:
+            - []
+            - []
+        public: true
 
     Pentatrion\ViteBundle\Asset\EntrypointsLookup:
         alias: "vite.entrypoints_lookup"
@@ -15,8 +22,9 @@ services:
         class: Pentatrion\ViteBundle\Asset\EntrypointRenderer
         arguments:
             - "@vite.entrypoints_lookup"
+            - "@vite.tag_renderer"
         public: true
-    
+
     Pentatrion\ViteBundle\Asset\EntrypointRenderer:
         alias: "vite.entrypoint_renderer"
         public: true

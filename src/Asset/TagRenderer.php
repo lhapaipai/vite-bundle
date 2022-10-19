@@ -4,12 +4,29 @@ namespace Pentatrion\ViteBundle\Asset;
 
 class TagRenderer
 {
-    public function renderScriptFile($fileName)
+    private $defaultScriptAttributes;
+    private $defaultLinkAttributes;
+
+    public function __construct(
+        $defaultScriptAttributes = [],
+        $defaultLinkAttributes = []
+    ) {
+        $this->defaultScriptAttributes = $defaultScriptAttributes;
+        $this->defaultLinkAttributes = $defaultLinkAttributes;
+    }
+
+    public function renderScriptFile($fileName, $extraAttributes = [], $withDefaultScriptAttributes = true)
     {
         $attributes = [
             'src' => $fileName,
             'type' => 'module',
         ];
+
+        if ($withDefaultScriptAttributes) {
+            $attributes = array_merge($attributes, $this->defaultScriptAttributes, $extraAttributes);
+        } else {
+            $attributes = array_merge($attributes, $extraAttributes);
+        }
 
         return sprintf(
             '<script %s></script>',
@@ -28,12 +45,14 @@ class TagRenderer
     </script>';
     }
 
-    public function renderLinkStylesheet($fileName)
+    public function renderLinkStylesheet($fileName, $extraAttributes = [])
     {
         $attributes = [
             'rel' => 'stylesheet',
             'href' => $fileName,
         ];
+
+        $attributes = array_merge($attributes, $this->defaultLinkAttributes, $extraAttributes);
 
         return sprintf(
             '<link %s>',

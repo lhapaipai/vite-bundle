@@ -66,6 +66,14 @@ pentatrion_vite:
         host: localhost
         port: 5173
         https: false
+
+    script_attributes:
+        # you can define your attributes that you want to apply
+        # for all your script tags
+
+    link_attributes:
+        # you can define your attributes that you want to apply
+        # for all your link tags
 ```
 
 
@@ -100,6 +108,37 @@ export default defineConfig({
     },
 });
 ```
+
+## Twig functions
+
+The bundle provide 2 twig functions both of which accept an optional second parameter of options.
+
+`vite_entry_script_tags`
+
+- dependency: 'react' | null
+- attr: Array (an array of extra attributes)
+
+```
+vite_entry_script_tags('<entrypoint>', {
+    dependency: 'react',
+    attr: {
+        referrerpolicy: "origin"
+    }
+})
+```
+
+`vite_entry_link_tags`
+
+- attr: Array (an array of extra attributes)
+
+```
+vite_entry_link_tags('<entrypoint>', {
+    attr: {
+        media: "screen and (prefers-color-scheme: dark)"
+    }
+})
+```
+
 
 ## Vite Assets managements
 

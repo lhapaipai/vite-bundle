@@ -9,10 +9,10 @@ class EntrypointRenderer
 
     private $hasReturnedViteClient = false;
 
-    public function __construct(EntrypointsLookup $entrypointsLookup)
+    public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer)
     {
         $this->entrypointsLookup = $entrypointsLookup;
-        $this->tagRenderer = new TagRenderer();
+        $this->tagRenderer = $tagRenderer;
     }
 
     public function renderScripts(string $entryName, array $options = [])
@@ -26,7 +26,7 @@ class EntrypointRenderer
             $viteServer = $this->entrypointsLookup->getViteServer();
 
             if (!$this->hasReturnedViteClient) {
-                $scriptTags[] = $this->tagRenderer->renderScriptFile($viteServer['origin'].$viteServer['base'].'@vite/client');
+                $scriptTags[] = $this->tagRenderer->renderScriptFile($viteServer['origin'].$viteServer['base'].'@vite/client', [], false);
                 if (isset($options['dependency']) && 'react' === $options['dependency']) {
                     $scriptTags[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
                 }
@@ -34,13 +34,13 @@ class EntrypointRenderer
             }
         }
         foreach ($this->entrypointsLookup->getJSFiles($entryName) as $fileName) {
-            $scriptTags[] = $this->tagRenderer->renderScriptFile($fileName);
+            $scriptTags[] = $this->tagRenderer->renderScriptFile($fileName, $options['attr'] ?? []);
         }
 
         return implode('', $scriptTags);
     }
 
-    public function renderLinks(string $entryName)
+    public function renderLinks(string $entryName, array $options = [])
     {
         if (!$this->entrypointsLookup->hasFile()) {
             return '';
@@ -48,7 +48,7 @@ class EntrypointRenderer
 
         $linkTags = [];
         foreach ($this->entrypointsLookup->getCSSFiles($entryName) as $fileName) {
-            $linkTags[] = $this->tagRenderer->renderLinkStylesheet($fileName);
+            $linkTags[] = $this->tagRenderer->renderLinkStylesheet($fileName, $options['attr'] ?? []);
         }
 
         if ($this->entrypointsLookup->isProd()) {

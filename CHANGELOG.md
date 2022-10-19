@@ -1,3 +1,11 @@
+## v2.2.1
+
+- the choice of the vite dev server port is no longer strict, if it is already used the application will use the next available port.
+
+## v2.2.0
+
+- add extra attributes to script/link tags
+
 ## v2.1.1
 
 - update documentation, update with vite-plugin-symfony v0.6.0

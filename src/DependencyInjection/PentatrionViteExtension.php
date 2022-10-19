@@ -21,8 +21,6 @@ class PentatrionViteExtension extends Extension
 
         $container->setParameter('pentatrion_vite.base', $config['base']);
         $container->setParameter('pentatrion_vite.public_dir', $config['public_dir']);
-        $server = ($config['server']['https'] ? 'https://' : 'http://').$config['server']['host'].':'.$config['server']['port'];
-        $container->setParameter('pentatrion_vite.server', $server);
 
         $container->getDefinition('vite.tag_renderer')
             ->replaceArgument(0, $config['script_attributes'])

@@ -61,11 +61,6 @@ pentatrion_vite:
     base: /build/
     # path to the web root relative to the Symfony project root directory
     public_dir: /public
-    # Server options
-    server:
-        host: localhost
-        port: 5173
-        https: false
 
     script_attributes:
         # you can define your attributes that you want to apply

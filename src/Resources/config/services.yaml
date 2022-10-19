@@ -39,9 +39,9 @@ services:
     Pentatrion\ViteBundle\Controller\ViteController:
         tags: ["controller.service_arguments"]
         arguments:
-            - "%pentatrion_vite.server%"
             - "%pentatrion_vite.base%"
             - "@http_client"
+            - "@vite.entrypoints_lookup"
         public: true
 
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:

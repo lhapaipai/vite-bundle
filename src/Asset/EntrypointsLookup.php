@@ -8,6 +8,7 @@ class EntrypointsLookup
     private $fileExist = false;
     private $isProd;
     private $viteServer = null;
+    private $legacy = false;
 
     public function __construct($entrypointsFilePath)
     {
@@ -27,7 +28,14 @@ class EntrypointsLookup
         $this->entriesData = $fileInfos['entryPoints'];
         if (!$this->isProd) {
             $this->viteServer = $fileInfos['viteServer'];
+        } elseif ($fileInfos['legacy']) { // only checked on prod.
+            $this->legacy = true;
         }
+    }
+
+    public function isLegacyPluginEnabled()
+    {
+        return $this->legacy;
     }
 
     public function hasFile()
@@ -58,5 +66,17 @@ class EntrypointsLookup
     public function getJavascriptDependencies($entryName)
     {
         return $this->entriesData[$entryName]['preload'] ?? [];
+    }
+
+    public function hasLegacy($entryName)
+    {
+        return isset($this->entriesData[$entryName]['legacy']) && false !== $this->entriesData[$entryName]['legacy'];
+    }
+
+    public function getLegacyJSFile($entryName)
+    {
+        $legacyEntryName = $this->entriesData[$entryName]['legacy'];
+
+        return $this->entriesData[$legacyEntryName]['js'][0];
     }
 }

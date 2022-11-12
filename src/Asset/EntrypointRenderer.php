@@ -8,11 +8,27 @@ class EntrypointRenderer
     private $tagRenderer;
 
     private $hasReturnedViteClient = false;
+    private $hasReturnedViteLegacyScripts = false;
 
     public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer)
     {
         $this->entrypointsLookup = $entrypointsLookup;
         $this->tagRenderer = $tagRenderer;
+    }
+
+    public function checkAndInsertLegacyPolyfill(&$content)
+    {
+        if (
+            $this->entrypointsLookup->isProd()
+            && $this->entrypointsLookup->isLegacyPluginEnabled()
+            && !$this->hasReturnedViteLegacyScripts
+        ) {
+            $content[] = $this->tagRenderer->renderLegacyCheckInline();
+            foreach ($this->entrypointsLookup->getJSFiles('polyfills-legacy') as $fileName) {
+                $content[] = $this->tagRenderer->renderScriptFile($fileName, ['id' => 'vite-legacy-polyfill'], false, false);
+            }
+            $this->hasReturnedViteLegacyScripts = true;
+        }
     }
 
     public function renderScripts(string $entryName, array $options = [])
@@ -21,23 +37,30 @@ class EntrypointRenderer
             return '';
         }
 
-        $scriptTags = [];
+        $content = [];
         if (!$this->entrypointsLookup->isProd()) {
             $viteServer = $this->entrypointsLookup->getViteServer();
 
             if (!$this->hasReturnedViteClient) {
-                $scriptTags[] = $this->tagRenderer->renderScriptFile($viteServer['origin'].$viteServer['base'].'@vite/client', [], false);
+                $content[] = $this->tagRenderer->renderScriptFile($viteServer['origin'].$viteServer['base'].'@vite/client', [], false);
                 if (isset($options['dependency']) && 'react' === $options['dependency']) {
-                    $scriptTags[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
+                    $content[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
                 }
                 $this->hasReturnedViteClient = true;
             }
         }
+
+        $this->checkAndInsertLegacyPolyfill($content);
+
         foreach ($this->entrypointsLookup->getJSFiles($entryName) as $fileName) {
-            $scriptTags[] = $this->tagRenderer->renderScriptFile($fileName, $options['attr'] ?? []);
+            $content[] = $this->tagRenderer->renderScriptFile($fileName, $options['attr'] ?? []);
         }
 
-        return implode('', $scriptTags);
+        if ($this->entrypointsLookup->hasLegacy($entryName)) {
+            $content[] = $this->tagRenderer->renderLegacyScriptFile($this->entrypointsLookup->getLegacyJSFile($entryName), $entryName);
+        }
+
+        return implode('', $content);
     }
 
     public function renderLinks(string $entryName, array $options = [])
@@ -46,17 +69,20 @@ class EntrypointRenderer
             return '';
         }
 
-        $linkTags = [];
+        $content = [];
+
+        $this->checkAndInsertLegacyPolyfill($content);
+
         foreach ($this->entrypointsLookup->getCSSFiles($entryName) as $fileName) {
-            $linkTags[] = $this->tagRenderer->renderLinkStylesheet($fileName, $options['attr'] ?? []);
+            $content[] = $this->tagRenderer->renderLinkStylesheet($fileName, $options['attr'] ?? []);
         }
 
         if ($this->entrypointsLookup->isProd()) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName) as $fileName) {
-                $linkTags[] = $this->tagRenderer->renderLinkPreload($fileName);
+                $content[] = $this->tagRenderer->renderLinkPreload($fileName);
             }
         }
 
-        return implode('', $linkTags);
+        return implode('', $content);
     }
 }

@@ -25,7 +25,12 @@ class EntrypointRenderer
         ) {
             $content[] = $this->tagRenderer->renderLegacyCheckInline();
             foreach ($this->entrypointsLookup->getJSFiles('polyfills-legacy') as $fileName) {
-                $content[] = $this->tagRenderer->renderScriptFile($fileName, ['id' => 'vite-legacy-polyfill'], false, false);
+                $content[] = $this->tagRenderer->renderScriptFile([
+                    'src' => $fileName,
+                    'nomodule' => true,
+                    'crossorigin' => true,
+                    'id' => 'vite-legacy-polyfill',
+                ], '', false);
             }
             $this->hasReturnedViteLegacyScripts = true;
         }
@@ -42,7 +47,10 @@ class EntrypointRenderer
             $viteServer = $this->entrypointsLookup->getViteServer();
 
             if (!$this->hasReturnedViteClient) {
-                $content[] = $this->tagRenderer->renderScriptFile($viteServer['origin'].$viteServer['base'].'@vite/client', [], false);
+                $content[] = $this->tagRenderer->renderScriptFile([
+                    'src' => $viteServer['origin'].$viteServer['base'].'@vite/client',
+                    'type' => 'module',
+                ]);
                 if (isset($options['dependency']) && 'react' === $options['dependency']) {
                     $content[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
                 }
@@ -53,11 +61,22 @@ class EntrypointRenderer
         $this->checkAndInsertLegacyPolyfill($content);
 
         foreach ($this->entrypointsLookup->getJSFiles($entryName) as $fileName) {
-            $content[] = $this->tagRenderer->renderScriptFile($fileName, $options['attr'] ?? []);
+            $content[] = $this->tagRenderer->renderScriptFile(array_merge([
+                'src' => $fileName,
+                'type' => 'module',
+            ], $options['attr'] ?? []));
         }
 
         if ($this->entrypointsLookup->hasLegacy($entryName)) {
-            $content[] = $this->tagRenderer->renderLegacyScriptFile($this->entrypointsLookup->getLegacyJSFile($entryName), $entryName);
+            $id = self::pascalToKebab("vite-legacy-entry-$entryName");
+
+            $content[] = $this->tagRenderer->renderScriptFile([
+                'data-src' => $this->entrypointsLookup->getLegacyJSFile($entryName),
+                'id' => $id,
+                'nomodule' => true,
+                'crossorigin' => true,
+                'class' => 'vite-legacy-entry',
+            ], $this->tagRenderer->getSystemJSInlineCode($id));
         }
 
         return implode('', $content);
@@ -84,5 +103,10 @@ class EntrypointRenderer
         }
 
         return implode('', $content);
+    }
+
+    public static function pascalToKebab(string $str)
+    {
+        return strtolower(preg_replace('/[A-Z]/', '-\\0', lcfirst($str)));
     }
 }

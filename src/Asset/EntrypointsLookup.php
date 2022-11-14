@@ -28,7 +28,7 @@ class EntrypointsLookup
         $this->entriesData = $fileInfos['entryPoints'];
         if (!$this->isProd) {
             $this->viteServer = $fileInfos['viteServer'];
-        } elseif ($fileInfos['legacy']) { // only checked on prod.
+        } elseif (isset($fileInfos['legacy']) && $fileInfos['legacy']) { // only checked on prod.
             $this->legacy = true;
         }
     }

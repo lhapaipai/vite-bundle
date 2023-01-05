@@ -311,14 +311,6 @@ export default defineConfig({
 });
 ```
 
-```yaml
-# config/packages/pentatrion_vite.yaml
-pentatrion_vite:
-    # Server options
-    server:
-        https: true
-```
-
 ```console
 npm run dev
 symfony serve

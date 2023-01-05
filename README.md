@@ -337,6 +337,7 @@ use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
 use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
 
 class YourTwigExtension extends AbstractExtension
+{
     public function __contruct(
         private EntrypointsLookup $entrypointsLookup,
         private EntrypointRenderer $entrypointsRenderer

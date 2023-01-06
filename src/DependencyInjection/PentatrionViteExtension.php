@@ -19,7 +19,11 @@ class PentatrionViteExtension extends Extension
             $configs
         );
 
-        $container->setParameter('pentatrion_vite.base', $config['base']);
+        $base = $config['base'];
+        $base = '/' !== substr($base, 0, 1) ? '/'.$base : $base;
+        $base = '/' !== substr($base, -1) ? $base.'/' : $base;
+
+        $container->setParameter('pentatrion_vite.base', $base);
         $container->setParameter('pentatrion_vite.public_dir', $config['public_dir']);
 
         $container->getDefinition('vite.tag_renderer')

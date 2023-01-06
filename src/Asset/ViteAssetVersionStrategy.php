@@ -9,22 +9,27 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
+    private string $viteBase;
+    private string $manifestPath;
     private string $entrypointsPath;
-    private array $entrypointsData;
+    private $manifestData = null;
+    private $entrypointsData = null;
     private ?array $assetsData = null;
     private bool $strictMode;
 
     /**
-     * @param string $entrypointsPath Absolute path to the entrypoints file
-     * @param bool   $strictMode      Throws an exception for unknown paths
+     * @param string $manifestPath Absolute path to the manifest file
+     * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $entrypointsPath, bool $strictMode = true)
+    public function __construct(string $viteBase, string $manifestPath, string $entrypointsPath, bool $strictMode = true)
     {
+        $this->viteBase = $viteBase;
+        $this->manifestPath = $manifestPath;
         $this->entrypointsPath = $entrypointsPath;
         $this->strictMode = $strictMode;
 
-        if (($scheme = parse_url($this->entrypointsPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
-            throw new Exception('You can\' use a remote entrypoints with ViteAssetVersionStrategy');
+        if (($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+            throw new \Exception('You can\'t use a remote manifest with ViteAssetVersionStrategy');
         }
     }
 
@@ -45,29 +50,38 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     private function getassetsPath(string $path): ?string
     {
-        if (!isset($this->entrypointsData)) {
+        if (null === $this->manifestData) {
             if (!is_file($this->entrypointsPath)) {
-                throw new RuntimeException(sprintf('assets entrypoints file "%s" does not exist. Did you forget to build the assetss with npm or yarn?', $this->entrypointsPath));
+                throw new RuntimeException(sprintf('assets entrypoints file "%s" does not exist. Did you forget configure your base in pentatrion_vite.yml?', $this->manifestPath));
             }
 
-            try {
-                $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
-                throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->entrypointsPath).$e->getMessage(), 0, $e);
+            if (is_file($this->manifestPath)) {
+                try {
+                    $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, 512, \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->manifestPath).$e->getMessage(), 0, $e);
+                }
+            } else {
+                $this->manifestData = false;
+                try {
+                    $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->manifestPath).$e->getMessage(), 0, $e);
+                }
             }
         }
 
-        if ($this->entrypointsData['isProd']) {
-            if (isset($this->entrypointsData['assets'][$path])) {
-                return $this->entrypointsData['assets'][$path];
+        if (false !== $this->manifestData) {
+            if (isset($this->manifestData[$path])) {
+                return $this->viteBase.$this->manifestData[$path]['file'];
             }
         } else {
             return $this->entrypointsData['viteServer']['origin'].$this->entrypointsData['viteServer']['base'].$path;
         }
 
         if ($this->strictMode) {
-            $message = sprintf('assets "%s" not found in entrypoints file "%s".', $path, $this->entrypointsPath);
-            $alternatives = $this->findAlternatives($path, $this->assetsData);
+            $message = sprintf('assets "%s" not found in manifest file "%s".', $path, $this->manifestPath);
+            $alternatives = $this->findAlternatives($path, $this->manifestData);
             if (\count($alternatives) > 0) {
                 $message .= sprintf(' Did you mean one of these? "%s".', implode('", "', $alternatives));
             }
@@ -89,11 +103,6 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
         foreach ($assetsData as $key => $value) {
             $lev = levenshtein($path, strtolower($key));
-            if ($lev <= \strlen($path) / 3 || false !== stripos($key, $path)) {
-                $alternatives[$key] = isset($alternatives[$key]) ? min($lev, $alternatives[$key]) : $lev;
-            }
-
-            $lev = levenshtein($path, strtolower($value));
             if ($lev <= \strlen($path) / 3 || false !== stripos($key, $path)) {
                 $alternatives[$key] = isset($alternatives[$key]) ? min($lev, $alternatives[$key]) : $lev;
             }

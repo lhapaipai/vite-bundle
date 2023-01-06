@@ -378,4 +378,8 @@ In development environment, the bundle also acts as a proxy by forwarding reques
 
 ## Migration
 
+This version 3 is compatible with Vite v4. For migration from v2.X to v3, you just need to update your `vite-plugin-symfony` package to version >= 0.7.2.
+
+Vite-bundle version 2 is compatible with Vite v3.
+
 If you use previous version of the plugin consult [migration](https://github.com/lhapaipai/vite-bundle/blob/main/docs/migration.md) page.

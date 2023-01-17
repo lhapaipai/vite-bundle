@@ -2,7 +2,6 @@
 
 namespace Pentatrion\ViteBundle\Controller;
 
-use Exception;
 use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -10,16 +9,19 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class ViteController
 {
     public $httpClient;
-    public string $viteBase;
+    public string $defaultBuild;
+    public array $builds;
     private $entrypointsLookup;
     private $viteDevServer;
 
     public function __construct(
-        string $viteBase,
+        string $defaultBuild,
+        array $builds,
         HttpClientInterface $httpClient,
         EntrypointsLookup $entrypointsLookup
     ) {
-        $this->viteBase = $viteBase;
+        $this->defaultBuild = $defaultBuild;
+        $this->builds = $builds;
         $this->httpClient = $httpClient;
         $this->entrypointsLookup = $entrypointsLookup;
 
@@ -29,7 +31,7 @@ class ViteController
     public function proxyBuild($path): Response
     {
         if (is_null($this->viteDevServer) || false === $this->viteDevServer) {
-            return new Exception('Vite dev server not available');
+            return new \Exception('Vite dev server not available');
         }
 
         $response = $this->httpClient->request(

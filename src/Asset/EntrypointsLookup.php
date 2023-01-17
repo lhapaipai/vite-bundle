@@ -4,79 +4,95 @@ namespace Pentatrion\ViteBundle\Asset;
 
 class EntrypointsLookup
 {
-    private $entriesData;
-    private $fileExist = false;
-    private $isProd;
-    private $viteServer = null;
-    private $legacy = false;
+    private $defaultBuild;
+    private $buildsInfos = [];
 
-    public function __construct($entrypointsFilePath)
+    public function __construct($publicPath, $defaultBuild, $builds)
     {
-        if (!file_exists($entrypointsFilePath)) {
-            return;
-        }
+        $this->defaultBuild = $defaultBuild;
 
-        $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
-
-        if (!isset($fileInfos['isProd'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
-            return;
-        }
-
-        $this->fileExist = true;
-
-        $this->isProd = $fileInfos['isProd'];
-        $this->entriesData = $fileInfos['entryPoints'];
-        if (!$this->isProd) {
-            $this->viteServer = $fileInfos['viteServer'];
-        } elseif (isset($fileInfos['legacy']) && $fileInfos['legacy']) { // only checked on prod.
-            $this->legacy = true;
+        foreach ($builds as $buildName => $build) {
+            $this->buildsInfos[$buildName] = [
+                'entryPointsPath' => $publicPath.$build['base'].'entrypoints.json',
+                'infos' => null,
+            ];
         }
     }
 
-    public function isLegacyPluginEnabled()
+    private function getInfos($buildName = null)
     {
-        return $this->legacy;
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
+        if (!isset($this->buildsInfos[$buildName]['infos'])) {
+            $entrypointsFilePath = $this->buildsInfos[$buildName]['entryPointsPath'];
+            if (!file_exists($entrypointsFilePath)) {
+                throw new \Exception($entrypointsFilePath.' not exists');
+            }
+            $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
+            if (!isset($fileInfos['isProd'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
+                throw new \Exception($entrypointsFilePath.' : isProd, entryPoints or viteServer not exists');
+            }
+
+            $this->buildsInfos[$buildName]['infos'] = $fileInfos;
+        }
+
+        return $this->buildsInfos[$buildName]['infos'];
     }
 
-    public function hasFile()
+    public function isLegacyPluginEnabled($buildName = null)
     {
-        return $this->fileExist;
+        return $this->getInfos($buildName)['legacy'];
     }
 
-    public function isProd()
+    public function hasFile($buildName = null)
     {
-        return $this->isProd;
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
+        return file_exists($this->buildsInfos[$buildName]['entryPointsPath']);
     }
 
-    public function getViteServer()
+    public function isProd($buildName = null)
     {
-        return $this->viteServer;
+        return $this->getInfos($buildName)['isProd'];
     }
 
-    public function getJSFiles($entryName)
+    public function getViteServer($buildName = null)
     {
-        return $this->entriesData[$entryName]['js'] ?? [];
+        return $this->getInfos($buildName)['viteServer'];
     }
 
-    public function getCSSFiles($entryName)
+    public function getJSFiles($entryName, $buildName = null)
     {
-        return $this->entriesData[$entryName]['css'] ?? [];
+        return $this->getInfos($buildName)['entryPoints'][$entryName]['js'] ?? [];
     }
 
-    public function getJavascriptDependencies($entryName)
+    public function getCSSFiles($entryName, $buildName = null)
     {
-        return $this->entriesData[$entryName]['preload'] ?? [];
+        return $this->getInfos($buildName)['entryPoints'][$entryName]['css'] ?? [];
     }
 
-    public function hasLegacy($entryName)
+    public function getJavascriptDependencies($entryName, $buildName = null)
     {
-        return isset($this->entriesData[$entryName]['legacy']) && false !== $this->entriesData[$entryName]['legacy'];
+        return $this->getInfos($buildName)['entryPoints'][$entryName]['preload'] ?? [];
     }
 
-    public function getLegacyJSFile($entryName)
+    public function hasLegacy($entryName, $buildName = null)
     {
-        $legacyEntryName = $this->entriesData[$entryName]['legacy'];
+        $entryInfos = $this->getInfos($buildName);
 
-        return $this->entriesData[$legacyEntryName]['js'][0];
+        return isset($entryInfos['entryPoints'][$entryName]['legacy']) && false !== $entryInfos['entryPoints'][$entryName]['legacy'];
+    }
+
+    public function getLegacyJSFile($entryName, $buildName = null)
+    {
+        $entryInfos = $this->getInfos($buildName);
+
+        $legacyEntryName = $entryInfos['entryPoints'][$entryName]['legacy'];
+
+        return $entryInfos['entryPoints'][$legacyEntryName]['js'][0];
     }
 }

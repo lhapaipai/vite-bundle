@@ -3,13 +3,15 @@ services:
     vite.entrypoints_lookup:
         class: Pentatrion\ViteBundle\Asset\EntrypointsLookup
         arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json"
+            - "%kernel.project_dir%%pentatrion_vite.public_dir%"
+            - "%pentatrion_vite.default_build%"
+            - "%pentatrion_vite.builds%"
         public: true
     
     vite.tag_renderer:
         class: Pentatrion\ViteBundle\Asset\TagRenderer
         arguments:
-            - []
+            - default
             - []
         public: true
 
@@ -39,14 +41,15 @@ services:
     Pentatrion\ViteBundle\Controller\ViteController:
         tags: ["controller.service_arguments"]
         arguments:
-            - "%pentatrion_vite.base%"
+            - "%pentatrion_vite.default_build%"
+            - "%pentatrion_vite.builds%"
             - "@http_client"
             - "@vite.entrypoints_lookup"
         public: true
 
-    Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
-        arguments:
-            - "%pentatrion_vite.base%"
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%manifest.json"
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json"
-            - true
+    # Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
+    #     arguments:
+    #         - "%pentatrion_vite.base%"
+    #         - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%manifest.json"
+    #         - "%kernel.project_dir%%pentatrion_vite.public_dir%%pentatrion_vite.base%entrypoints.json"
+    #         - true

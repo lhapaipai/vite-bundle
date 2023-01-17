@@ -4,8 +4,13 @@ namespace Pentatrion\ViteBundle\Asset;
 
 class TagRenderer
 {
-    private $defaultScriptAttributes;
-    private $defaultLinkAttributes;
+    /** @deprecated */
+    private $defaultScriptAttributes = [];
+    /** @deprecated */
+    private $defaultLinkAttributes = [];
+
+    private $defaultBuild;
+    private $builds;
 
     // https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc
     protected const SAFARI10_NO_MODULE_FIX = '<script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>';
@@ -43,11 +48,11 @@ class TagRenderer
     }
 
     public function __construct(
-        $defaultScriptAttributes = [],
-        $defaultLinkAttributes = []
+        $defaultBuild = 'default',
+        $builds = []
     ) {
-        $this->defaultScriptAttributes = $defaultScriptAttributes;
-        $this->defaultLinkAttributes = $defaultLinkAttributes;
+        $this->defaultBuild = $defaultBuild;
+        $this->builds = $builds;
     }
 
     public function renderScriptFile($attributes = [], $content = '', $withDefaultScriptAttributes = true)

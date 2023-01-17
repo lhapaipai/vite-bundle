@@ -23,13 +23,13 @@ class EntryFilesTwigExtension extends AbstractExtension
     ];
     }
 
-    public function renderViteScriptTags(string $entryName, array $options = []): string
+    public function renderViteScriptTags(string $entryName, array $options = [], $buildName = null): string
     {
-        return $this->entrypointRenderer->renderScripts($entryName, $options);
+        return $this->entrypointRenderer->renderScripts($entryName, $options, $buildName);
     }
 
-    public function renderViteLinkTags(string $entryName, array $options = []): string
+    public function renderViteLinkTags(string $entryName, array $options = [], $buildName = null): string
     {
-        return $this->entrypointRenderer->renderLinks($entryName, $options);
+        return $this->entrypointRenderer->renderLinks($entryName, $options, $buildName);
     }
 }

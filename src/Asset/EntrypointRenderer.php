@@ -7,7 +7,7 @@ class EntrypointRenderer
     private $entrypointsLookup;
     private $tagRenderer;
 
-    private $hasReturnedViteClient = false;
+    private $returnedViteClients = [];
     private $hasReturnedViteLegacyScripts = false;
 
     public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer)
@@ -16,21 +16,23 @@ class EntrypointRenderer
         $this->tagRenderer = $tagRenderer;
     }
 
-    public function checkAndInsertLegacyPolyfill(&$content)
+    public function checkAndInsertLegacyPolyfill(&$content, $buildName)
     {
+        $viteServer = $this->entrypointsLookup->getViteServer($buildName);
+
         if (
-            $this->entrypointsLookup->isProd()
-            && $this->entrypointsLookup->isLegacyPluginEnabled()
+            false === $viteServer
+            && $this->entrypointsLookup->isLegacyPluginEnabled($buildName)
             && !$this->hasReturnedViteLegacyScripts
         ) {
             $content[] = $this->tagRenderer->renderLegacyCheckInline();
-            foreach ($this->entrypointsLookup->getJSFiles('polyfills-legacy') as $fileName) {
+            foreach ($this->entrypointsLookup->getJSFiles('polyfills-legacy', $buildName) as $fileName) {
                 $content[] = $this->tagRenderer->renderScriptFile([
                     'src' => $fileName,
                     'nomodule' => true,
                     'crossorigin' => true,
                     'id' => 'vite-legacy-polyfill',
-                ], '', false);
+                ], '', $buildName, false);
             }
             $this->hasReturnedViteLegacyScripts = true;
         }
@@ -43,28 +45,27 @@ class EntrypointRenderer
         }
 
         $content = [];
-        if (!$this->entrypointsLookup->isProd($buildName)) {
-            $viteServer = $this->entrypointsLookup->getViteServer($buildName);
-
-            if (!$this->hasReturnedViteClient) {
+        $viteServer = $this->entrypointsLookup->getViteServer($buildName);
+        if (false !== $viteServer) {
+            if (!isset($this->returnedViteClients[$buildName])) {
                 $content[] = $this->tagRenderer->renderScriptFile([
                     'src' => $viteServer['origin'].$viteServer['base'].'@vite/client',
                     'type' => 'module',
-                ]);
+                ], '', null, false);
                 if (isset($options['dependency']) && 'react' === $options['dependency']) {
                     $content[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
                 }
-                $this->hasReturnedViteClient = true;
+                $this->returnedViteClients[$buildName] = true;
             }
         }
 
-        $this->checkAndInsertLegacyPolyfill($content);
+        $this->checkAndInsertLegacyPolyfill($content, $buildName);
 
         foreach ($this->entrypointsLookup->getJSFiles($entryName, $buildName) as $fileName) {
             $content[] = $this->tagRenderer->renderScriptFile(array_merge([
                 'src' => $fileName,
                 'type' => 'module',
-            ], $options['attr'] ?? []));
+            ], $options['attr'] ?? []), '', $buildName, true);
         }
 
         if ($this->entrypointsLookup->hasLegacy($entryName, $buildName)) {
@@ -76,7 +77,7 @@ class EntrypointRenderer
                 'nomodule' => true,
                 'crossorigin' => true,
                 'class' => 'vite-legacy-entry',
-            ], $this->tagRenderer->getSystemJSInlineCode($id));
+            ], $this->tagRenderer->getSystemJSInlineCode($id), $buildName);
         }
 
         return implode('', $content);
@@ -90,10 +91,10 @@ class EntrypointRenderer
 
         $content = [];
 
-        $this->checkAndInsertLegacyPolyfill($content);
+        $this->checkAndInsertLegacyPolyfill($content, $buildName);
 
         foreach ($this->entrypointsLookup->getCSSFiles($entryName, $buildName) as $fileName) {
-            $content[] = $this->tagRenderer->renderLinkStylesheet($fileName, $options['attr'] ?? []);
+            $content[] = $this->tagRenderer->renderLinkStylesheet($fileName, $options['attr'] ?? [], $buildName);
         }
 
         if ($this->entrypointsLookup->isProd($buildName)) {

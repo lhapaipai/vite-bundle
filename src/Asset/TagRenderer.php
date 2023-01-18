@@ -55,10 +55,14 @@ class TagRenderer
         $this->builds = $builds;
     }
 
-    public function renderScriptFile($attributes = [], $content = '', $withDefaultScriptAttributes = true)
+    public function renderScriptFile($attributes = [], $content = '', $buildName = null, $withDefaultScriptAttributes = true)
     {
         if ($withDefaultScriptAttributes) {
-            $attributes = array_merge($this->defaultScriptAttributes, $attributes);
+            if (is_null($buildName)) {
+                $buildName = $this->defaultBuild;
+            }
+
+            $attributes = array_merge($this->builds[$buildName]['script_attributes'], $attributes);
         }
 
         return sprintf(
@@ -79,14 +83,18 @@ class TagRenderer
     </script>';
     }
 
-    public function renderLinkStylesheet($fileName, $extraAttributes = [])
+    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null)
     {
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
         $attributes = [
             'rel' => 'stylesheet',
             'href' => $fileName,
         ];
 
-        $attributes = array_merge($attributes, $this->defaultLinkAttributes, $extraAttributes);
+        $attributes = array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes);
 
         return sprintf(
             '<link %s>',

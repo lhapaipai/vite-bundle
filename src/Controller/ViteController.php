@@ -30,7 +30,8 @@ class ViteController
 
     public function proxyBuild($path): Response
     {
-        if (is_null($this->viteDevServer) || false === $this->viteDevServer) {
+        $viteDevServer = $this->entrypointsLookup->getViteServer();
+        if (is_null($viteDevServer) || false === $viteDevServer) {
             return new \Exception('Vite dev server not available');
         }
 

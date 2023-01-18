@@ -10,11 +10,12 @@ class EntrypointsLookup
     public function __construct($publicPath, $defaultBuild, $builds)
     {
         $this->defaultBuild = $defaultBuild;
-
         foreach ($builds as $buildName => $build) {
+            $entryPointsPath = $publicPath.$build['base'].'entrypoints.json';
             $this->buildsInfos[$buildName] = [
-                'entryPointsPath' => $publicPath.$build['base'].'entrypoints.json',
+                'entryPointsPath' => $entryPointsPath,
                 'infos' => null,
+                'fileExists' => file_exists($entryPointsPath),
             ];
         }
     }
@@ -26,10 +27,10 @@ class EntrypointsLookup
         }
 
         if (!isset($this->buildsInfos[$buildName]['infos'])) {
-            $entrypointsFilePath = $this->buildsInfos[$buildName]['entryPointsPath'];
-            if (!file_exists($entrypointsFilePath)) {
-                throw new \Exception($entrypointsFilePath.' not exists');
+            if (!$this->buildsInfos[$buildName]['fileExists']) {
+                throw new \Exception('entrypoints.json for '.$buildName.' not exists');
             }
+            $entrypointsFilePath = $this->buildsInfos[$buildName]['entryPointsPath'];
             $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
             if (!isset($fileInfos['isProd'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
                 throw new \Exception($entrypointsFilePath.' : isProd, entryPoints or viteServer not exists');
@@ -51,8 +52,11 @@ class EntrypointsLookup
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
         }
+        if (!isset($this->buildsInfos[$buildName])) {
+            return false;
+        }
 
-        return file_exists($this->buildsInfos[$buildName]['entryPointsPath']);
+        return $this->buildsInfos[$buildName]['fileExists'];
     }
 
     public function isProd($buildName = null)

@@ -57,10 +57,11 @@ default configuration
 ```yaml
 # config/packages/pentatrion_vite.yaml
 pentatrion_vite:
-    # Base public path when served in development or production
-    base: /build/
     # path to the web root relative to the Symfony project root directory
     public_dir: /public
+
+    # Base public path when served in development or production
+    base: /build/
 
     script_attributes:
         # you can define your attributes that you want to apply
@@ -69,6 +70,22 @@ pentatrion_vite:
     link_attributes:
         # you can define your attributes that you want to apply
         # for all your link tags
+
+
+    # only if you have multiple vite.config files
+    # leave keys : base, script_attributes, link_attributes empty
+    # and fill in the following
+    default_build: <custom-build-name-1>
+    builds:
+        <custom-build-name-1>:
+            # Base public path when served in development or production
+            base: /build/
+
+            script_attributes:
+                # etc
+
+            link_attributes:
+                # etc
 ```
 
 
@@ -106,14 +123,15 @@ export default defineConfig({
 
 ## Twig functions
 
-The bundle provide 2 twig functions both of which accept an optional second parameter of options.
+The bundle provide 2 twig functions both of which accept an optional second parameter of options and an optional third parameter `buildName` if you have multiple builds ([#multiple-vite-configurations](multiple-vite-configurations)).
 
 `vite_entry_script_tags`
 
+options:
 - dependency: 'react' | null
 - attr: Array (an array of extra attributes)
 
-```
+```twig
 vite_entry_script_tags('<entrypoint>', {
     dependency: 'react',
     attr: {
@@ -124,9 +142,10 @@ vite_entry_script_tags('<entrypoint>', {
 
 `vite_entry_link_tags`
 
+options:
 - attr: Array (an array of extra attributes)
 
-```
+```twig
 vite_entry_link_tags('<entrypoint>', {
     attr: {
         media: "screen and (prefers-color-scheme: dark)"
@@ -134,6 +153,10 @@ vite_entry_link_tags('<entrypoint>', {
 })
 ```
 
+if you have defined multiple builds
+```twig
+vite_entry_script_tags('<entrypoint>', {}, '<custom-build-name-1>')
+```
 
 ## Vite Assets managements
 
@@ -465,17 +488,18 @@ in your templates
 
 to show your assets in dev mode
 
-```diff
+```yaml
 # config/routes/dev/pentatrion_vite.yaml
 
 # remove this default config
-- _pentatrion_vite:
--     prefix: /build
--     resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
+# _pentatrion_vite:
+#     prefix: /build
+#     resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
 
 # add this
+
 _pentatrion_vite_build1:
-    path: /build1/{path}
+    path: /build1/{path} #same as your build1 base
     defaults:
         _controller: Pentatrion\ViteBundle\Controller\ViteController::proxyBuild
         buildName: build1
@@ -483,7 +507,7 @@ _pentatrion_vite_build1:
         path: ".+"
 
 _pentatrion_vite_build2:
-    path: /build2/{path}
+    path: /build2/{path} #same as your build2 base
     defaults:
         _controller: Pentatrion\ViteBundle\Controller\ViteController::proxyBuild
         buildName: build2
@@ -501,7 +525,7 @@ services:
         class: Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_dir%"
-            - build1
+            - build1 # change this
             - "%pentatrion_vite.builds%"
             - true
 
@@ -509,7 +533,7 @@ services:
         class: Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_dir%"
-            - build2
+            - build2 # change this
             - "%pentatrion_vite.builds%"
             - true
 
@@ -522,6 +546,7 @@ framework:
         version_strategy: 'Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy'
         packages:
             build1:
+                # same name as your service defined above
                 version_strategy: 'pentatrion_vite.asset_strategy_build1'
 
             build2:

@@ -23,21 +23,27 @@ class ViteController
         $this->defaultBuild = $defaultBuild;
         $this->builds = $builds;
         $this->httpClient = $httpClient;
+
         $this->entrypointsLookup = $entrypointsLookup;
 
-        $this->viteDevServer = $this->entrypointsLookup->getViteServer();
+        // $this->viteDevServer = $this->entrypointsLookup->getViteServer();
     }
 
-    public function proxyBuild($path): Response
+    public function proxyBuild($path, $buildName = null): Response
     {
-        $viteDevServer = $this->entrypointsLookup->getViteServer();
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
+        $viteDevServer = $this->entrypointsLookup->getViteServer($buildName);
+
         if (is_null($viteDevServer) || false === $viteDevServer) {
             return new \Exception('Vite dev server not available');
         }
 
         $response = $this->httpClient->request(
             'GET',
-            $this->viteDevServer['origin'].$this->viteBase.$path
+            $viteDevServer['origin'].$this->builds[$buildName]['base'].$path
         );
 
         $content = $response->getContent();

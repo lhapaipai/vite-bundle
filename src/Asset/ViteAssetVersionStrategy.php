@@ -9,23 +9,23 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
-    private string $viteBase;
     private string $manifestPath;
     private string $entrypointsPath;
     private $manifestData = null;
     private $entrypointsData = null;
     private ?array $assetsData = null;
+    private ?array $build = null;
     private bool $strictMode;
 
     /**
      * @param string $manifestPath Absolute path to the manifest file
      * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $viteBase, string $manifestPath, string $entrypointsPath, bool $strictMode = true)
+    public function __construct(string $publicPath, string $buildName, array $builds, bool $strictMode = true)
     {
-        $this->viteBase = $viteBase;
-        $this->manifestPath = $manifestPath;
-        $this->entrypointsPath = $entrypointsPath;
+        $this->build = $builds[$buildName];
+        $this->manifestPath = $publicPath.$this->build['base'].'manifest.json';
+        $this->entrypointsPath = $publicPath.$this->build['base'].'entrypoints.json';
         $this->strictMode = $strictMode;
 
         if (($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
@@ -73,7 +73,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
         if (false !== $this->manifestData) {
             if (isset($this->manifestData[$path])) {
-                return $this->viteBase.$this->manifestData[$path]['file'];
+                return $this->build['base'].$this->manifestData[$path]['file'];
             }
         } else {
             return $this->entrypointsData['viteServer']['origin'].$this->entrypointsData['viteServer']['base'].$path;

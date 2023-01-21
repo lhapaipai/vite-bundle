@@ -1,3 +1,11 @@
+## v3.1.0
+
+- allow vite multiple configuration files
+
+## v3.0.0
+
+- Add vite 4 compatibility
+
 ## v2.2.1
 
 - the choice of the vite dev server port is no longer strict, if it is already used the application will use the next available port.

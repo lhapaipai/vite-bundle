@@ -27,7 +27,6 @@ You need to add manually the `vite` and `vite-plugin-symfony` packages and scrip
 There is some minor differences with the twig functions
 
 
-
 ```diff
 // webpack.config.js
 -Encore.addEntry("app", "./assets/app.js");
@@ -37,7 +36,9 @@ There is some minor differences with the twig functions
 // vite.config.js
 +export default {
 +    // ...
-+    root: "./assets",
++    plugins: [
++      symfonyPlugin()
++    ],
 +    build: {
 +        rollupOptions: {
 +            input: {

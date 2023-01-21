@@ -9,11 +9,13 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
+    private string $publicPath;
+    private array $builds;
+
     private string $manifestPath;
     private string $entrypointsPath;
     private $manifestData = null;
     private $entrypointsData = null;
-    private ?array $assetsData = null;
     private ?array $build = null;
     private bool $strictMode;
 
@@ -21,16 +23,24 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
      * @param string $manifestPath Absolute path to the manifest file
      * @param bool   $strictMode   Throws an exception for unknown paths
      */
-    public function __construct(string $publicPath, string $buildName, array $builds, bool $strictMode = true)
+    public function __construct(string $publicPath, array $builds, string $defaultBuildName, bool $strictMode = true)
     {
-        $this->build = $builds[$buildName];
-        $this->manifestPath = $publicPath.$this->build['base'].'manifest.json';
-        $this->entrypointsPath = $publicPath.$this->build['base'].'entrypoints.json';
+        $this->publicPath = $publicPath;
+        $this->builds = $builds;
         $this->strictMode = $strictMode;
+
+        $this->setBuildName($defaultBuildName);
 
         if (($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
             throw new \Exception('You can\'t use a remote manifest with ViteAssetVersionStrategy');
         }
+    }
+
+    public function setBuildName(string $buildName): void
+    {
+        $this->build = $this->builds[$buildName];
+        $this->manifestPath = $this->publicPath.$this->build['base'].'manifest.json';
+        $this->entrypointsPath = $this->publicPath.$this->build['base'].'entrypoints.json';
     }
 
     /**
@@ -92,16 +102,16 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return null;
     }
 
-    private function findAlternatives(string $path, ?array $assetsData): array
+    private function findAlternatives(string $path, ?array $manifestData): array
     {
         $path = strtolower($path);
         $alternatives = [];
 
-        if (is_null($assetsData)) {
+        if (is_null($manifestData)) {
             return $alternatives;
         }
 
-        foreach ($assetsData as $key => $value) {
+        foreach ($manifestData as $key => $value) {
             $lev = levenshtein($path, strtolower($key));
             if ($lev <= \strlen($path) / 3 || false !== stripos($key, $path)) {
                 $alternatives[$key] = isset($alternatives[$key]) ? min($lev, $alternatives[$key]) : $lev;

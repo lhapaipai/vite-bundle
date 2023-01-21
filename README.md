@@ -336,7 +336,7 @@ to show your assets in dev mode
 #     prefix: /build
 #     resource: "@PentatrionViteBundle/Resources/config/routing.yaml"
 
-# add this
+# add one route by build path
 _pentatrion_vite_build1:
     path: /build1/{path} #same as your build1 base
     defaults:
@@ -361,28 +361,20 @@ Optional : if you want to use asset symfony component with custom strategy you n
 # config/services.yaml
 services:
     pentatrion_vite.asset_strategy_build1:
-        class: Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy
-        arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%"
-            - build1 # change this
-            - "%pentatrion_vite.builds%"
-            - true
+        parent: Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy
+        calls:
+            - [setBuildName, ['build1']]
 
     pentatrion_vite.asset_strategy_build2:
-        class: Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy
-        arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%"
-            - build2 # change this
-            - "%pentatrion_vite.builds%"
-            - true
-
+        parent: Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy
+        calls:
+            - [setBuildName, ['build2']]
 ```
 
 ```yaml
 # config/packages/framework.yaml
 framework:
     assets:
-        version_strategy: 'Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy'
         packages:
             build1:
                 # same name as your service defined above

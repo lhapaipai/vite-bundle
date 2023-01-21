@@ -12,7 +12,6 @@ class ViteController
     public string $defaultBuild;
     public array $builds;
     private $entrypointsLookup;
-    private $viteDevServer;
 
     public function __construct(
         string $defaultBuild,
@@ -25,8 +24,6 @@ class ViteController
         $this->httpClient = $httpClient;
 
         $this->entrypointsLookup = $entrypointsLookup;
-
-        // $this->viteDevServer = $this->entrypointsLookup->getViteServer();
     }
 
     public function proxyBuild($path, $buildName = null): Response

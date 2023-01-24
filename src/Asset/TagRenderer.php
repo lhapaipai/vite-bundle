@@ -4,48 +4,35 @@ namespace Pentatrion\ViteBundle\Asset;
 
 class TagRenderer
 {
-    /** @deprecated */
-    private $defaultScriptAttributes = [];
-    /** @deprecated */
-    private $defaultLinkAttributes = [];
-
     private $defaultBuild;
     private $builds;
 
     // https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc
-    protected const SAFARI10_NO_MODULE_FIX = '<script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>';
+    public const SAFARI10_NO_MODULE_FIX = '<!-- SAFARI10_NO_MODULE_FIX --><script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>';
 
-    protected const DETECT_MODERN_BROWSER_CODE = '<script type="module">try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;</script>';
-    protected const DYNAMIC_FALLBACK_INLINE_CODE = '
-    <script type="module">
-        ! function() {
+    public const DETECT_MODERN_BROWSER_CODE = '<!-- DETECT_MODERN_BROWSER_CODE --><script type="module">try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;</script>';
+
+    // load the <script nomodule crossorigin id="vite-legacy-polyfill" src="..."></script>
+    // and the <script nomodule crossorigin id="vite-legacy-entry" data-src="..."></script>
+    // if browser accept modules but don't dynamic import or import.meta
+    public const DYNAMIC_FALLBACK_INLINE_CODE = '
+    <!-- DYNAMIC_FALLBACK_INLINE_CODE --><script type="module">
+        (function() {
             if (window.__vite_is_modern_browser) return;
             console.warn("vite: loading legacy build because dynamic import or import.meta.url is unsupported, syntax error above should be ignored");
-            var e = document.getElementById("vite-legacy-polyfill"),
-                n = document.createElement("script");
-                n.src = e.src,
-                n.onload = function() {
-                    document.querySelectorAll("script.vite-legacy-entry").forEach(function(elt) {
-                        System.import(elt.getAttribute("data-src"));
-                    })
-                },
-                document.body.appendChild(n)
-        }();
+            var legacyPolyfill = document.getElementById("vite-legacy-polyfill")
+            var script = document.createElement("script");
+            script.src = legacyPolyfill.src;
+            script.onload = function() {
+                document.querySelectorAll("script.vite-legacy-entry").forEach(function(elt) {
+                    System.import(elt.getAttribute("data-src"));
+                });
+            };
+            document.body.appendChild(script);
+        })();
     </script>';
 
-    protected const SYSTEM_JS_INLINE_CODE = 'System.import(document.getElementById("__ID__").getAttribute("data-src"))';
-
-    public function renderLegacyCheckInline()
-    {
-        return self::DETECT_MODERN_BROWSER_CODE
-            .self::DYNAMIC_FALLBACK_INLINE_CODE
-            .self::SAFARI10_NO_MODULE_FIX;
-    }
-
-    public function getSystemJSInlineCode($id)
-    {
-        return str_replace('__ID__', $id, self::SYSTEM_JS_INLINE_CODE);
-    }
+    public const SYSTEM_JS_INLINE_CODE = 'System.import(document.getElementById("__ID__").getAttribute("data-src"))';
 
     public function __construct(
         $defaultBuild = 'default',
@@ -55,24 +42,12 @@ class TagRenderer
         $this->builds = $builds;
     }
 
-    public function renderScriptFile($attributes = [], $content = '', $buildName = null, $withDefaultScriptAttributes = true)
+    public function getSystemJSInlineCode($id): string
     {
-        if ($withDefaultScriptAttributes) {
-            if (is_null($buildName)) {
-                $buildName = $this->defaultBuild;
-            }
-
-            $attributes = array_merge($this->builds[$buildName]['script_attributes'], $attributes);
-        }
-
-        return sprintf(
-            '<script %s>%s</script>',
-            $this->convertArrayToAttributes($attributes),
-            $content
-        );
+        return str_replace('__ID__', $id, self::SYSTEM_JS_INLINE_CODE);
     }
 
-    public function renderReactRefreshInline($devServerUrl)
+    public function renderReactRefreshInline($devServerUrl): string
     {
         return '  <script type="module">
     import RefreshRuntime from "'.$devServerUrl.'@react-refresh"
@@ -80,10 +55,21 @@ class TagRenderer
     window.$RefreshReg$ = () => {}
     window.$RefreshSig$ = () => (type) => type
     window.__vite_plugin_react_preamble_installed__ = true
-    </script>';
+    </script>'.PHP_EOL;
     }
 
-    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null)
+    public function renderScriptFile($extraAttributes = [], $content = '', $buildName = null): string
+    {
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
+        $attributes = array_merge($this->builds[$buildName]['script_attributes'], $extraAttributes);
+
+        return $this->renderTag('script', $attributes, $content);
+    }
+
+    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
@@ -96,26 +82,29 @@ class TagRenderer
 
         $attributes = array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes);
 
-        return sprintf(
-            '<link %s>',
-            $this->convertArrayToAttributes($attributes)
-        );
+        return $this->renderTag('link', $attributes);
     }
 
-    public function renderLinkPreload($fileName)
+    public function renderLinkPreload($fileName): string
     {
-        $attributes = [
+        return $this->renderTag('link', [
             'rel' => 'modulepreload',
             'href' => $fileName,
-        ];
-
-        return sprintf(
-            '<link %s>',
-            $this->convertArrayToAttributes($attributes)
-        );
+        ]);
     }
 
-    private function convertArrayToAttributes(array $attributes): string
+    public function renderTag($tagName, $attributes, $content = ''): string
+    {
+        return sprintf(
+            '<%s %s>%s</%s>',
+            $tagName,
+            self::convertArrayToAttributes($attributes),
+            $content,
+            $tagName
+        ).PHP_EOL;
+    }
+
+    private static function convertArrayToAttributes(array $attributes): string
     {
         return implode(' ', array_map(
             function ($key, $value) {

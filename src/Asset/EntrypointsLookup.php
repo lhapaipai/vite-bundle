@@ -20,7 +20,19 @@ class EntrypointsLookup
         }
     }
 
-    private function getInfos($buildName = null)
+    public function hasFile($buildName = null): bool
+    {
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+        if (!isset($this->buildsInfos[$buildName])) {
+            return false;
+        }
+
+        return $this->buildsInfos[$buildName]['fileExists'];
+    }
+
+    private function getInfos($buildName = null): array
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
@@ -42,24 +54,12 @@ class EntrypointsLookup
         return $this->buildsInfos[$buildName]['infos'];
     }
 
-    public function isLegacyPluginEnabled($buildName = null)
+    public function isLegacyPluginEnabled($buildName = null): bool
     {
         return $this->getInfos($buildName)['legacy'];
     }
 
-    public function hasFile($buildName = null)
-    {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-        if (!isset($this->buildsInfos[$buildName])) {
-            return false;
-        }
-
-        return $this->buildsInfos[$buildName]['fileExists'];
-    }
-
-    public function isProd($buildName = null)
+    public function isProd($buildName = null): bool
     {
         return $this->getInfos($buildName)['isProd'];
     }
@@ -69,29 +69,29 @@ class EntrypointsLookup
         return $this->getInfos($buildName)['viteServer'];
     }
 
-    public function getJSFiles($entryName, $buildName = null)
+    public function getJSFiles($entryName, $buildName = null): array
     {
         return $this->getInfos($buildName)['entryPoints'][$entryName]['js'] ?? [];
     }
 
-    public function getCSSFiles($entryName, $buildName = null)
+    public function getCSSFiles($entryName, $buildName = null): array
     {
         return $this->getInfos($buildName)['entryPoints'][$entryName]['css'] ?? [];
     }
 
-    public function getJavascriptDependencies($entryName, $buildName = null)
+    public function getJavascriptDependencies($entryName, $buildName = null): array
     {
         return $this->getInfos($buildName)['entryPoints'][$entryName]['preload'] ?? [];
     }
 
-    public function hasLegacy($entryName, $buildName = null)
+    public function hasLegacy($entryName, $buildName = null): bool
     {
         $entryInfos = $this->getInfos($buildName);
 
         return isset($entryInfos['entryPoints'][$entryName]['legacy']) && false !== $entryInfos['entryPoints'][$entryName]['legacy'];
     }
 
-    public function getLegacyJSFile($entryName, $buildName = null)
+    public function getLegacyJSFile($entryName, $buildName = null): string
     {
         $entryInfos = $this->getInfos($buildName);
 

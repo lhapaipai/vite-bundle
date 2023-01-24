@@ -2,7 +2,6 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
-use Exception;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
@@ -19,10 +18,6 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     private ?array $build = null;
     private bool $strictMode;
 
-    /**
-     * @param string $manifestPath Absolute path to the manifest file
-     * @param bool   $strictMode   Throws an exception for unknown paths
-     */
     public function __construct(string $publicPath, array $builds, string $defaultBuildName, bool $strictMode = true)
     {
         $this->publicPath = $publicPath;

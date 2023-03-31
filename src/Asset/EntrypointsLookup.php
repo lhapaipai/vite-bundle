@@ -56,7 +56,9 @@ class EntrypointsLookup
 
     public function isLegacyPluginEnabled($buildName = null): bool
     {
-        return array_key_exists('legacy', $this->getInfos($buildName));
+        $buildInfos = $this->getInfos($buildName);
+
+        return array_key_exists('legacy', $buildInfos) && true === $buildInfos['legacy'];
     }
 
     public function isProd($buildName = null): bool

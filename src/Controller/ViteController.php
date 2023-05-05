@@ -12,18 +12,21 @@ class ViteController
     public string $defaultBuild;
     public array $builds;
     private $entrypointsLookup;
+    private $proxyOrigin;
 
     public function __construct(
         string $defaultBuild,
         array $builds,
         HttpClientInterface $httpClient,
-        EntrypointsLookup $entrypointsLookup
+        EntrypointsLookup $entrypointsLookup,
+        ?string $proxyOrigin
     ) {
         $this->defaultBuild = $defaultBuild;
         $this->builds = $builds;
         $this->httpClient = $httpClient;
 
         $this->entrypointsLookup = $entrypointsLookup;
+        $this->proxyOrigin = $proxyOrigin;
     }
 
     public function proxyBuild($path, $buildName = null): Response
@@ -38,9 +41,11 @@ class ViteController
             return new \Exception('Vite dev server not available');
         }
 
+        $origin = $this->proxyOrigin ?? $viteDevServer['origin'];
+
         $response = $this->httpClient->request(
             'GET',
-            $viteDevServer['origin'].$this->builds[$buildName]['base'].$path
+            $origin.$this->builds[$buildName]['base'].$path
         );
 
         $content = $response->getContent();

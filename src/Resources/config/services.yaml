@@ -45,6 +45,7 @@ services:
             - "%pentatrion_vite.builds%"
             - "@http_client"
             - "@vite.entrypoints_lookup"
+            - "%pentatrion_vite.proxy_origin%"
         public: true
 
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:

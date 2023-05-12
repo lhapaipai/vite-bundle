@@ -1,3 +1,7 @@
+## v3.1.4
+
+- add proxy_origin option (@FluffyDiscord)
+
 ## v3.1.0
 
 - allow vite multiple configuration files

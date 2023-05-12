@@ -63,6 +63,11 @@ pentatrion_vite:
     # Base public path when served in development or production
     base: /build/
 
+    # you can set different origin for asset proxy for vite dev
+    # required when vite dev is running outside Docker container
+    # on your host machine, eg. http://host.docker.internal:5173
+    proxy_origin:
+
     script_attributes:
         # you can define your attributes that you want to apply
         # for all your script tags

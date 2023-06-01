@@ -58,6 +58,7 @@ class PentatrionViteExtension extends Extension
         $container->setParameter('pentatrion_vite.builds', $builds);
 
         $container->setParameter('pentatrion_vite.proxy_origin', $config['proxy_origin']);
+        $container->setParameter('pentatrion_vite.throw_on_missing_entry', $config['throw_on_missing_entry']);
 
         $container->getDefinition('vite.tag_renderer')
             ->replaceArgument(0, $defaultBuild)

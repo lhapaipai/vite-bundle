@@ -4,11 +4,13 @@ namespace Pentatrion\ViteBundle\Asset;
 
 class EntrypointsLookup
 {
+    private bool $throwOnMissingEntry;
     private $defaultBuild;
     private $buildsInfos = [];
 
-    public function __construct($publicPath, $defaultBuild, $builds)
+    public function __construct($publicPath, $defaultBuild, $builds, $throwOnMissingEntry)
     {
+        $this->throwOnMissingEntry = $throwOnMissingEntry;
         $this->defaultBuild = $defaultBuild;
         foreach ($builds as $buildName => $build) {
             $entryPointsPath = $publicPath.$build['base'].'entrypoints.json';
@@ -73,21 +75,29 @@ class EntrypointsLookup
 
     public function getJSFiles($entryName, $buildName = null): array
     {
+        $this->throwIfEntryIsMissing($entryName, $buildName);
+
         return $this->getInfos($buildName)['entryPoints'][$entryName]['js'] ?? [];
     }
 
     public function getCSSFiles($entryName, $buildName = null): array
     {
+        $this->throwIfEntryIsMissing($entryName, $buildName);
+
         return $this->getInfos($buildName)['entryPoints'][$entryName]['css'] ?? [];
     }
 
     public function getJavascriptDependencies($entryName, $buildName = null): array
     {
+        $this->throwIfEntryIsMissing($entryName, $buildName);
+
         return $this->getInfos($buildName)['entryPoints'][$entryName]['preload'] ?? [];
     }
 
     public function hasLegacy($entryName, $buildName = null): bool
     {
+        $this->throwIfEntryIsMissing($entryName, $buildName);
+
         $entryInfos = $this->getInfos($buildName);
 
         return isset($entryInfos['entryPoints'][$entryName]['legacy']) && false !== $entryInfos['entryPoints'][$entryName]['legacy'];
@@ -95,10 +105,27 @@ class EntrypointsLookup
 
     public function getLegacyJSFile($entryName, $buildName = null): string
     {
+        $this->throwIfEntryIsMissing($entryName, $buildName);
+
         $entryInfos = $this->getInfos($buildName);
 
         $legacyEntryName = $entryInfos['entryPoints'][$entryName]['legacy'];
 
         return $entryInfos['entryPoints'][$legacyEntryName]['js'][0];
+    }
+
+    private function throwIfEntryIsMissing(string $entryName, ?string $buildName = null): void
+    {
+        if (!$this->throwOnMissingEntry) {
+            return;
+        }
+
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
+        if (!array_key_exists($entryName, $this->getInfos($buildName)['entryPoints'])) {
+            throw new \Exception("Entry $entryName not present in the entrypoints file");
+        }
     }
 }

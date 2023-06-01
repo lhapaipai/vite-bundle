@@ -68,6 +68,12 @@ pentatrion_vite:
     # on your host machine, eg. http://host.docker.internal:5173
     proxy_origin:
 
+    # by default vite-bundle will silently ignore entries
+    # not present in the entrypoints file. by setting this
+    # flat to true, it will throw an exception each time
+    # you reference non existing entry in your templates
+    throw_on_missing_entry: false
+
     script_attributes:
         # you can define your attributes that you want to apply
         # for all your script tags

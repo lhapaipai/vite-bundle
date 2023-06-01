@@ -6,8 +6,9 @@ services:
             - "%kernel.project_dir%%pentatrion_vite.public_dir%"
             - "%pentatrion_vite.default_build%"
             - "%pentatrion_vite.builds%"
+            - "%pentatrion_vite.throw_on_missing_entry%"
         public: true
-    
+
     vite.tag_renderer:
         class: Pentatrion\ViteBundle\Asset\TagRenderer
         arguments:

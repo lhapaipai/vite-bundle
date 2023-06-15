@@ -114,7 +114,7 @@ class EntrypointsLookup
         return $entryInfos['entryPoints'][$legacyEntryName]['js'][0];
     }
 
-    private function throwIfEntryIsMissing(string $entryName, ?string $buildName = null): void
+    private function throwIfEntryIsMissing(string $entryName, string $buildName = null): void
     {
         if (!$this->throwOnMissingEntry) {
             return;
@@ -125,7 +125,9 @@ class EntrypointsLookup
         }
 
         if (!array_key_exists($entryName, $this->getInfos($buildName)['entryPoints'])) {
-            throw new \Exception("Entry $entryName not present in the entrypoints file");
+            $keys = array_keys($this->getInfos($buildName)['entryPoints']);
+            $entryPointKeys = join(', ', array_map(function ($key) { return "'$key'"; }, $keys));
+            throw new \Exception("Entry '$entryName' not present in the entrypoints file. Defined entrypoints are $entryPointKeys");
         }
     }
 }

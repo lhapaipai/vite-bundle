@@ -1,3 +1,7 @@
+## v3.2.0
+
+- add throw_on_missing_entry option (@Magiczne)
+
 ## v3.1.4
 
 - add proxy_origin option (@FluffyDiscord)

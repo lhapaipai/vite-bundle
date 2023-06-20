@@ -1,3 +1,7 @@
+## v3.3.0
+
+- versionning synchronization between pentatrion/vite-bundle and vite-plugin-symfony
+
 ## v3.2.0
 
 - add throw_on_missing_entry option (@Magiczne)

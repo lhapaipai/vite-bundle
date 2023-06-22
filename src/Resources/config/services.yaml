@@ -3,7 +3,7 @@ services:
     vite.entrypoints_lookup:
         class: Pentatrion\ViteBundle\Asset\EntrypointsLookup
         arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%"
+            - "%kernel.project_dir%%pentatrion_vite.public_directory%"
             - "%pentatrion_vite.default_build%"
             - "%pentatrion_vite.builds%"
             - "%pentatrion_vite.throw_on_missing_entry%"
@@ -51,7 +51,7 @@ services:
 
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
         arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_dir%"
+            - "%kernel.project_dir%%pentatrion_vite.public_directory%"
             - "%pentatrion_vite.builds%"
             - "%pentatrion_vite.default_build%"
             - true

@@ -57,11 +57,12 @@ default configuration
 ```yaml
 # config/packages/pentatrion_vite.yaml
 pentatrion_vite:
-    # path to the web root relative to the Symfony project root directory
-    public_dir: /public
 
-    # Base public path when served in development or production
-    base: /build/
+    # path to the web root relative to the Symfony project root directory
+    public_directory: public
+
+    # path to your compiled files relative to the web root.
+    build_directory: build
 
     # you can set different origin for asset proxy for vite dev
     # required when vite dev is running outside Docker container
@@ -84,19 +85,30 @@ pentatrion_vite:
 
 
     # only if you have multiple vite.config files
-    # leave keys : base, script_attributes, link_attributes empty
+    # leave keys : build_directory, script_attributes, link_attributes empty
     # and fill in the following
     default_build: <custom-build-name-1>
     builds:
         <custom-build-name-1>:
-            # Base public path when served in development or production
-            base: /build1/
+
+            # path to your compiled files relative to the web root.
+            build_directory: build1
 
             script_attributes:
                 # etc
 
             link_attributes:
                 # etc
+
+            # @deprecated since 3.3.1 use build_directory instead
+            base: /build1/
+
+            # @deprecated since 3.3.1 use public_directory instead
+            public_dir: /public
+
+            # @deprecated since 3.3.1 use build_directory instead
+            base: /build/
+
 ```
 
 ## Compatibility

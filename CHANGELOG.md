@@ -1,3 +1,8 @@
+## v3.3.1
+
+- deprecate `public_dir` / `base`
+- add `public_directory` / `build_directory`
+
 ## v3.3.0
 
 - versionning synchronization between pentatrion/vite-bundle and vite-plugin-symfony

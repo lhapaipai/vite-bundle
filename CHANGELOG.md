@@ -1,3 +1,7 @@
+## next
+
+- fix react refresh when vite client is returned
+
 ## v3.3.1
 
 - deprecate `public_dir` / `base`

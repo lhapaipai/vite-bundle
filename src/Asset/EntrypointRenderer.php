@@ -8,6 +8,8 @@ class EntrypointRenderer
     private $tagRenderer;
 
     private $returnedViteClients = [];
+    private $returnedReactRefresh = [];
+
     private $hasReturnedViteLegacyScripts = false;
 
     public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer)
@@ -32,10 +34,11 @@ class EntrypointRenderer
                     'type' => 'module',
                     'src' => $viteServer['origin'].$viteServer['base'].'@vite/client',
                 ]);
-                if (isset($options['dependency']) && 'react' === $options['dependency']) {
-                    $content[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
-                }
                 $this->returnedViteClients[$buildName] = true;
+            }
+            if (!isset($this->returnedReactRefresh[$buildName]) && isset($options['dependency']) && 'react' === $options['dependency']) {
+                $content[] = $this->tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
+                $this->returnedReactRefresh[$buildName] = true;
             }
         } elseif (
             $this->entrypointsLookup->isLegacyPluginEnabled($buildName)

@@ -85,12 +85,20 @@ class TagRenderer
         return $this->renderTag('link', $attributes);
     }
 
-    public function renderLinkPreload($fileName): string
+    public function renderLinkPreload($fileName, $extraAttributes = [], $buildName = null): string
     {
-        return $this->renderTag('link', [
+        if (is_null($buildName)) {
+            $buildName = $this->defaultBuild;
+        }
+
+        $attributes = [
             'rel' => 'modulepreload',
             'href' => $fileName,
-        ]);
+        ];
+
+        $attributes = array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes);
+
+        return $this->renderTag('link', $attributes);
     }
 
     public function renderTag($tagName, $attributes, $content = ''): string
@@ -106,6 +114,14 @@ class TagRenderer
 
     private static function convertArrayToAttributes(array $attributes): string
     {
+        $nonNullAttributes = array_filter(
+            $attributes,
+            function ($value, $key) {
+                return null !== $value;
+            },
+            ARRAY_FILTER_USE_BOTH
+        );
+
         return implode(' ', array_map(
             function ($key, $value) {
                 if (true === $value) {
@@ -114,8 +130,8 @@ class TagRenderer
                     return sprintf('%s="%s"', $key, htmlentities($value));
                 }
             },
-            array_keys($attributes),
-            $attributes
+            array_keys($nonNullAttributes),
+            $nonNullAttributes
         ));
     }
 }

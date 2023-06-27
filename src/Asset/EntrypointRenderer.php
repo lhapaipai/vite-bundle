@@ -58,12 +58,12 @@ class EntrypointRenderer
              *  it will load <script nomodule> anyway */
             $content[] = $this->tagRenderer::SAFARI10_NO_MODULE_FIX;
 
-            foreach ($this->entrypointsLookup->getJSFiles('polyfills-legacy', $buildName) as $fileName) {
+            foreach ($this->entrypointsLookup->getJSFiles('polyfills-legacy', $buildName) as $fileWithHash) {
                 // normally only one js file
                 $content[] = $this->tagRenderer->renderTag('script', [
                     'nomodule' => true,
                     'crossorigin' => true,
-                    'src' => $fileName,
+                    'src' => $fileWithHash['path'],
                     'id' => 'vite-legacy-polyfill',
                 ]);
             }
@@ -71,10 +71,11 @@ class EntrypointRenderer
         }
 
         /* normal js scripts */
-        foreach ($this->entrypointsLookup->getJSFiles($entryName, $buildName) as $fileName) {
+        foreach ($this->entrypointsLookup->getJSFiles($entryName, $buildName) as $fileWithHash) {
             $attributes = array_merge([
                 'type' => 'module',
-                'src' => $fileName,
+                'src' => $fileWithHash['path'],
+                'integrity' => $fileWithHash['hash'],
             ], $options['attr'] ?? []);
             $content[] = $this->tagRenderer->renderScriptFile($attributes, '', $buildName);
         }
@@ -103,13 +104,17 @@ class EntrypointRenderer
 
         $content = [];
 
-        foreach ($this->entrypointsLookup->getCSSFiles($entryName, $buildName) as $fileName) {
-            $content[] = $this->tagRenderer->renderLinkStylesheet($fileName, $options['attr'] ?? [], $buildName);
+        foreach ($this->entrypointsLookup->getCSSFiles($entryName, $buildName) as $fileWithHash) {
+            $content[] = $this->tagRenderer->renderLinkStylesheet($fileWithHash['path'], array_merge([
+                'integrity' => $fileWithHash['hash'],
+            ], $options['attr'] ?? []), $buildName);
         }
 
         if ($this->entrypointsLookup->isProd($buildName)) {
-            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileName) {
-                $content[] = $this->tagRenderer->renderLinkPreload($fileName, $buildName);
+            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
+                $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
+                    'integrity' => $fileWithHash['hash'],
+                ], $buildName);
             }
         }
 

@@ -1,3 +1,7 @@
+## v4.0.1
+
+- fix conditional imports generate modulepreloads for everything
+
 ## v4.0.0
 
 - fix react refresh when vite client is returned

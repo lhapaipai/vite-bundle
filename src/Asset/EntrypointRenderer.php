@@ -110,8 +110,16 @@ class EntrypointRenderer
             ], $options['attr'] ?? []), $buildName);
         }
 
-        if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
+        if ($this->entrypointsLookup->isProd($buildName)) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
+                $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
+                    'integrity' => $fileWithHash['hash'],
+                ], $buildName);
+            }
+        }
+
+        if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
+            foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
                 $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);

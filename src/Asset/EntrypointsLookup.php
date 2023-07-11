@@ -94,6 +94,13 @@ class EntrypointsLookup
         return $this->getInfos($buildName)['entryPoints'][$entryName]['preload'] ?? [];
     }
 
+    public function getJavascriptDynamicDependencies($entryName, $buildName = null): array
+    {
+        $this->throwIfEntryIsMissing($entryName, $buildName);
+
+        return $this->getInfos($buildName)['entryPoints'][$entryName]['dynamic'] ?? [];
+    }
+
     public function hasLegacy($entryName, $buildName = null): bool
     {
         $this->throwIfEntryIsMissing($entryName, $buildName);

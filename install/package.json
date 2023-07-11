@@ -7,6 +7,6 @@
     "license": "UNLICENSED",
     "devDependencies": {
         "vite": "^4.0",
-        "vite-plugin-symfony": "^3.3"
+        "vite-plugin-symfony": "^4.0"
     }
 }

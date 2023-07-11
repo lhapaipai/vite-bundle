@@ -1,6 +1,7 @@
-## next
+## v4.0.0
 
 - fix react refresh when vite client is returned
+- add CDN feature
 
 ## v3.3.1
 

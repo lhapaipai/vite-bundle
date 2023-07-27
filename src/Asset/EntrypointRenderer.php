@@ -132,7 +132,8 @@ class EntrypointRenderer
     public function reset()
     {
         // resets the state of this service
-        $this->returnedViteClients = $this->returnedReactRefresh = [];
+        $this->returnedViteClients = [];
+        $this->returnedReactRefresh = [];
     }
 
     public static function pascalToKebab(string $str): string

@@ -38,6 +38,7 @@ services:
         tags: ["twig.extension"]
         arguments:
             - "@vite.entrypoint_renderer"
+            - "@vite.entrypoints_lookup"
 
     Pentatrion\ViteBundle\Controller\ViteController:
         tags: ["controller.service_arguments"]

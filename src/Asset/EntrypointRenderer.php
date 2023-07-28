@@ -129,6 +129,13 @@ class EntrypointRenderer
         return implode(PHP_EOL, $content);
     }
 
+    public function reset()
+    {
+        // resets the state of this service
+        $this->returnedViteClients = [];
+        $this->returnedReactRefresh = [];
+    }
+
     public static function pascalToKebab(string $str): string
     {
         return strtolower(preg_replace('/[A-Z]/', '-\\0', lcfirst($str)));

@@ -6,16 +6,18 @@ class EntrypointRenderer
 {
     private $entrypointsLookup;
     private $tagRenderer;
+    private $router;
 
     private $returnedViteClients = [];
     private $returnedReactRefresh = [];
 
     private $hasReturnedViteLegacyScripts = false;
 
-    public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer)
+    public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer, ?\Symfony\Component\Routing\RouterInterface $router = null)
     {
         $this->entrypointsLookup = $entrypointsLookup;
         $this->tagRenderer = $tagRenderer;
+        $this->router = $router;
     }
 
     public function renderScripts(string $entryName, array $options = [], $buildName = null): string
@@ -74,7 +76,7 @@ class EntrypointRenderer
         foreach ($this->entrypointsLookup->getJSFiles($entryName, $buildName) as $fileWithHash) {
             $attributes = array_merge([
                 'type' => 'module',
-                'src' => $fileWithHash['path'],
+                'src' => $this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'],
                 'integrity' => $fileWithHash['hash'],
             ], $options['attr'] ?? []);
             $content[] = $this->tagRenderer->renderScriptFile($attributes, '', $buildName);
@@ -96,23 +98,41 @@ class EntrypointRenderer
         return implode(PHP_EOL, $content);
     }
 
+    private function getAbsoluteURL(string $path)
+    {
+        if ($this->router === null) {
+            return $path;
+        }
+
+        return $this->router->getContext()->getScheme() . '://' . $this->router->getContext()->getHost() . $path;
+    }
+
+    private function shouldUseAbsoluteURL(array $options, $buildName)
+    {
+        $viteServer = $this->entrypointsLookup->getViteServer($buildName);
+
+        return false === $viteServer && isset($options['absoluteURL']) && true === $options['absoluteURL'];
+    }
+
     public function renderLinks(string $entryName, array $options = [], $buildName = null): string
     {
         if (!$this->entrypointsLookup->hasFile($buildName)) {
             return '';
         }
 
+        $viteServer = $this->entrypointsLookup->getViteServer($buildName);
+
         $content = [];
 
         foreach ($this->entrypointsLookup->getCSSFiles($entryName, $buildName) as $fileWithHash) {
-            $content[] = $this->tagRenderer->renderLinkStylesheet($fileWithHash['path'], array_merge([
+            $content[] = $this->tagRenderer->renderLinkStylesheet($this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'], array_merge([
                 'integrity' => $fileWithHash['hash'],
             ], $options['attr'] ?? []), $buildName);
         }
 
         if ($this->entrypointsLookup->isProd($buildName)) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
+                $content[] = $this->tagRenderer->renderLinkPreload($this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'], [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);
             }
@@ -120,7 +140,7 @@ class EntrypointRenderer
 
         if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
+                $content[] = $this->tagRenderer->renderLinkPreload($this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'], [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);
             }

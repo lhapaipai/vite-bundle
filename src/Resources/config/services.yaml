@@ -26,6 +26,7 @@ services:
         arguments:
             - "@vite.entrypoints_lookup"
             - "@vite.tag_renderer"
+            - "@?router"
         public: true
 
     Pentatrion\ViteBundle\Asset\EntrypointRenderer:

@@ -1,3 +1,7 @@
+## v4.2.0
+
+- add `vite_mode` twig function
+
 ## v4.0.1
 
 - fix conditional imports generate modulepreloads for everything

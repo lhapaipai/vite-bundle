@@ -129,6 +129,15 @@ class EntrypointRenderer
         return implode(PHP_EOL, $content);
     }
 
+    public function getMode(string $buildName = null): ?string
+    {
+        if (!$this->entrypointsLookup->hasFile($buildName)) {
+            return null;
+        }
+
+        return $this->entrypointsLookup->isProd() ? 'prod' : 'dev';
+    }
+
     public function reset()
     {
         // resets the state of this service

@@ -20,7 +20,13 @@ class EntryFilesTwigExtension extends AbstractExtension
         return [
       new TwigFunction('vite_entry_script_tags', [$this, 'renderViteScriptTags'], ['is_safe' => ['html']]),
       new TwigFunction('vite_entry_link_tags', [$this, 'renderViteLinkTags'], ['is_safe' => ['html']]),
+      new TwigFunction('vite_mode', [$this, 'getViteMode']),
     ];
+    }
+
+    public function getViteMode(string $buildName = null): ?string
+    {
+        return $this->entrypointRenderer->getMode($buildName);
     }
 
     public function renderViteScriptTags(string $entryName, array $options = [], $buildName = null): string

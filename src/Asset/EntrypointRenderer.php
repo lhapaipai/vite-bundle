@@ -114,7 +114,7 @@ class EntrypointRenderer
         }
 
         if ($this->entrypointsLookup->isProd($buildName)) {
-            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName, $this->returnedPreloadedScripts) as $fileWithHash) {
+            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
                 $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);
@@ -123,7 +123,7 @@ class EntrypointRenderer
 
         if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
-                if (in_array($this->returnedPreloadedScripts, $fileWithHash['path'], true) === false) {
+                if (in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true) === false) {
                     $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
                         'integrity' => $fileWithHash['hash'],
                     ], $buildName);

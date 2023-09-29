@@ -18,10 +18,10 @@ class EntryFilesTwigExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-      new TwigFunction('vite_entry_script_tags', [$this, 'renderViteScriptTags'], ['is_safe' => ['html']]),
-      new TwigFunction('vite_entry_link_tags', [$this, 'renderViteLinkTags'], ['is_safe' => ['html']]),
-      new TwigFunction('vite_mode', [$this, 'getViteMode']),
-    ];
+            new TwigFunction('vite_entry_script_tags', [$this, 'renderViteScriptTags'], ['is_safe' => ['html']]),
+            new TwigFunction('vite_entry_link_tags', [$this, 'renderViteLinkTags'], ['is_safe' => ['html']]),
+            new TwigFunction('vite_mode', [$this, 'getViteMode']),
+        ];
     }
 
     public function getViteMode(string $buildName = null): ?string

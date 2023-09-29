@@ -2,6 +2,8 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use function in_array;
+
 class EntrypointRenderer
 {
     private $entrypointsLookup;
@@ -9,6 +11,7 @@ class EntrypointRenderer
 
     private $returnedViteClients = [];
     private $returnedReactRefresh = [];
+    private $returnedPreloadedScripts = [];
 
     private $hasReturnedViteLegacyScripts = false;
 
@@ -111,7 +114,7 @@ class EntrypointRenderer
         }
 
         if ($this->entrypointsLookup->isProd($buildName)) {
-            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
+            foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName, $this->returnedPreloadedScripts) as $fileWithHash) {
                 $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);
@@ -120,9 +123,12 @@ class EntrypointRenderer
 
         if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
-                    'integrity' => $fileWithHash['hash'],
-                ], $buildName);
+                if (in_array($this->returnedPreloadedScripts, $fileWithHash['path'], true) === false) {
+                    $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
+                        'integrity' => $fileWithHash['hash'],
+                    ], $buildName);
+                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                }
             }
         }
 

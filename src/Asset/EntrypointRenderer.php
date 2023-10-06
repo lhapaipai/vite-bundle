@@ -2,8 +2,6 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
-use function in_array;
-
 class EntrypointRenderer
 {
     private $entrypointsLookup;
@@ -115,15 +113,17 @@ class EntrypointRenderer
 
         if ($this->entrypointsLookup->isProd($buildName)) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
-                    'integrity' => $fileWithHash['hash'],
-                ], $buildName);
+                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+                    $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
+                        'integrity' => $fileWithHash['hash'],
+                    ], $buildName);
+                }
             }
         }
 
         if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
-                if (in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true) === false) {
+                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
                     $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
                         'integrity' => $fileWithHash['hash'],
                     ], $buildName);

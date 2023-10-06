@@ -13,6 +13,7 @@ class EntrypointRenderer
 
     private $returnedViteClients = [];
     private $returnedReactRefresh = [];
+    private $returnedPreloadedScripts = [];
 
     private $hasReturnedViteLegacyScripts = false;
 
@@ -142,21 +143,36 @@ class EntrypointRenderer
 
         if ($this->entrypointsLookup->isProd($buildName)) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
-                    'integrity' => $fileWithHash['hash'],
-                ], $buildName);
+                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+                    $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
+                        'integrity' => $fileWithHash['hash'],
+                    ], $buildName);
+                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                }
             }
         }
 
         if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
-                    'integrity' => $fileWithHash['hash'],
-                ], $buildName);
+                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+                    $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
+                        'integrity' => $fileWithHash['hash'],
+                    ], $buildName);
+                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                }
             }
         }
 
         return implode(PHP_EOL, $content);
+    }
+
+    public function getMode(string $buildName = null): ?string
+    {
+        if (!$this->entrypointsLookup->hasFile($buildName)) {
+            return null;
+        }
+
+        return $this->entrypointsLookup->isProd() ? 'prod' : 'dev';
     }
 
     public function reset()

@@ -117,6 +117,7 @@ class EntrypointRenderer
                     $content[] = $this->tagRenderer->renderLinkPreload($fileWithHash['path'], [
                         'integrity' => $fileWithHash['hash'],
                     ], $buildName);
+                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
                 }
             }
         }

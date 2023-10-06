@@ -26,6 +26,7 @@ services:
         arguments:
             - "@vite.entrypoints_lookup"
             - "@vite.tag_renderer"
+            - "%pentatrion_vite.absolute_url%"
             - "@?router"
         public: true
 
@@ -55,4 +56,6 @@ services:
             - "%kernel.project_dir%%pentatrion_vite.public_directory%"
             - "%pentatrion_vite.builds%"
             - "%pentatrion_vite.default_build%"
+            - "%pentatrion_vite.absolute_url%"
+            - "@?router"
             - true

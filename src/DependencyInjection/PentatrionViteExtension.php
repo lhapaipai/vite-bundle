@@ -75,10 +75,10 @@ class PentatrionViteExtension extends Extension
         }
 
         $container->setParameter('pentatrion_vite.public_directory', self::preparePublicDirectory($config['public_directory']));
-
         $container->setParameter('pentatrion_vite.default_build', $defaultBuild);
         $container->setParameter('pentatrion_vite.builds', $builds);
 
+        $container->setParameter('pentatrion_vite.absolute_url', $config['absolute_url']);
         $container->setParameter('pentatrion_vite.proxy_origin', $config['proxy_origin']);
         $container->setParameter('pentatrion_vite.throw_on_missing_entry', $config['throw_on_missing_entry']);
 

@@ -2,21 +2,29 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Symfony\Component\Routing\RouterInterface;
+
 class EntrypointRenderer
 {
     private $entrypointsLookup;
     private $tagRenderer;
     private $router;
+    private $useAbsoluteUrl;
 
     private $returnedViteClients = [];
     private $returnedReactRefresh = [];
 
     private $hasReturnedViteLegacyScripts = false;
 
-    public function __construct(EntrypointsLookup $entrypointsLookup, TagRenderer $tagRenderer, ?\Symfony\Component\Routing\RouterInterface $router = null)
-    {
+    public function __construct(
+        EntrypointsLookup $entrypointsLookup,
+        TagRenderer $tagRenderer,
+        $useAbsoluteUrl,
+        RouterInterface $router = null
+    ) {
         $this->entrypointsLookup = $entrypointsLookup;
         $this->tagRenderer = $tagRenderer;
+        $this->useAbsoluteUrl = $useAbsoluteUrl;
         $this->router = $router;
     }
 
@@ -25,6 +33,8 @@ class EntrypointRenderer
         if (!$this->entrypointsLookup->hasFile($buildName)) {
             return '';
         }
+
+        $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $buildName);
 
         $content = [];
         $viteServer = $this->entrypointsLookup->getViteServer($buildName);
@@ -65,7 +75,7 @@ class EntrypointRenderer
                 $content[] = $this->tagRenderer->renderTag('script', [
                     'nomodule' => true,
                     'crossorigin' => true,
-                    'src' => $fileWithHash['path'],
+                    'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
                     'id' => 'vite-legacy-polyfill',
                 ]);
             }
@@ -76,7 +86,7 @@ class EntrypointRenderer
         foreach ($this->entrypointsLookup->getJSFiles($entryName, $buildName) as $fileWithHash) {
             $attributes = array_merge([
                 'type' => 'module',
-                'src' => $this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'],
+                'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
                 'integrity' => $fileWithHash['hash'],
             ], $options['attr'] ?? []);
             $content[] = $this->tagRenderer->renderScriptFile($attributes, '', $buildName);
@@ -88,7 +98,7 @@ class EntrypointRenderer
 
             $content[] = $this->tagRenderer->renderScriptFile([
                 'nomodule' => true,
-                'data-src' => $this->entrypointsLookup->getLegacyJSFile($entryName, $buildName),
+                'data-src' => $this->completeURL($this->entrypointsLookup->getLegacyJSFile($entryName, $buildName), $useAbsoluteUrl),
                 'id' => $id,
                 'crossorigin' => true,
                 'class' => 'vite-legacy-entry',
@@ -98,20 +108,20 @@ class EntrypointRenderer
         return implode(PHP_EOL, $content);
     }
 
-    private function getAbsoluteURL(string $path)
+    private function completeURL(string $path, $useAbsoluteUrl = false)
     {
-        if ($this->router === null) {
+        if (false === $useAbsoluteUrl || null === $this->router) {
             return $path;
         }
 
-        return $this->router->getContext()->getScheme() . '://' . $this->router->getContext()->getHost() . $path;
+        return $this->router->getContext()->getScheme().'://'.$this->router->getContext()->getHost().$path;
     }
 
     private function shouldUseAbsoluteURL(array $options, $buildName)
     {
         $viteServer = $this->entrypointsLookup->getViteServer($buildName);
 
-        return false === $viteServer && isset($options['absoluteURL']) && true === $options['absoluteURL'];
+        return false === $viteServer && $this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']);
     }
 
     public function renderLinks(string $entryName, array $options = [], $buildName = null): string
@@ -120,19 +130,19 @@ class EntrypointRenderer
             return '';
         }
 
-        $viteServer = $this->entrypointsLookup->getViteServer($buildName);
+        $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $buildName);
 
         $content = [];
 
         foreach ($this->entrypointsLookup->getCSSFiles($entryName, $buildName) as $fileWithHash) {
-            $content[] = $this->tagRenderer->renderLinkStylesheet($this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'], array_merge([
+            $content[] = $this->tagRenderer->renderLinkStylesheet($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), array_merge([
                 'integrity' => $fileWithHash['hash'],
             ], $options['attr'] ?? []), $buildName);
         }
 
         if ($this->entrypointsLookup->isProd($buildName)) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'], [
+                $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);
             }
@@ -140,7 +150,7 @@ class EntrypointRenderer
 
         if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
-                $content[] = $this->tagRenderer->renderLinkPreload($this->shouldUseAbsoluteURL($options, $buildName) ? $this->getAbsoluteURL($fileWithHash['path']) : $fileWithHash['path'], [
+                $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
                     'integrity' => $fileWithHash['hash'],
                 ], $buildName);
             }

@@ -5,24 +5,35 @@ namespace Pentatrion\ViteBundle\Asset;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
     private string $publicPath;
     private array $builds;
+    private $useAbsoluteUrl;
+    private $router;
 
     private string $manifestPath;
     private string $entrypointsPath;
-    private $manifestData = null;
-    private $entrypointsData = null;
+    private $manifestData;
+    private $entrypointsData;
     private ?array $build = null;
     private bool $strictMode;
 
-    public function __construct(string $publicPath, array $builds, string $defaultBuildName, bool $strictMode = true)
-    {
+    public function __construct(
+        string $publicPath,
+        array $builds,
+        string $defaultBuildName,
+        $useAbsoluteUrl,
+        RouterInterface $router = null,
+        bool $strictMode = true,
+    ) {
         $this->publicPath = $publicPath;
         $this->builds = $builds;
         $this->strictMode = $strictMode;
+        $this->useAbsoluteUrl = $useAbsoluteUrl;
+        $this->router = $router;
 
         $this->setBuildName($defaultBuildName);
 
@@ -53,6 +64,15 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return $this->getassetsPath($path) ?: $path;
     }
 
+    private function completeURL(string $path)
+    {
+        if (false === $this->useAbsoluteUrl || null === $this->router) {
+            return $path;
+        }
+
+        return $this->router->getContext()->getScheme().'://'.$this->router->getContext()->getHost().$path;
+    }
+
     private function getassetsPath(string $path): ?string
     {
         if (null === $this->manifestData) {
@@ -78,7 +98,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
         if (false !== $this->manifestData) {
             if (isset($this->manifestData[$path])) {
-                return $this->build['base'].$this->manifestData[$path]['file'];
+                return $this->completeURL($this->build['base'].$this->manifestData[$path]['file']);
             }
         } else {
             return $this->entrypointsData['viteServer']['origin'].$this->entrypointsData['viteServer']['base'].$path;

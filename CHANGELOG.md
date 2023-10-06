@@ -1,3 +1,8 @@
+## v4.3.0
+
+- add `absolute_url` bundle option.
+- add `absolute_url` twig option. (@drazik)
+
 ## v4.2.0
 
 - add `vite_mode` twig function

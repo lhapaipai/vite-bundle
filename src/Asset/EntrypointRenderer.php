@@ -20,7 +20,7 @@ class EntrypointRenderer
     public function __construct(
         EntrypointsLookup $entrypointsLookup,
         TagRenderer $tagRenderer,
-        $useAbsoluteUrl,
+        bool $useAbsoluteUrl,
         RouterInterface $router = null
     ) {
         $this->entrypointsLookup = $entrypointsLookup;

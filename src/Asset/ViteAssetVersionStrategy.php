@@ -25,9 +25,9 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         string $publicPath,
         array $builds,
         string $defaultBuildName,
-        $useAbsoluteUrl,
+        bool $useAbsoluteUrl,
         RouterInterface $router = null,
-        bool $strictMode = true,
+        bool $strictMode = true
     ) {
         $this->publicPath = $publicPath;
         $this->builds = $builds;

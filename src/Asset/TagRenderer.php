@@ -64,7 +64,7 @@ class TagRenderer
     </script>'.PHP_EOL;
     }
 
-    public function renderScriptFile($extraAttributes = [], $content = '', $buildName = null, $isBuild): string
+    public function renderScriptFile($extraAttributes = [], $content = '', $buildName = null, $isBuild = true): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
@@ -82,7 +82,7 @@ class TagRenderer
         return $this->renderTag('script', $event->getAttributes(), $content);
     }
 
-    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null, $isBuild): string
+    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null, $isBuild = true): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
@@ -105,7 +105,7 @@ class TagRenderer
         return $this->renderTag('link', $event->getAttributes());
     }
 
-    public function renderLinkPreload($fileName, $extraAttributes = [], $buildName = null, $isBuild): string
+    public function renderLinkPreload($fileName, $extraAttributes = [], $buildName = null, $isBuild = true): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;

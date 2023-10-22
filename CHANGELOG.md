@@ -1,3 +1,8 @@
+## v5.0.1
+
+- remove deprecated options
+- fix `absolute_url` error in `shouldUseAbsoluteURL`.
+
 ## v4.3.0
 
 - add `absolute_url` bundle option.

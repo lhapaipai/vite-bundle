@@ -2,6 +2,7 @@
 
 namespace Pentatrion\ViteBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -10,18 +11,11 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('pentatrion_vite');
+        /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode
             ->children()
-                ->scalarNode('public_dir')
-                    ->defaultValue('public')
-                    ->setDeprecated('pentatrion/vite-bundle', '3.3.1', 'The "%node%" option is deprecated. Use "public_directory" instead.')
-                ->end()
-                ->scalarNode('base')
-                    ->defaultValue('/build/')
-                    ->setDeprecated('pentatrion/vite-bundle', '3.3.1', 'The "%node%" option is deprecated. Use "build_directory" instead.')
-                ->end()
                 ->scalarNode('public_directory')
                     ->defaultValue('public')
                 ->end()
@@ -61,10 +55,6 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()
-                            ->scalarNode('base')
-                                ->defaultValue('/build/')
-                                ->setDeprecated('pentatrion/vite-bundle', '3.3.1', 'The "%node%" option is deprecated. Use "build_directory" instead.')
-                            ->end()
                             ->scalarNode('build_directory')
                                 ->defaultValue('build')
                             ->end()

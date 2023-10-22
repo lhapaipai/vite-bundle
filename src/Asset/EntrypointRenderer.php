@@ -123,7 +123,7 @@ class EntrypointRenderer
     {
         $viteServer = $this->entrypointsLookup->getViteServer($buildName);
 
-        return false === $viteServer && $this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']);
+        return false === $viteServer && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
     }
 
     public function renderLinks(string $entryName, array $options = [], $buildName = null): string

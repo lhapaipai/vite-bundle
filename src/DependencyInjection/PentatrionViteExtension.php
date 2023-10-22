@@ -43,10 +43,6 @@ class PentatrionViteExtension extends Extension
             $defaultBuild = $config['default_build'];
             $builds = [];
             foreach ($config['builds'] as $buildName => $build) {
-                if ('build' === $build['build_directory'] && '/build/' !== $build['base']) {
-                    $build['build_directory'] = $build['base'];
-                }
-
                 $builds[$buildName] = [
                     'base' => self::prepareBase($build['build_directory']),
                     'script_attributes' => $build['script_attributes'],
@@ -55,11 +51,6 @@ class PentatrionViteExtension extends Extension
             }
         } else {
             $defaultBuild = 'default';
-
-            if ('build' === $config['build_directory'] && '/build/' !== $config['base']) {
-                $config['build_directory'] = $config['base'];
-            }
-
             $builds = [
                 'default' => [
                     'base' => self::prepareBase($config['build_directory']),
@@ -67,11 +58,6 @@ class PentatrionViteExtension extends Extension
                     'link_attributes' => $config['link_attributes'],
                 ],
             ];
-        }
-
-        // if deprecated option is set and not `public_directory`.
-        if ('public' === $config['public_directory'] && 'public' !== $config['public_dir']) {
-            $config['public_directory'] = $config['public_dir'];
         }
 
         $container->setParameter('pentatrion_vite.public_directory', self::preparePublicDirectory($config['public_directory']));

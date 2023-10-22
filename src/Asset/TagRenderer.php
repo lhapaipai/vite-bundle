@@ -2,10 +2,14 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 class TagRenderer
 {
-    private $defaultBuild;
-    private $builds;
+    private string $defaultBuild;
+    private array $builds;
+    private EventDispatcherInterface $eventDispatcher;
 
     // https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc
     public const SAFARI10_NO_MODULE_FIX = '<!-- SAFARI10_NO_MODULE_FIX --><script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>';
@@ -36,10 +40,12 @@ class TagRenderer
 
     public function __construct(
         $defaultBuild = 'default',
-        $builds = []
+        $builds = [],
+        EventDispatcherInterface $eventDispatcher = null
     ) {
         $this->defaultBuild = $defaultBuild;
         $this->builds = $builds;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getSystemJSInlineCode($id): string
@@ -58,18 +64,25 @@ class TagRenderer
     </script>'.PHP_EOL;
     }
 
-    public function renderScriptFile($extraAttributes = [], $content = '', $buildName = null): string
+    public function renderScriptFile($extraAttributes = [], $content = '', $buildName = null, $isBuild): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
         }
 
-        $attributes = array_merge($this->builds[$buildName]['script_attributes'], $extraAttributes);
+        $event = new RenderAssetTagEvent(
+            RenderAssetTagEvent::TYPE_SCRIPT,
+            array_merge($this->builds[$buildName]['script_attributes'], $extraAttributes),
+            $isBuild
+        );
+        if (null !== $this->eventDispatcher) {
+            $event = $this->eventDispatcher->dispatch($event);
+        }
 
-        return $this->renderTag('script', $attributes, $content);
+        return $this->renderTag('script', $event->getAttributes(), $content);
     }
 
-    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null): string
+    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null, $isBuild): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
@@ -80,12 +93,19 @@ class TagRenderer
             'href' => $fileName,
         ];
 
-        $attributes = array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes);
+        $event = new RenderAssetTagEvent(
+            RenderAssetTagEvent::TYPE_LINK,
+            array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes),
+            $isBuild
+        );
+        if (null !== $this->eventDispatcher) {
+            $event = $this->eventDispatcher->dispatch($event);
+        }
 
-        return $this->renderTag('link', $attributes);
+        return $this->renderTag('link', $event->getAttributes());
     }
 
-    public function renderLinkPreload($fileName, $extraAttributes = [], $buildName = null): string
+    public function renderLinkPreload($fileName, $extraAttributes = [], $buildName = null, $isBuild): string
     {
         if (is_null($buildName)) {
             $buildName = $this->defaultBuild;
@@ -96,7 +116,14 @@ class TagRenderer
             'href' => $fileName,
         ];
 
-        $attributes = array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes);
+        $event = new RenderAssetTagEvent(
+            RenderAssetTagEvent::TYPE_PRELOAD,
+            array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes),
+            $isBuild
+        );
+        if (null !== $this->eventDispatcher) {
+            $event = $this->eventDispatcher->dispatch($event);
+        }
 
         return $this->renderTag('link', $attributes);
     }

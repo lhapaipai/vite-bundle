@@ -46,8 +46,8 @@ class EntrypointsLookup
             }
             $entrypointsFilePath = $this->buildsInfos[$buildName]['entryPointsPath'];
             $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
-            if (!isset($fileInfos['isProd'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
-                throw new \Exception($entrypointsFilePath.' : isProd, entryPoints or viteServer not exists');
+            if (!isset($fileInfos['isBuild'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
+                throw new \Exception($entrypointsFilePath.' : isBuild, entryPoints or viteServer not exists');
             }
 
             $this->buildsInfos[$buildName]['infos'] = $fileInfos;
@@ -63,9 +63,9 @@ class EntrypointsLookup
         return array_key_exists('legacy', $buildInfos) && true === $buildInfos['legacy'];
     }
 
-    public function isProd($buildName = null): bool
+    public function isBuild($buildName = null): bool
     {
-        return $this->getInfos($buildName)['isProd'];
+        return $this->getInfos($buildName)['isBuild'];
     }
 
     public function getViteServer($buildName = null)

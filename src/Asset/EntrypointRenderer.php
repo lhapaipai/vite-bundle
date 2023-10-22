@@ -39,6 +39,7 @@ class EntrypointRenderer
 
         $content = [];
         $viteServer = $this->entrypointsLookup->getViteServer($buildName);
+        $isBuild = $this->entrypointsLookup->isBuild($buildName);
 
         if (false !== $viteServer) {
             // vite server is active
@@ -90,7 +91,7 @@ class EntrypointRenderer
                 'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
                 'integrity' => $fileWithHash['hash'],
             ], $options['attr'] ?? []);
-            $content[] = $this->tagRenderer->renderScriptFile($attributes, '', $buildName);
+            $content[] = $this->tagRenderer->renderScriptFile($attributes, '', $buildName, $isBuild);
         }
 
         /* legacy js scripts */
@@ -103,7 +104,7 @@ class EntrypointRenderer
                 'id' => $id,
                 'crossorigin' => true,
                 'class' => 'vite-legacy-entry',
-            ], $this->tagRenderer->getSystemJSInlineCode($id), $buildName);
+            ], $this->tagRenderer->getSystemJSInlineCode($id), $buildName, $isBuild);
         }
 
         return implode(PHP_EOL, $content);
@@ -132,32 +133,33 @@ class EntrypointRenderer
         }
 
         $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $buildName);
+        $isBuild = $this->entrypointsLookup->isBuild($buildName);
 
         $content = [];
 
         foreach ($this->entrypointsLookup->getCSSFiles($entryName, $buildName) as $fileWithHash) {
             $content[] = $this->tagRenderer->renderLinkStylesheet($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), array_merge([
                 'integrity' => $fileWithHash['hash'],
-            ], $options['attr'] ?? []), $buildName);
+            ], $options['attr'] ?? []), $buildName, $isBuild);
         }
 
-        if ($this->entrypointsLookup->isProd($buildName)) {
+        if ($this->entrypointsLookup->isBuild($buildName)) {
             foreach ($this->entrypointsLookup->getJavascriptDependencies($entryName, $buildName) as $fileWithHash) {
                 if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
                     $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
                         'integrity' => $fileWithHash['hash'],
-                    ], $buildName);
+                    ], $buildName, $isBuild);
                     $this->returnedPreloadedScripts[] = $fileWithHash['path'];
                 }
             }
         }
 
-        if ($this->entrypointsLookup->isProd($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
+        if ($this->entrypointsLookup->isBuild($buildName) && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($this->entrypointsLookup->getJavascriptDynamicDependencies($entryName, $buildName) as $fileWithHash) {
                 if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
                     $content[] = $this->tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
                         'integrity' => $fileWithHash['hash'],
-                    ], $buildName);
+                    ], $buildName, $isBuild);
                     $this->returnedPreloadedScripts[] = $fileWithHash['path'];
                 }
             }
@@ -172,7 +174,7 @@ class EntrypointRenderer
             return null;
         }
 
-        return $this->entrypointsLookup->isProd() ? 'prod' : 'dev';
+        return $this->entrypointsLookup->isBuild() ? 'build' : 'dev';
     }
 
     public function reset()

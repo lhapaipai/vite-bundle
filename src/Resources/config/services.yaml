@@ -14,6 +14,7 @@ services:
         arguments:
             - default
             - []
+            - "@?event_dispatcher"
         public: true
 
     Pentatrion\ViteBundle\Asset\EntrypointsLookup:

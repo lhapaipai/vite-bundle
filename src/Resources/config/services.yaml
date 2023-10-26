@@ -7,19 +7,16 @@ services:
             - "%pentatrion_vite.default_build%"
             - "%pentatrion_vite.builds%"
             - "%pentatrion_vite.throw_on_missing_entry%"
-        public: true
 
     vite.tag_renderer:
         class: Pentatrion\ViteBundle\Asset\TagRenderer
         arguments:
-            - default
-            - []
+            - default # Default default_build
+            - []      # Default builds
             - "@?event_dispatcher"
-        public: true
 
     Pentatrion\ViteBundle\Asset\EntrypointsLookup:
         alias: "vite.entrypoints_lookup"
-        public: true
 
 
     vite.entrypoint_renderer:
@@ -29,11 +26,9 @@ services:
             - "@vite.tag_renderer"
             - "%pentatrion_vite.absolute_url%"
             - "@?router"
-        public: true
 
     Pentatrion\ViteBundle\Asset\EntrypointRenderer:
         alias: "vite.entrypoint_renderer"
-        public: true
 
 
     vite.twig_entry_files_extension:
@@ -50,7 +45,6 @@ services:
             - "@http_client"
             - "@vite.entrypoints_lookup"
             - "%pentatrion_vite.proxy_origin%"
-        public: true
 
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
         arguments:

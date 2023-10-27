@@ -8,16 +8,8 @@ services:
             - "%pentatrion_vite.builds%"
             - "%pentatrion_vite.throw_on_missing_entry%"
 
-    vite.tag_renderer:
-        class: Pentatrion\ViteBundle\Asset\TagRenderer
-        arguments:
-            - default # Default default_build
-            - []      # Default builds
-            - "@?event_dispatcher"
-
     Pentatrion\ViteBundle\Asset\EntrypointsLookup:
         alias: "vite.entrypoints_lookup"
-
 
     vite.entrypoint_renderer:
         class: Pentatrion\ViteBundle\Asset\EntrypointRenderer
@@ -30,6 +22,14 @@ services:
     Pentatrion\ViteBundle\Asset\EntrypointRenderer:
         alias: "vite.entrypoint_renderer"
 
+    vite.tag_renderer:
+        class: Pentatrion\ViteBundle\Asset\TagRenderer
+        arguments:
+            - default # Default default_build
+            - []      # Default builds
+            - "@?event_dispatcher"
+
+    
 
     vite.twig_entry_files_extension:
         class: Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension

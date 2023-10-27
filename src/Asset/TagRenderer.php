@@ -7,8 +7,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TagRenderer
 {
-    private string $defaultBuild;
-    private array $builds;
+    private array $scriptAttributes;
+    private array $linkAttributes;
+
     private EventDispatcherInterface $eventDispatcher;
 
     // https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc
@@ -39,12 +40,12 @@ class TagRenderer
     public const SYSTEM_JS_INLINE_CODE = 'System.import(document.getElementById("__ID__").getAttribute("data-src"))';
 
     public function __construct(
-        $defaultBuild = 'default',
-        $builds = [],
+        $scriptAttributes = [],
+        $linkAttributes = [],
         EventDispatcherInterface $eventDispatcher = null
     ) {
-        $this->defaultBuild = $defaultBuild;
-        $this->builds = $builds;
+        $this->scriptAttributes = $scriptAttributes;
+        $this->linkAttributes = $linkAttributes;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -64,15 +65,11 @@ class TagRenderer
     </script>'.PHP_EOL;
     }
 
-    public function renderScriptFile($extraAttributes = [], $content = '', $buildName = null, $isBuild = true): string
+    public function renderScriptFile($extraAttributes = [], $content = '', $isBuild = true): string
     {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-
         $event = new RenderAssetTagEvent(
             RenderAssetTagEvent::TYPE_SCRIPT,
-            array_merge($this->builds[$buildName]['script_attributes'], $extraAttributes),
+            array_merge($this->scriptAttributes, $extraAttributes),
             $isBuild
         );
         if (null !== $this->eventDispatcher) {
@@ -82,12 +79,8 @@ class TagRenderer
         return $this->renderTag('script', $event->getAttributes(), $content);
     }
 
-    public function renderLinkStylesheet($fileName, $extraAttributes = [], $buildName = null, $isBuild = true): string
+    public function renderLinkStylesheet($fileName, $extraAttributes = [], $isBuild = true): string
     {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-
         $attributes = [
             'rel' => 'stylesheet',
             'href' => $fileName,
@@ -95,7 +88,7 @@ class TagRenderer
 
         $event = new RenderAssetTagEvent(
             RenderAssetTagEvent::TYPE_LINK,
-            array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes),
+            array_merge($attributes, $this->linkAttributes, $extraAttributes),
             $isBuild
         );
         if (null !== $this->eventDispatcher) {
@@ -105,12 +98,8 @@ class TagRenderer
         return $this->renderTag('link', $event->getAttributes());
     }
 
-    public function renderLinkPreload($fileName, $extraAttributes = [], $buildName = null, $isBuild = true): string
+    public function renderLinkPreload($fileName, $extraAttributes = [], $isBuild = true): string
     {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-
         $attributes = [
             'rel' => 'modulepreload',
             'href' => $fileName,
@@ -118,7 +107,7 @@ class TagRenderer
 
         $event = new RenderAssetTagEvent(
             RenderAssetTagEvent::TYPE_PRELOAD,
-            array_merge($attributes, $this->builds[$buildName]['link_attributes'], $extraAttributes),
+            array_merge($attributes, $this->linkAttributes, $extraAttributes),
             $isBuild
         );
         if (null !== $this->eventDispatcher) {

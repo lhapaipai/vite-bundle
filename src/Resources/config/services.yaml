@@ -1,56 +1,71 @@
 services:
+    pentatrion_vite.entrypoints_lookup_collection:
+        class: Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection
 
-    vite.entrypoints_lookup:
-        class: Pentatrion\ViteBundle\Asset\EntrypointsLookup
-        arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_directory%"
-            - "%pentatrion_vite.default_build%"
-            - "%pentatrion_vite.builds%"
-            - "%pentatrion_vite.throw_on_missing_entry%"
+    Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection:
+        alias: pentatrion_vite.entrypoints_lookup_collection
 
-    Pentatrion\ViteBundle\Asset\EntrypointsLookup:
-        alias: "vite.entrypoints_lookup"
+    # TODO readd for user customisation
+    # pentatrion_vite.entrypoints_lookup:
+    #     class: Pentatrion\ViteBundle\Asset\EntrypointsLookup
+    #     arguments:
+    #         - "%kernel.project_dir%%pentatrion_vite.public_directory%"
+    #         - "%pentatrion_vite.default_config%"
+    #         - "%pentatrion_vite.configs%"
+    #         - "%pentatrion_vite.throw_on_missing_entry%"
 
-    vite.entrypoint_renderer:
+    # Pentatrion\ViteBundle\Asset\EntrypointsLookup:
+    #     alias: "pentatrion_vite.entrypoints_lookup"
+
+    pentatrion_vite.entrypoint_renderer:
         class: Pentatrion\ViteBundle\Asset\EntrypointRenderer
         arguments:
-            - "@vite.entrypoints_lookup"
-            - "@vite.tag_renderer"
+            - "@pentatrion_vite.entrypoints_lookup_collection"
+            - "@pentatrion_vite.tag_renderer_collection"
             - "%pentatrion_vite.absolute_url%"
             - "@?router"
 
     Pentatrion\ViteBundle\Asset\EntrypointRenderer:
-        alias: "vite.entrypoint_renderer"
+        alias: "pentatrion_vite.entrypoint_renderer"
 
-    vite.tag_renderer:
-        class: Pentatrion\ViteBundle\Asset\TagRenderer
-        arguments:
-            - default # Default default_build
-            - []      # Default builds
-            - "@?event_dispatcher"
+    pentatrion_vite.tag_renderer_collection:
+        class: Pentatrion\ViteBundle\Asset\TagRendererCollection
+
+    Pentatrion\ViteBundle\Asset\TagRendererCollection:
+        alias: pentatrion_vite.tag_renderer_collection
+
+    # TODO readd for user customisation
+    # pentatrion_vite.tag_renderer:
+    #     class: Pentatrion\ViteBundle\Asset\TagRenderer
+    #     arguments:
+    #         - []      # Default script_attributes
+    #         - []      # Default link_attributes
+    #         - "@?event_dispatcher"
 
     
 
-    vite.twig_entry_files_extension:
+    pentatrion_vite.twig_entry_files_extension:
         class: Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension
         tags: ["twig.extension"]
         arguments:
-            - "@vite.entrypoint_renderer"
+            - "@pentatrion_vite.entrypoint_renderer"
 
     Pentatrion\ViteBundle\Controller\ViteController:
         tags: ["controller.service_arguments"]
         arguments:
-            - "%pentatrion_vite.default_build%"
-            - "%pentatrion_vite.builds%"
+            - "%pentatrion_vite.default_config%"
+            - "%pentatrion_vite.configs%"
             - "@http_client"
-            - "@vite.entrypoints_lookup"
+            - "@pentatrion_vite.entrypoints_lookup_collection"
             - "%pentatrion_vite.proxy_origin%"
 
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
+        # tags:
+        #     - { name: assets.package, package: vite }
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_directory%"
-            - "%pentatrion_vite.builds%"
-            - "%pentatrion_vite.default_build%"
+            - "%pentatrion_vite.configs%"
+            - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
             - "@?router"
             - true

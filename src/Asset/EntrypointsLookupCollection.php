@@ -1,0 +1,33 @@
+<?php
+
+namespace Pentatrion\ViteBundle\Asset;
+
+use Pentatrion\ViteBundle\Exception\UndefinedConfigNameException;
+use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
+
+class EntrypointsLookupCollection
+{
+    private ServiceLocator $entrypointsLookupLocator;
+    private string $defaultConfigName;
+
+    public function __construct(
+        ServiceLocator $entrypointsLookupLocator,
+        string $defaultConfigName
+    ) {
+        $this->entrypointsLookupLocator = $entrypointsLookupLocator;
+        $this->defaultConfigName = $defaultConfigName;
+    }
+
+    public function getEntrypointsLookup(string $configName = null): EntrypointsLookup
+    {
+        if (is_null($configName)) {
+            $configName = $this->defaultConfigName;
+        }
+
+        if (!$this->entrypointsLookupLocator->has($configName)) {
+            throw new UndefinedConfigNameException(sprintf('The config "%s" is not set.', $configName));
+        }
+
+        return $this->entrypointsLookupLocator->get($configName);
+    }
+}

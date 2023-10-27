@@ -5,134 +5,119 @@ namespace Pentatrion\ViteBundle\Asset;
 class EntrypointsLookup
 {
     private bool $throwOnMissingEntry;
-    private $defaultBuild;
-    private $buildsInfos = [];
+    private array $fileInfos;
 
-    public function __construct($publicPath, $defaultBuild, $builds, $throwOnMissingEntry)
+    public function __construct(string $publicPath, array $config, bool $throwOnMissingEntry)
     {
         $this->throwOnMissingEntry = $throwOnMissingEntry;
-        $this->defaultBuild = $defaultBuild;
-        foreach ($builds as $buildName => $build) {
-            $entryPointsPath = $publicPath.$build['base'].'entrypoints.json';
-            $this->buildsInfos[$buildName] = [
-                'entryPointsPath' => $entryPointsPath,
-                'infos' => null,
-                'fileExists' => file_exists($entryPointsPath),
-            ];
-        }
+        $entrypointsPath = $publicPath.$config['base'].'entrypoints.json';
+
+        $this->fileInfos = [
+            'entrypointsPath' => $entrypointsPath,
+            'content' => null,
+            'fileExists' => file_exists($entrypointsPath),
+        ];
     }
 
-    public function hasFile($buildName = null): bool
+    public function hasFile(): bool
     {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-        if (!isset($this->buildsInfos[$buildName])) {
+        if (!isset($this->fileInfos)) {
             return false;
         }
 
-        return $this->buildsInfos[$buildName]['fileExists'];
+        return $this->fileInfos['fileExists'];
     }
 
-    private function getInfos($buildName = null): array
+    private function getFileContent(): array
     {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-
-        if (!isset($this->buildsInfos[$buildName]['infos'])) {
-            if (!$this->buildsInfos[$buildName]['fileExists']) {
-                throw new \Exception('entrypoints.json for '.$buildName.' not exists');
+        if (!isset($this->fileInfos['content'])) {
+            if (!$this->fileInfos['fileExists']) {
+                throw new \Exception('entrypoints.json not found at '.$this->fileInfos['entrypointsPath']);
             }
-            $entrypointsFilePath = $this->buildsInfos[$buildName]['entryPointsPath'];
-            $fileInfos = json_decode(file_get_contents($entrypointsFilePath), true);
-            if (!isset($fileInfos['isBuild'], $fileInfos['entryPoints'], $fileInfos['viteServer'])) {
-                throw new \Exception($entrypointsFilePath.' : isBuild, entryPoints or viteServer not exists');
+            $content = json_decode(file_get_contents($this->fileInfos['entrypointsPath']), true);
+            if (!isset($content['isBuild'], $content['entryPoints'], $content['viteServer'])) {
+                throw new \Exception($this->fileInfos['entrypointsPath'].' : isBuild, entryPoints or viteServer not exists');
             }
 
-            $this->buildsInfos[$buildName]['infos'] = $fileInfos;
+            $this->fileInfos['content'] = $content;
         }
 
-        return $this->buildsInfos[$buildName]['infos'];
+        return $this->fileInfos['content'];
     }
 
-    public function isLegacyPluginEnabled($buildName = null): bool
+    public function isLegacyPluginEnabled(): bool
     {
-        $buildInfos = $this->getInfos($buildName);
+        $infos = $this->getFileContent();
 
-        return array_key_exists('legacy', $buildInfos) && true === $buildInfos['legacy'];
+        return array_key_exists('legacy', $infos) && true === $infos['legacy'];
     }
 
-    public function isBuild($buildName = null): bool
+    public function isBuild(): bool
     {
-        return $this->getInfos($buildName)['isBuild'];
+        return $this->getFileContent()['isBuild'];
     }
 
-    public function getViteServer($buildName = null)
+    public function getViteServer()
     {
-        return $this->getInfos($buildName)['viteServer'];
+        return $this->getFileContent()['viteServer'];
     }
 
-    public function getJSFiles($entryName, $buildName = null): array
+    public function getJSFiles($entryName): array
     {
-        $this->throwIfEntryIsMissing($entryName, $buildName);
+        $this->throwIfEntrypointIsMissing($entryName);
 
-        return $this->getInfos($buildName)['entryPoints'][$entryName]['js'] ?? [];
+        return $this->getFileContent()['entryPoints'][$entryName]['js'] ?? [];
     }
 
-    public function getCSSFiles($entryName, $buildName = null): array
+    public function getCSSFiles($entryName): array
     {
-        $this->throwIfEntryIsMissing($entryName, $buildName);
+        $this->throwIfEntrypointIsMissing($entryName);
 
-        return $this->getInfos($buildName)['entryPoints'][$entryName]['css'] ?? [];
+        return $this->getFileContent()['entryPoints'][$entryName]['css'] ?? [];
     }
 
-    public function getJavascriptDependencies($entryName, $buildName = null): array
+    public function getJavascriptDependencies($entryName): array
     {
-        $this->throwIfEntryIsMissing($entryName, $buildName);
+        $this->throwIfEntrypointIsMissing($entryName);
 
-        return $this->getInfos($buildName)['entryPoints'][$entryName]['preload'] ?? [];
+        return $this->getFileContent()['entryPoints'][$entryName]['preload'] ?? [];
     }
 
-    public function getJavascriptDynamicDependencies($entryName, $buildName = null): array
+    public function getJavascriptDynamicDependencies($entryName): array
     {
-        $this->throwIfEntryIsMissing($entryName, $buildName);
+        $this->throwIfEntrypointIsMissing($entryName);
 
-        return $this->getInfos($buildName)['entryPoints'][$entryName]['dynamic'] ?? [];
+        return $this->getFileContent()['entryPoints'][$entryName]['dynamic'] ?? [];
     }
 
-    public function hasLegacy($entryName, $buildName = null): bool
+    public function hasLegacy($entryName): bool
     {
-        $this->throwIfEntryIsMissing($entryName, $buildName);
+        $this->throwIfEntrypointIsMissing($entryName);
 
-        $entryInfos = $this->getInfos($buildName);
+        $entryInfos = $this->getFileContent();
 
         return isset($entryInfos['entryPoints'][$entryName]['legacy']) && false !== $entryInfos['entryPoints'][$entryName]['legacy'];
     }
 
-    public function getLegacyJSFile($entryName, $buildName = null): string
+    public function getLegacyJSFile($entryName): string
     {
-        $this->throwIfEntryIsMissing($entryName, $buildName);
+        $this->throwIfEntrypointIsMissing($entryName);
 
-        $entryInfos = $this->getInfos($buildName);
+        $entryInfos = $this->getFileContent();
 
         $legacyEntryName = $entryInfos['entryPoints'][$entryName]['legacy'];
 
         return $entryInfos['entryPoints'][$legacyEntryName]['js'][0]['path'];
     }
 
-    private function throwIfEntryIsMissing(string $entryName, string $buildName = null): void
+    private function throwIfEntrypointIsMissing(string $entryName): void
     {
         if (!$this->throwOnMissingEntry) {
             return;
         }
 
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
-        }
-
-        if (!array_key_exists($entryName, $this->getInfos($buildName)['entryPoints'])) {
-            $keys = array_keys($this->getInfos($buildName)['entryPoints']);
+        if (!array_key_exists($entryName, $this->getFileContent()['entryPoints'])) {
+            $keys = array_keys($this->getFileContent()['entryPoints']);
             $entryPointKeys = join(', ', array_map(function ($key) { return "'$key'"; }, $keys));
             throw new \Exception("Entry '$entryName' not present in the entrypoints file. Defined entrypoints are $entryPointKeys");
         }

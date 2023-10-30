@@ -2,130 +2,127 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
-use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-
 class TagRenderer
 {
-    private array $scriptAttributes;
-    private array $linkAttributes;
-
-    private EventDispatcherInterface $eventDispatcher;
-
-    // https://gist.github.com/samthor/64b114e4a4f539915a95b91ffd340acc
-    public const SAFARI10_NO_MODULE_FIX = '<!-- SAFARI10_NO_MODULE_FIX --><script nomodule>!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();</script>';
-
-    public const DETECT_MODERN_BROWSER_CODE = '<!-- DETECT_MODERN_BROWSER_CODE --><script type="module">try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;</script>';
-
-    // load the <script nomodule crossorigin id="vite-legacy-polyfill" src="..."></script>
-    // and the <script nomodule crossorigin id="vite-legacy-entry" data-src="..."></script>
-    // if browser accept modules but don't dynamic import or import.meta
-    public const DYNAMIC_FALLBACK_INLINE_CODE = '
-    <!-- DYNAMIC_FALLBACK_INLINE_CODE --><script type="module">
-        (function() {
-            if (window.__vite_is_modern_browser) return;
-            console.warn("vite: loading legacy build because dynamic import or import.meta.url is unsupported, syntax error above should be ignored");
-            var legacyPolyfill = document.getElementById("vite-legacy-polyfill")
-            var script = document.createElement("script");
-            script.src = legacyPolyfill.src;
-            script.onload = function() {
-                document.querySelectorAll("script.vite-legacy-entry").forEach(function(elt) {
-                    System.import(elt.getAttribute("data-src"));
-                });
-            };
-            document.body.appendChild(script);
-        })();
-    </script>';
-
-    public const SYSTEM_JS_INLINE_CODE = 'System.import(document.getElementById("__ID__").getAttribute("data-src"))';
+    private array $globalScriptAttributes;
+    private array $globalLinkAttributes;
 
     public function __construct(
         $scriptAttributes = [],
-        $linkAttributes = [],
-        EventDispatcherInterface $eventDispatcher = null
+        $linkAttributes = []
     ) {
-        $this->scriptAttributes = $scriptAttributes;
-        $this->linkAttributes = $linkAttributes;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->globalScriptAttributes = $scriptAttributes;
+        $this->globalLinkAttributes = $linkAttributes;
     }
 
-    public function getSystemJSInlineCode($id): string
+    public function createViteClientScript($src): Tag
     {
-        return str_replace('__ID__', $id, self::SYSTEM_JS_INLINE_CODE);
-    }
-
-    public function renderReactRefreshInline($devServerUrl): string
-    {
-        return '  <script type="module">
-    import RefreshRuntime from "'.$devServerUrl.'@react-refresh"
-    RefreshRuntime.injectIntoGlobalHook(window)
-    window.$RefreshReg$ = () => {}
-    window.$RefreshSig$ = () => (type) => type
-    window.__vite_plugin_react_preamble_installed__ = true
-    </script>'.PHP_EOL;
-    }
-
-    public function renderScriptFile($extraAttributes = [], $content = '', $isBuild = true): string
-    {
-        $event = new RenderAssetTagEvent(
-            RenderAssetTagEvent::TYPE_SCRIPT,
-            array_merge($this->scriptAttributes, $extraAttributes),
-            $isBuild
+        return $this->createInternalScriptTag(
+            [
+                'type' => 'module',
+                'src' => $src,
+            ]
         );
-        if (null !== $this->eventDispatcher) {
-            $event = $this->eventDispatcher->dispatch($event);
-        }
-
-        return $this->renderTag('script', $event->getAttributes(), $content);
     }
 
-    public function renderLinkStylesheet($fileName, $extraAttributes = [], $isBuild = true): string
+    public function createReactRefreshScript($devServerUrl): Tag
+    {
+        return $this->createInternalScriptTag(
+            ['type' => 'module'],
+            InlineContent::getReactRefreshInlineCode($devServerUrl)
+        );
+    }
+
+    public function createSafariNoModuleScript(): Tag
+    {
+        return $this->createInternalScriptTag(
+            ['nomodule' => true],
+            InlineContent::SAFARI10_NO_MODULE_FIX_INLINE_CODE
+        );
+    }
+
+    public function createDynamicFallbackScript(): Tag
+    {
+        return $this->createInternalScriptTag(
+            ['type' => 'module'],
+            InlineContent::DYNAMIC_FALLBACK_INLINE_CODE
+        );
+    }
+
+    public function createDetectModernBrowserScript(): Tag
+    {
+        return $this->createInternalScriptTag(
+            ['type' => 'module'],
+            InlineContent::DETECT_MODERN_BROWSER_INLINE_CODE
+        );
+    }
+
+    public function createInternalScriptTag($attributes = [], $content = ''): Tag
+    {
+        $tag = new Tag(
+            Tag::SCRIPT_TAG,
+            $attributes,
+            $content,
+            true
+        );
+
+        return $tag;
+    }
+
+    public function createScriptTag($attributes = [], $content = ''): Tag
+    {
+        $tag = new Tag(
+            Tag::SCRIPT_TAG,
+            array_merge($this->globalScriptAttributes, $attributes),
+            $content
+        );
+
+        return $tag;
+    }
+
+    public function createLinkStylesheetTag($fileName, $extraAttributes = []): Tag
     {
         $attributes = [
             'rel' => 'stylesheet',
             'href' => $fileName,
         ];
 
-        $event = new RenderAssetTagEvent(
-            RenderAssetTagEvent::TYPE_LINK,
-            array_merge($attributes, $this->linkAttributes, $extraAttributes),
-            $isBuild
+        $tag = new Tag(
+            Tag::LINK_TAG,
+            array_merge($this->globalLinkAttributes, $attributes, $extraAttributes)
         );
-        if (null !== $this->eventDispatcher) {
-            $event = $this->eventDispatcher->dispatch($event);
-        }
 
-        return $this->renderTag('link', $event->getAttributes());
+        return $tag;
     }
 
-    public function renderLinkPreload($fileName, $extraAttributes = [], $isBuild = true): string
+    public function createModulePreloadLinkTag($fileName, $extraAttributes = []): Tag
     {
         $attributes = [
             'rel' => 'modulepreload',
             'href' => $fileName,
         ];
 
-        $event = new RenderAssetTagEvent(
-            RenderAssetTagEvent::TYPE_PRELOAD,
-            array_merge($attributes, $this->linkAttributes, $extraAttributes),
-            $isBuild
+        $tag = new Tag(
+            Tag::LINK_TAG,
+            array_merge($attributes, $extraAttributes)
         );
-        if (null !== $this->eventDispatcher) {
-            $event = $this->eventDispatcher->dispatch($event);
-        }
 
-        return $this->renderTag('link', $attributes);
+        return $tag;
     }
 
-    public function renderTag($tagName, $attributes, $content = ''): string
+    public static function generateTag(Tag $tag): string
     {
-        return sprintf(
+        return $tag->isLinkTag() ? sprintf(
+            '<%s %s>',
+            $tag->getTagName(),
+            self::convertArrayToAttributes($tag->getAttributes())
+        ) : sprintf(
             '<%s %s>%s</%s>',
-            $tagName,
-            self::convertArrayToAttributes($attributes),
-            $content,
-            $tagName
-        ).PHP_EOL;
+            $tag->getTagName(),
+            self::convertArrayToAttributes($tag->getAttributes()),
+            $tag->getContent(),
+            $tag->getTagName()
+        );
     }
 
     private static function convertArrayToAttributes(array $attributes): string
@@ -133,7 +130,7 @@ class TagRenderer
         $nonNullAttributes = array_filter(
             $attributes,
             function ($value, $key) {
-                return null !== $value;
+                return null !== $value && false !== $value;
             },
             ARRAY_FILTER_USE_BOTH
         );

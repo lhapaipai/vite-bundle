@@ -1,0 +1,20 @@
+{
+  "entryPoints": {
+    "app": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        {
+          "path": "/build/assets/app-dc399f15.js",
+          "hash": null
+        }
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "isBuild": true,
+  "legacy": false,
+  "viteServer": false
+}

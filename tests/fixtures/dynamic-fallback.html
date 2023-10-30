@@ -1,0 +1,15 @@
+<script type="module">
+    (function() {
+        if (window.__vite_is_modern_browser) return;
+        console.warn("vite: loading legacy build because dynamic import or import.meta.url is unsupported, syntax error above should be ignored");
+        var legacyPolyfill = document.getElementById("vite-legacy-polyfill")
+        var script = document.createElement("script");
+        script.src = legacyPolyfill.src;
+        script.onload = function() {
+            document.querySelectorAll("script.vite-legacy-entry").forEach(function(elt) {
+                System.import(elt.getAttribute("data-src"));
+            });
+        };
+        document.body.appendChild(script);
+    })();
+</script>

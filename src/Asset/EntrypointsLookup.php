@@ -107,7 +107,7 @@ class EntrypointsLookup
 
         $legacyEntryName = $entryInfos['entryPoints'][$entryName]['legacy'];
 
-        return $entryInfos['entryPoints'][$legacyEntryName]['js'][0]['path'];
+        return $entryInfos['entryPoints'][$legacyEntryName]['js'][0];
     }
 
     private function throwIfEntrypointIsMissing(string $entryName): void

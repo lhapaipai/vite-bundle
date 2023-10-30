@@ -24,6 +24,7 @@ services:
             - "@pentatrion_vite.tag_renderer_collection"
             - "%pentatrion_vite.absolute_url%"
             - "@?router"
+            - "@?event_dispatcher"
 
     Pentatrion\ViteBundle\Asset\EntrypointRenderer:
         alias: "pentatrion_vite.entrypoint_renderer"
@@ -40,7 +41,6 @@ services:
     #     arguments:
     #         - []      # Default script_attributes
     #         - []      # Default link_attributes
-    #         - "@?event_dispatcher"
 
     
 

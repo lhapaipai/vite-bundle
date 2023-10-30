@@ -2,7 +2,9 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EntrypointRenderer
 {
@@ -10,9 +12,10 @@ class EntrypointRenderer
     private TagRendererCollection $tagRendererCollection;
     private bool $useAbsoluteUrl;
     private RouterInterface $router;
+    private EventDispatcherInterface $eventDispatcher;
 
-    private $returnedViteClients = [];
-    private $returnedReactRefresh = [];
+    private $returnedViteClient = false;
+    private $returnedReactRefresh = false;
     private $returnedPreloadedScripts = [];
 
     private $hasReturnedViteLegacyScripts = false;
@@ -21,12 +24,14 @@ class EntrypointRenderer
         EntrypointsLookupCollection $entrypointsLookupCollection,
         TagRendererCollection $tagRendererCollection,
         bool $useAbsoluteUrl,
-        RouterInterface $router = null
+        RouterInterface $router = null,
+        EventDispatcherInterface $eventDispatcher = null
     ) {
         $this->entrypointsLookupCollection = $entrypointsLookupCollection;
         $this->tagRendererCollection = $tagRendererCollection;
         $this->useAbsoluteUrl = $useAbsoluteUrl;
         $this->router = $router;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     private function getEntrypointsLookup(string $configName = null): EntrypointsLookup
@@ -37,90 +42,6 @@ class EntrypointRenderer
     private function getTagRenderer(string $configName = null): TagRenderer
     {
         return $this->tagRendererCollection->getTagRenderer($configName);
-    }
-
-    public function renderScripts(string $entryName, array $options = [], $configName = null): string
-    {
-        $entrypointsLookup = $this->getEntrypointsLookup($configName);
-        $tagRenderer = $this->getTagRenderer($configName);
-
-        if (!$entrypointsLookup->hasFile()) {
-            return '';
-        }
-
-        $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $configName);
-
-        $content = [];
-        $viteServer = $entrypointsLookup->getViteServer();
-        $isBuild = $entrypointsLookup->isBuild();
-
-        if (false !== $viteServer) {
-            // vite server is active
-            if (!isset($this->returnedViteClients[$configName])) {
-                $content[] = $tagRenderer->renderTag('script', [
-                    'type' => 'module',
-                    'src' => $viteServer['origin'].$viteServer['base'].'@vite/client',
-                ]);
-                $this->returnedViteClients[$configName] = true;
-            }
-            if (!isset($this->returnedReactRefresh[$configName]) && isset($options['dependency']) && 'react' === $options['dependency']) {
-                $content[] = $tagRenderer->renderReactRefreshInline($viteServer['origin'].$viteServer['base']);
-                $this->returnedReactRefresh[$configName] = true;
-            }
-        } elseif (
-            $entrypointsLookup->isLegacyPluginEnabled()
-            && !$this->hasReturnedViteLegacyScripts
-        ) {
-            /* legacy section when vite server is inactive */
-
-            /* set or not the __vite_is_modern_browser variable */
-            $content[] = $tagRenderer::DETECT_MODERN_BROWSER_CODE;
-
-            /* if your browser understands the modules but not dynamic import,
-             * load the legacy entrypoints
-             */
-            $content[] = $tagRenderer::DYNAMIC_FALLBACK_INLINE_CODE;
-
-            /* Safari 10.1 supports modules, but does not support the `nomodule` attribute
-             *  it will load <script nomodule> anyway */
-            $content[] = $tagRenderer::SAFARI10_NO_MODULE_FIX;
-
-            foreach ($entrypointsLookup->getJSFiles('polyfills-legacy') as $fileWithHash) {
-                // normally only one js file
-                $content[] = $tagRenderer->renderTag('script', [
-                    'nomodule' => true,
-                    'crossorigin' => true,
-                    'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
-                    'id' => 'vite-legacy-polyfill',
-                ]);
-            }
-            $this->hasReturnedViteLegacyScripts = true;
-        }
-
-        /* normal js scripts */
-        foreach ($entrypointsLookup->getJSFiles($entryName) as $fileWithHash) {
-            $attributes = array_merge([
-                'type' => 'module',
-                'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
-                'integrity' => $fileWithHash['hash'],
-            ], $options['attr'] ?? []);
-            $content[] = $tagRenderer->renderScriptFile($attributes, '', $isBuild);
-        }
-
-        /* legacy js scripts */
-        if ($entrypointsLookup->hasLegacy($entryName)) {
-            $id = self::pascalToKebab("vite-legacy-entry-$entryName");
-
-            $content[] = $tagRenderer->renderScriptFile([
-                'nomodule' => true,
-                'data-src' => $this->completeURL($entrypointsLookup->getLegacyJSFile($entryName), $useAbsoluteUrl),
-                'id' => $id,
-                'crossorigin' => true,
-                'class' => 'vite-legacy-entry',
-            ], $tagRenderer->getSystemJSInlineCode($id), $isBuild);
-        }
-
-        return implode(PHP_EOL, $content);
     }
 
     private function completeURL(string $path, $useAbsoluteUrl = false)
@@ -139,51 +60,6 @@ class EntrypointRenderer
         return false === $viteServer && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
     }
 
-    public function renderLinks(string $entryName, array $options = [], $configName = null): string
-    {
-        $entrypointsLookup = $this->getEntrypointsLookup($configName);
-        $tagRenderer = $this->getTagRenderer($configName);
-
-        if (!$entrypointsLookup->hasFile($configName)) {
-            return '';
-        }
-
-        $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $configName);
-        $isBuild = $entrypointsLookup->isBuild();
-
-        $content = [];
-
-        foreach ($entrypointsLookup->getCSSFiles($entryName) as $fileWithHash) {
-            $content[] = $tagRenderer->renderLinkStylesheet($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), array_merge([
-                'integrity' => $fileWithHash['hash'],
-            ], $options['attr'] ?? []), $isBuild);
-        }
-
-        if ($isBuild) {
-            foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $fileWithHash) {
-                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
-                    $content[] = $tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
-                        'integrity' => $fileWithHash['hash'],
-                    ], $isBuild);
-                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
-                }
-            }
-        }
-
-        if ($isBuild && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
-            foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $fileWithHash) {
-                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
-                    $content[] = $tagRenderer->renderLinkPreload($this->completeURL($fileWithHash['path'], $useAbsoluteUrl), [
-                        'integrity' => $fileWithHash['hash'],
-                    ], $isBuild);
-                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
-                }
-            }
-        }
-
-        return implode(PHP_EOL, $content);
-    }
-
     public function getMode(string $configName = null): ?string
     {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
@@ -198,8 +74,167 @@ class EntrypointRenderer
     public function reset()
     {
         // resets the state of this service
-        $this->returnedViteClients = [];
-        $this->returnedReactRefresh = [];
+        $this->returnedViteClient = false;
+        $this->returnedReactRefresh = false;
+    }
+
+    public function renderScripts(
+        string $entryName,
+        array $options = [],
+        $configName = null,
+        $toString = true
+    ): string {
+        $entrypointsLookup = $this->getEntrypointsLookup($configName);
+        $tagRenderer = $this->getTagRenderer($configName);
+
+        if (!$entrypointsLookup->hasFile()) {
+            return '';
+        }
+
+        $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $configName);
+
+        $tags = [];
+        $viteServer = $entrypointsLookup->getViteServer();
+        $isBuild = $entrypointsLookup->isBuild();
+
+        if (false !== $viteServer) {
+            // vite server is active
+            if (!$this->returnedViteClient) {
+                $tags[] = $tagRenderer->createViteClientScript($viteServer['origin'].$viteServer['base'].'@vite/client');
+                $this->returnedViteClient = true;
+            }
+
+            if (
+                !$this->returnedReactRefresh
+                && isset($options['dependency']) && 'react' === $options['dependency']
+            ) {
+                $tags[] = $tagRenderer->createReactRefreshScript($viteServer['origin'].$viteServer['base']);
+
+                $this->$this->returnedReactRefresh = true;
+            }
+        } elseif (
+            $entrypointsLookup->isLegacyPluginEnabled()
+            && !$this->hasReturnedViteLegacyScripts
+        ) {
+            /* legacy section when vite server is inactive */
+            $tags[] = $tagRenderer->createDetectModernBrowserScript();
+            $tags[] = $tagRenderer->createDynamicFallbackScript();
+            $tags[] = $tagRenderer->createSafariNoModuleScript();
+
+            foreach ($entrypointsLookup->getJSFiles('polyfills-legacy') as $fileWithHash) {
+                // normally only one js file
+                $tags[] = $tagRenderer->createScriptTag(
+                    [
+                        'nomodule' => true,
+                        'crossorigin' => true,
+                        'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
+                        'id' => 'vite-legacy-polyfill',
+                    ]
+                );
+            }
+            $this->hasReturnedViteLegacyScripts = true;
+        }
+
+        /* normal js scripts */
+        foreach ($entrypointsLookup->getJSFiles($entryName) as $fileWithHash) {
+            $tags[] = $tagRenderer->createScriptTag(
+                array_merge(
+                    [
+                        'type' => 'module',
+                        'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
+                        'integrity' => $fileWithHash['hash'],
+                    ],
+                    $options['attr'] ?? []
+                )
+            );
+        }
+
+        /* legacy js scripts */
+        if ($entrypointsLookup->hasLegacy($entryName)) {
+            $id = self::pascalToKebab("vite-legacy-entry-$entryName");
+
+            $file = $entrypointsLookup->getLegacyJSFile($entryName);
+            $tags[] = $tagRenderer->createScriptTag(
+                [
+                    'nomodule' => true,
+                    'data-src' => $this->completeURL($file['path'], $useAbsoluteUrl),
+                    'id' => $id,
+                    'crossorigin' => true,
+                    'class' => 'vite-legacy-entry',
+                    'integrity' => $file['hash'],
+                ],
+                InlineContent::getSystemJSInlineCode($id)
+            );
+        }
+
+        return $this->renderTags($tags, $isBuild, $toString);
+    }
+
+    public function renderLinks(
+        string $entryName,
+        array $options = [],
+        $configName = null,
+        $toString = true
+    ): string {
+        $entrypointsLookup = $this->getEntrypointsLookup($configName);
+        $tagRenderer = $this->getTagRenderer($configName);
+
+        if (!$entrypointsLookup->hasFile($configName)) {
+            return '';
+        }
+
+        $useAbsoluteUrl = $this->shouldUseAbsoluteURL($options, $configName);
+        $isBuild = $entrypointsLookup->isBuild();
+
+        $tags = [];
+
+        foreach ($entrypointsLookup->getCSSFiles($entryName) as $fileWithHash) {
+            $tags[] = $tagRenderer->createLinkStylesheetTag(
+                $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
+                array_merge(['integrity' => $fileWithHash['hash']], $options['attr'] ?? [])
+            );
+        }
+
+        if ($isBuild) {
+            foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $fileWithHash) {
+                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+                    $tags[] = $tagRenderer->createModulePreloadLinkTag(
+                        $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
+                        ['integrity' => $fileWithHash['hash']]
+                    );
+                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                }
+            }
+        }
+
+        if ($isBuild && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
+            foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $fileWithHash) {
+                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+                    $tags[] = $tagRenderer->createModulePreloadLinkTag(
+                        $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
+                        ['integrity' => $fileWithHash['hash']]
+                    );
+                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                }
+            }
+        }
+
+        return $this->renderTags($tags, $isBuild, $toString);
+    }
+
+    public function renderTags(array $tags, $isBuild, $toString)
+    {
+        if (null !== $this->eventDispatcher) {
+            foreach ($tags as $tag) {
+                $this->eventDispatcher->dispatch(new RenderAssetTagEvent($isBuild, $tag));
+            }
+        }
+
+        return $toString
+        ? implode(PHP_EOL, array_map(function ($tagEvent) {
+            return TagRenderer::generateTag($tagEvent);
+        }, $tags))
+        : $tags;
     }
 
     public static function pascalToKebab(string $str): string

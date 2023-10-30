@@ -7,7 +7,6 @@ use Pentatrion\ViteBundle\Asset\TagRenderer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -106,7 +105,6 @@ class PentatrionViteExtension extends Extension
         $arguments = [
             $config['script_attributes'],
             $config['link_attributes'],
-            new Reference('event_dispatcher', ContainerInterface::NULL_ON_INVALID_REFERENCE),
         ];
         $definition = new Definition(TagRenderer::class, $arguments);
         $container->setDefinition($id, $definition);

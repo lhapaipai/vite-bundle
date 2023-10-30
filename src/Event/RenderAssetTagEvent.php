@@ -6,62 +6,29 @@
 
 namespace Pentatrion\ViteBundle\Event;
 
+use Pentatrion\ViteBundle\Asset\Tag;
+
 /**
  * Dispatched each time a script or link tag is rendered.
  */
 final class RenderAssetTagEvent
 {
-    public const TYPE_SCRIPT = 'script';
-    public const TYPE_LINK = 'link';
-    public const TYPE_PRELOAD = 'preload';
+    private bool $build;
+    private Tag $tag;
 
-    private string $type;
-    private array $attributes;
-    private bool $isBuild;
-
-    public function __construct(string $type, array $attributes, bool $isBuild)
+    public function __construct(bool $build, Tag $tag)
     {
-        $this->type = $type;
-        $this->attributes = $attributes;
-        $this->isBuild = $isBuild;
-    }
-
-    public function isScriptTag(): bool
-    {
-        return self::TYPE_SCRIPT === $this->type;
-    }
-
-    public function isLinkTag(): bool
-    {
-        return self::TYPE_LINK === $this->type;
-    }
-
-    public function isPreloadTag(): bool
-    {
-        return self::TYPE_PRELOAD === $this->type;
-    }
-
-    public function getAttributes(): array
-    {
-        return $this->attributes;
+        $this->build = $build;
+        $this->tag = $tag;
     }
 
     public function isBuild(): bool
     {
-        return $this->isBuild;
+        return $this->build;
     }
 
-    /**
-     * @param string      $name  The attribute name
-     * @param string|bool $value Value can be "true" to have an attribute without a value (e.g. "defer")
-     */
-    public function setAttribute(string $name, $value): void
+    public function getTag(): Tag
     {
-        $this->attributes[$name] = $value;
-    }
-
-    public function removeAttribute(string $name): void
-    {
-        unset($this->attributes[$name]);
+        return $this->tag;
     }
 }

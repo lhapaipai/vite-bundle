@@ -1,0 +1,59 @@
+{
+  "entryPoints": {
+    "app": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build/assets/pageImports-53eb9fd1.js"
+      ],
+      "legacy": false,
+      "preload": []
+    },
+    "theme": {
+      "assets": [],
+      "css": [
+        "/build/assets/theme-62617963.css"
+      ],
+      "dynamic": [],
+      "js": [],
+      "legacy": false,
+      "preload": []
+    },
+    "with-dep": {
+      "assets": [],
+      "css": [
+        "/build/assets/main-76fa9059.css"
+      ],
+      "dynamic": [],
+      "js": [
+        "/build/assets/main-e664f4b5.js"
+      ],
+      "legacy": false,
+      "preload": [
+        "/build/assets/vue-2d05229a.js",
+        "/build/assets/react-2d05228c.js"
+      ]
+    },
+    "with-async": {
+      "assets": [],
+      "css": [
+        "/build/assets/main-76fa9059.css"
+      ],
+      "dynamic": [
+        "/build/assets/async-script-12324565.js"
+      ],
+      "js": [
+        "/build/assets/main-e664f4b5.js"
+      ],
+      "legacy": false,
+      "preload": [
+        "/build/assets/vue-2d05229a.js",
+        "/build/assets/react-2d05228c.js"
+      ]
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "viteServer": false
+}

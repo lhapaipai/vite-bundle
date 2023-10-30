@@ -123,7 +123,7 @@ class TagRendererTest extends TestCase
                 '/dependency.js',
                 [],
                 '<link rel="modulepreload" href="/dependency.js">',
-                'global link/script attribute are not added',
+                'global link/script attributes are not added',
             ],
         ];
     }

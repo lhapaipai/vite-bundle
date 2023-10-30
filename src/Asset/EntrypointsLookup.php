@@ -2,6 +2,8 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
+
 class EntrypointsLookup
 {
     private bool $throwOnMissingEntry;
@@ -35,14 +37,25 @@ class EntrypointsLookup
                 throw new \Exception('entrypoints.json not found at '.$this->fileInfos['entrypointsPath']);
             }
             $content = json_decode(file_get_contents($this->fileInfos['entrypointsPath']), true);
-            if (!isset($content['isBuild'], $content['entryPoints'], $content['viteServer'])) {
-                throw new \Exception($this->fileInfos['entrypointsPath'].' : isBuild, entryPoints or viteServer not exists');
+            if (!isset($content['entryPoints'], $content['viteServer'])) {
+                throw new \Exception($this->fileInfos['entrypointsPath'].' : entryPoints or viteServer not exists');
             }
 
             $this->fileInfos['content'] = $content;
         }
 
         return $this->fileInfos['content'];
+    }
+
+    public function getFileHash(string $filePath): ?string
+    {
+        $infos = $this->getFileContent();
+
+        if (is_null($infos['metadatas']) || !array_key_exists($filePath, $infos['metadatas'])) {
+            return null;
+        }
+
+        return $infos['metadatas'][$filePath]['hash'];
     }
 
     public function isLegacyPluginEnabled(): bool
@@ -54,7 +67,7 @@ class EntrypointsLookup
 
     public function isBuild(): bool
     {
-        return $this->getFileContent()['isBuild'];
+        return false === $this->getFileContent()['viteServer'];
     }
 
     public function getViteServer()
@@ -119,7 +132,7 @@ class EntrypointsLookup
         if (!array_key_exists($entryName, $this->getFileContent()['entryPoints'])) {
             $keys = array_keys($this->getFileContent()['entryPoints']);
             $entryPointKeys = join(', ', array_map(function ($key) { return "'$key'"; }, $keys));
-            throw new \Exception("Entry '$entryName' not present in the entrypoints file. Defined entrypoints are $entryPointKeys");
+            throw new EntrypointNotFoundException(sprintf("Entry '%s' not present in the entrypoints file. Defined entrypoints are %s", $entryName, $entryPointKeys));
         }
     }
 }

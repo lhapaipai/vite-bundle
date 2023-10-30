@@ -1,0 +1,59 @@
+{
+  "entryPoints": {
+    "app-legacy": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build/assets/app-legacy-59951366.js"
+      ],
+      "legacy": false,
+      "preload": []
+    },
+    "app": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build/assets/app-23802617.js"
+      ],
+      "legacy": "app-legacy",
+      "preload": []
+    },
+    "theme-legacy": {
+      "assets": [
+        "/build/assets/topography-303b8303.svg"
+      ],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build/assets/theme-legacy-de9eb869.js"
+      ],
+      "legacy": false,
+      "preload": []
+    },
+    "theme": {
+      "assets": [],
+      "css": [
+        "/build/assets/theme-5cd46aed.css"
+      ],
+      "dynamic": [],
+      "js": [],
+      "legacy": "theme-legacy",
+      "preload": []
+    },
+    "polyfills-legacy": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build/assets/polyfills-legacy-40963d34.js"
+      ],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": true,
+  "metadatas": {},
+  "viteServer": false
+}

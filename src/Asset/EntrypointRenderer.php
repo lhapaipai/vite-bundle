@@ -121,13 +121,13 @@ class EntrypointRenderer
             $tags[] = $tagRenderer->createDynamicFallbackScript();
             $tags[] = $tagRenderer->createSafariNoModuleScript();
 
-            foreach ($entrypointsLookup->getJSFiles('polyfills-legacy') as $fileWithHash) {
+            foreach ($entrypointsLookup->getJSFiles('polyfills-legacy') as $filePath) {
                 // normally only one js file
                 $tags[] = $tagRenderer->createScriptTag(
                     [
                         'nomodule' => true,
                         'crossorigin' => true,
-                        'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
+                        'src' => $this->completeURL($filePath, $useAbsoluteUrl),
                         'id' => 'vite-legacy-polyfill',
                     ]
                 );
@@ -136,13 +136,13 @@ class EntrypointRenderer
         }
 
         /* normal js scripts */
-        foreach ($entrypointsLookup->getJSFiles($entryName) as $fileWithHash) {
+        foreach ($entrypointsLookup->getJSFiles($entryName) as $filePath) {
             $tags[] = $tagRenderer->createScriptTag(
                 array_merge(
                     [
                         'type' => 'module',
-                        'src' => $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
-                        'integrity' => $fileWithHash['hash'],
+                        'src' => $this->completeURL($filePath, $useAbsoluteUrl),
+                        'integrity' => $entrypointsLookup->getFileHash($filePath),
                     ],
                     $options['attr'] ?? []
                 )
@@ -157,11 +157,11 @@ class EntrypointRenderer
             $tags[] = $tagRenderer->createScriptTag(
                 [
                     'nomodule' => true,
-                    'data-src' => $this->completeURL($file['path'], $useAbsoluteUrl),
+                    'data-src' => $this->completeURL($file, $useAbsoluteUrl),
                     'id' => $id,
                     'crossorigin' => true,
                     'class' => 'vite-legacy-entry',
-                    'integrity' => $file['hash'],
+                    'integrity' => $entrypointsLookup->getFileHash($file),
                 ],
                 InlineContent::getSystemJSInlineCode($id)
             );
@@ -188,33 +188,33 @@ class EntrypointRenderer
 
         $tags = [];
 
-        foreach ($entrypointsLookup->getCSSFiles($entryName) as $fileWithHash) {
+        foreach ($entrypointsLookup->getCSSFiles($entryName) as $filePath) {
             $tags[] = $tagRenderer->createLinkStylesheetTag(
-                $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
-                array_merge(['integrity' => $fileWithHash['hash']], $options['attr'] ?? [])
+                $this->completeURL($filePath, $useAbsoluteUrl),
+                array_merge(['integrity' => $entrypointsLookup->getFileHash($filePath)], $options['attr'] ?? [])
             );
         }
 
         if ($isBuild) {
-            foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $fileWithHash) {
-                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+            foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $filePath) {
+                if (false === \in_array($filePath, $this->returnedPreloadedScripts, true)) {
                     $tags[] = $tagRenderer->createModulePreloadLinkTag(
-                        $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
-                        ['integrity' => $fileWithHash['hash']]
+                        $this->completeURL($filePath, $useAbsoluteUrl),
+                        ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                    $this->returnedPreloadedScripts[] = $filePath;
                 }
             }
         }
 
         if ($isBuild && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
-            foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $fileWithHash) {
-                if (false === \in_array($fileWithHash['path'], $this->returnedPreloadedScripts, true)) {
+            foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $filePath) {
+                if (false === \in_array($filePath, $this->returnedPreloadedScripts, true)) {
                     $tags[] = $tagRenderer->createModulePreloadLinkTag(
-                        $this->completeURL($fileWithHash['path'], $useAbsoluteUrl),
-                        ['integrity' => $fileWithHash['hash']]
+                        $this->completeURL($filePath, $useAbsoluteUrl),
+                        ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->returnedPreloadedScripts[] = $fileWithHash['path'];
+                    $this->returnedPreloadedScripts[] = $filePath;
                 }
             }
         }

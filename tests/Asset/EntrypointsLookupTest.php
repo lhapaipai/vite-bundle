@@ -11,8 +11,7 @@ class EntrypointsLookupTest extends TestCase
     private function getEntrypointsLookup($prefix)
     {
         return new EntrypointsLookup(
-            __DIR__.'/../fixtures/entrypoints',
-            ['base' => '/'.$prefix.'/'],
+            __DIR__.'/../fixtures/entrypoints/'.$prefix.'/',
             true
         );
     }

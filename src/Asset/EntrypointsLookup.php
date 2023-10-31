@@ -3,16 +3,27 @@
 namespace Pentatrion\ViteBundle\Asset;
 
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
+use Pentatrion\ViteBundle\Exception\EntrypointsFileNotFoundException;
+use Psr\Cache\CacheItemPoolInterface;
 
 class EntrypointsLookup
 {
+    private string $configName;
     private bool $throwOnMissingEntry;
+    private ?CacheItemPoolInterface $cache;
+
     private array $fileInfos;
 
-    public function __construct(string $publicPath, array $config, bool $throwOnMissingEntry)
-    {
+    public function __construct(
+        string $basePath,
+        string $configName = '_default',
+        bool $throwOnMissingEntry = false,
+        CacheItemPoolInterface $cache = null
+    ) {
+        $this->configName = $configName;
         $this->throwOnMissingEntry = $throwOnMissingEntry;
-        $entrypointsPath = $publicPath.$config['base'].'entrypoints.json';
+        $this->cache = $cache;
+        $entrypointsPath = $basePath.'entrypoints.json';
 
         $this->fileInfos = [
             'entrypointsPath' => $entrypointsPath,
@@ -32,9 +43,17 @@ class EntrypointsLookup
 
     private function getFileContent(): array
     {
+        if ($this->cache) {
+            $cached = $this->cache->getItem($this->configName);
+
+            if ($cached->isHit()) {
+                $this->fileInfos['content'] = $cached->get();
+            }
+        }
+
         if (!isset($this->fileInfos['content'])) {
             if (!$this->fileInfos['fileExists']) {
-                throw new \Exception('entrypoints.json not found at '.$this->fileInfos['entrypointsPath']);
+                throw new EntrypointsFileNotFoundException('entrypoints.json not found at '.$this->fileInfos['entrypointsPath']);
             }
             $content = json_decode(file_get_contents($this->fileInfos['entrypointsPath']), true);
             if (!array_key_exists('entryPoints', $content)
@@ -42,6 +61,10 @@ class EntrypointsLookup
              || !array_key_exists('base', $content)
             ) {
                 throw new \Exception($this->fileInfos['entrypointsPath'].' : entryPoints, base or viteServer not exists');
+            }
+
+            if (isset($cached)) {
+                $this->cache->save($cached->set($content));
             }
 
             $this->fileInfos['content'] = $content;

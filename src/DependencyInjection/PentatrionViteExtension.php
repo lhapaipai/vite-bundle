@@ -32,6 +32,12 @@ class PentatrionViteExtension extends Extension
             $bundleConfig['default_config'] = $bundleConfig['default_build'];
         }
 
+        $container->setParameter('pentatrion_vite.preload', $bundleConfig['preload']);
+        $container->setParameter('pentatrion_vite.public_directory', self::preparePublicDirectory($bundleConfig['public_directory']));
+        $container->setParameter('pentatrion_vite.absolute_url', $bundleConfig['absolute_url']);
+        $container->setParameter('pentatrion_vite.proxy_origin', $bundleConfig['proxy_origin']);
+        $container->setParameter('pentatrion_vite.throw_on_missing_entry', $bundleConfig['throw_on_missing_entry']);
+
         if (
             count($bundleConfig['configs']) > 0) {
             if (is_null($bundleConfig['default_config']) || !isset($bundleConfig['configs'][$bundleConfig['default_config']])) {
@@ -41,22 +47,35 @@ class PentatrionViteExtension extends Extension
             $lookupFactories = [];
             $tagRendererFactories = [];
             $configs = [];
+            $cacheKeys = [];
 
             foreach ($bundleConfig['configs'] as $configName => $config) {
                 $configs[$configName] = $configPrepared = self::prepareConfig($config);
-                $lookupFactories[$configName] = $this->entrypointsLookupFactory($container, $configName, $configPrepared);
+                $lookupFactories[$configName] = $this->entrypointsLookupFactory(
+                    $container,
+                    $configName,
+                    $configPrepared,
+                    $bundleConfig['cache']
+                );
                 $tagRendererFactories[$configName] = $this->tagRendererFactory($container, $configName, $configPrepared);
+                $cacheKeys[] = $this->resolveBasePath($container, $configPrepared);
             }
         } else {
             $defaultConfigName = '_default';
             $configs[$defaultConfigName] = $configPrepared = self::prepareConfig($bundleConfig);
 
             $lookupFactories = [
-                '_default' => $this->entrypointsLookupFactory($container, $defaultConfigName, $configPrepared),
+                '_default' => $this->entrypointsLookupFactory(
+                    $container,
+                    $defaultConfigName,
+                    $configPrepared,
+                    $bundleConfig['cache']
+                ),
             ];
             $tagRendererFactories = [
                 '_default' => $this->tagRendererFactory($container, $defaultConfigName, $configPrepared),
             ];
+            $cacheKeys = [$this->resolveBasePath($container, $configPrepared)];
         }
 
         if ('link-header' === $bundleConfig['preload']) {
@@ -66,15 +85,9 @@ class PentatrionViteExtension extends Extension
         } else {
             $container->removeDefinition('pentatrion_vite.preload_assets_event_listener');
         }
-        $container->setParameter('pentatrion_vite.preload', $bundleConfig['preload']);
 
-        $container->setParameter('pentatrion_vite.public_directory', self::preparePublicDirectory($bundleConfig['public_directory']));
         $container->setParameter('pentatrion_vite.default_config', $defaultConfigName);
         $container->setParameter('pentatrion_vite.configs', $configs);
-
-        $container->setParameter('pentatrion_vite.absolute_url', $bundleConfig['absolute_url']);
-        $container->setParameter('pentatrion_vite.proxy_origin', $bundleConfig['proxy_origin']);
-        $container->setParameter('pentatrion_vite.throw_on_missing_entry', $bundleConfig['throw_on_missing_entry']);
 
         $container->getDefinition('pentatrion_vite.entrypoints_lookup_collection')
             ->addArgument(ServiceLocatorTagPass::register($container, $lookupFactories))
@@ -83,23 +96,39 @@ class PentatrionViteExtension extends Extension
         $container->getDefinition('pentatrion_vite.tag_renderer_collection')
             ->addArgument(ServiceLocatorTagPass::register($container, $tagRendererFactories))
             ->addArgument($defaultConfigName);
+
+        $container->getDefinition('pentatrion_vite.cache_warmer')
+            ->replaceArgument(0, $cacheKeys);
     }
 
     private function entrypointsLookupFactory(
         ContainerBuilder $container,
         string $configName,
-        array $config
+        array $config,
+        bool $cacheEnabled
     ): Reference {
         $id = $this->getServiceId('entrypoints_lookup', $configName);
         $arguments = [
-            '%kernel.project_dir%%pentatrion_vite.public_directory%',
-            $config,
+            $this->resolveBasePath($container, $config),
+            $configName,
             '%pentatrion_vite.throw_on_missing_entry%',
+            $cacheEnabled ? new Reference('pentatrion_vite.cache') : null,
         ];
         $definition = new Definition(EntrypointsLookup::class, $arguments);
         $container->setDefinition($id, $definition);
 
         return new Reference($id);
+    }
+
+    /**
+     * Return absolute path to the build directory with final slash
+     * ex: "/path-to-your-project/public/build/".
+     */
+    private function resolveBasePath(ContainerBuilder $container, $config): string
+    {
+        return $container->getParameter('kernel.project_dir')
+            .$container->getParameter('pentatrion_vite.public_directory')
+            .$config['base'];
     }
 
     private function tagRendererFactory(

@@ -44,58 +44,10 @@ class EntrypointRendererTest extends TestCase
         return $entrypointsLookupCollection;
     }
 
-    // public function getBaseDevEntrypointsLookupStub()
-    // {
-    //     /**
-    //      * @var EntrypointsLookup|Stub $entrypointsLookup
-    //      */
-    //     $entrypointsLookup = $this->createStub(EntrypointsLookup::class);
-
-    //     $entrypointsLookup
-    //         ->method('hasFile')
-    //         ->willReturn(true);
-
-    //     $entrypointsLookup
-    //         ->method('isBuild')
-    //         ->willReturn(false);
-
-    //     $entrypointsLookup
-    //         ->method('getViteServer')
-    //         ->willReturn([
-    //             'origin' => 'http://127.0.0.1:5173',
-    //             'base' => '/build/',
-    //         ]);
-
-    //     return $entrypointsLookup;
-    // }
-
-    // public function getBaseBuildEntrypointsLookupStub()
-    // {
-    //     /**
-    //      * @var EntrypointsLookup|Stub $entrypointsLookup
-    //      */
-    //     $entrypointsLookup = $this->createStub(EntrypointsLookup::class);
-
-    //     $entrypointsLookup
-    //         ->method('hasFile')
-    //         ->willReturn(true);
-
-    //     $entrypointsLookup
-    //         ->method('isBuild')
-    //         ->willReturn(true);
-
-    //     $entrypointsLookup
-    //         ->method('getViteServer')
-    //         ->willReturn(false);
-
-    //     return $entrypointsLookup;
-    // }
-
     private function getEntrypointsLookup($prefix)
     {
         return new EntrypointsLookup(
-            __DIR__.'/../fixtures/entrypoints',
-            ['base' => '/'.$prefix.'/'],
+            __DIR__.'/../fixtures/entrypoints/'.$prefix.'/',
             true
         );
     }

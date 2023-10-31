@@ -77,3 +77,20 @@ services:
         arguments:
             - "@pentatrion_vite.entrypoint_renderer"
 
+    pentatrion_vite.cache_warmer:
+        class:  Pentatrion\ViteBundle\CacheWarmer\EntrypointsCacheWarmer
+        tags: ["kernel.cache_warmer"]
+        arguments:
+            - []
+            - '%kernel.cache_dir%/pentatrion_vite.cache.php'
+
+    pentatrion_vite.cache:
+        class: Symfony\Component\Cache\Adapter\PhpArrayAdapter
+        factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
+        arguments:
+            - '%kernel.cache_dir%/pentatrion_vite.cache.php'
+            - '@cache.pentatrion_vite'
+
+    cache.pentatrion_vite:
+        tags: ["cache.pool"]
+        parent: cache.system

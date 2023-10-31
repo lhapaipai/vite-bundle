@@ -1,11 +1,12 @@
 {
+  "base": "/build/",
   "entryPoints": {
     "app-legacy": {
       "assets": [],
       "css": [],
       "dynamic": [],
       "js": [
-        "/build/assets/app-legacy-59951366.js"
+        "/build/assets/app-legacy.js"
       ],
       "legacy": false,
       "preload": []
@@ -15,19 +16,19 @@
       "css": [],
       "dynamic": [],
       "js": [
-        "/build/assets/app-23802617.js"
+        "/build/assets/app.js"
       ],
       "legacy": "app-legacy",
       "preload": []
     },
     "theme-legacy": {
       "assets": [
-        "/build/assets/topography-303b8303.svg"
+        "/build/assets/topography-svg"
       ],
       "css": [],
       "dynamic": [],
       "js": [
-        "/build/assets/theme-legacy-de9eb869.js"
+        "/build/assets/theme-legacy.js"
       ],
       "legacy": false,
       "preload": []
@@ -35,7 +36,7 @@
     "theme": {
       "assets": [],
       "css": [
-        "/build/assets/theme-5cd46aed.css"
+        "/build/assets/theme.css"
       ],
       "dynamic": [],
       "js": [],
@@ -47,7 +48,7 @@
       "css": [],
       "dynamic": [],
       "js": [
-        "/build/assets/polyfills-legacy-40963d34.js"
+        "/build/assets/polyfills-legacy.js"
       ],
       "legacy": false,
       "preload": []
@@ -55,5 +56,5 @@
   },
   "legacy": true,
   "metadatas": {},
-  "viteServer": false
+  "viteServer": null
 }

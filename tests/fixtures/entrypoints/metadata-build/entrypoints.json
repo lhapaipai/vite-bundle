@@ -1,11 +1,12 @@
 {
+  "base": "/build/",
   "entryPoints": {
-    "pageVue": {
+    "app": {
       "assets": [],
       "css": [],
       "dynamic": [],
       "js": [
-        "http://cdn.with-cdn.symfony-vite-dev.localhost/assets/pageVue-bda8ac3b.js"
+        "/build/assets/app.js"
       ],
       "legacy": false,
       "preload": []
@@ -13,9 +14,9 @@
   },
   "legacy": false,
   "metadatas": {
-    "http://cdn.with-cdn.symfony-vite-dev.localhost/assets/pageVue-bda8ac3b.js": {
-      "hash": "sha256-qABtt8+MbhDq8dts7DSJOnBqCO1QbV2S6zg24ylLkKY="
+    "/build/assets/app.js": {
+      "hash": "sha256-XYZ"
     }
   },
-  "viteServer": false
+  "viteServer": null
 }

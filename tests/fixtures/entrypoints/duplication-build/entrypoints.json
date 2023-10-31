@@ -1,0 +1,34 @@
+{
+  "base": "/build/",
+  "entryPoints": {
+    "app-1": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build/assets/app-1.js"
+      ],
+      "legacy": false,
+      "preload": [
+        "/build/assets/vue.js"
+      ]
+    },
+    "app-2": {
+      "assets": [],
+      "css": [
+        "/build/assets/app-2.css"
+      ],
+      "dynamic": [],
+      "js": [
+        "/build/assets/app-2.js"
+      ],
+      "legacy": false,
+      "preload": [
+        "/build/assets/vue.js"
+      ]
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "viteServer": null
+}

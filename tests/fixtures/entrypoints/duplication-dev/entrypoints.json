@@ -6,6 +6,11 @@
         "http://127.0.0.1:5173/build/assets/app.js"
       ]
     },
+    "other-app": {
+      "js": [
+        "http://127.0.0.1:5173/build/assets/other-app.js"
+      ]
+    },
     "theme": {
       "css": [
         "http://127.0.0.1:5173/build/assets/theme.scss"

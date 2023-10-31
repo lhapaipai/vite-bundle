@@ -2,50 +2,53 @@
 
 namespace Pentatrion\ViteBundle\Controller;
 
-use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
+use Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ViteController
 {
     public $httpClient;
-    public string $defaultBuild;
-    public array $builds;
-    private $entrypointsLookup;
+    public string $defaultConfig;
+    public array $configs;
+    private $entrypointsLookupCollection;
     private $proxyOrigin;
 
     public function __construct(
-        string $defaultBuild,
-        array $builds,
+        string $defaultConfig,
+        array $configs,
         HttpClientInterface $httpClient,
-        EntrypointsLookup $entrypointsLookup,
+        EntrypointsLookupCollection $entrypointsLookupCollection,
         ?string $proxyOrigin
     ) {
-        $this->defaultBuild = $defaultBuild;
-        $this->builds = $builds;
+        $this->defaultConfig = $defaultConfig;
+        $this->configs = $configs;
         $this->httpClient = $httpClient;
 
-        $this->entrypointsLookup = $entrypointsLookup;
+        $this->entrypointsLookupCollection = $entrypointsLookupCollection;
         $this->proxyOrigin = $proxyOrigin;
     }
 
-    public function proxyBuild($path, $buildName = null): Response
+    public function proxyBuild($path, $configName = null): Response
     {
-        if (is_null($buildName)) {
-            $buildName = $this->defaultBuild;
+        if (is_null($configName)) {
+            $configName = $this->defaultConfig;
         }
 
-        $viteDevServer = $this->entrypointsLookup->getViteServer($buildName);
+        $entrypointsLookup = $this->entrypointsLookupCollection->getEntrypointsLookup($configName);
 
-        if (is_null($viteDevServer) || false === $viteDevServer) {
+        $viteDevServer = $entrypointsLookup->getViteServer();
+        $base = $entrypointsLookup->getBase();
+
+        if (is_null($viteDevServer)) {
             return new \Exception('Vite dev server not available');
         }
 
-        $origin = $this->proxyOrigin ?? $viteDevServer['origin'];
+        $origin = $this->proxyOrigin ?? $viteDevServer;
 
         $response = $this->httpClient->request(
             'GET',
-            $origin.$this->builds[$buildName]['base'].$path
+            $origin.$base.$path
         );
 
         $content = $response->getContent();

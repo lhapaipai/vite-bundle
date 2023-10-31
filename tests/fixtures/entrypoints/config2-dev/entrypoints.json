@@ -1,0 +1,18 @@
+{
+  "base": "/build-config2/",
+  "entryPoints": {
+    "app-2": {
+      "js": [
+        "http://127.0.0.1:5174/build-config2/assets/app-2.js"
+      ]
+    },
+    "theme-2": {
+      "css": [
+        "http://127.0.0.1:5174/build-config2/assets/theme-2.scss"
+      ]
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "viteServer": "http://127.0.0.1:5174"
+}

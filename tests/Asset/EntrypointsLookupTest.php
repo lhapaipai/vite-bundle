@@ -47,12 +47,12 @@ class EntrypointsLookupTest extends TestCase
         $entrypointsLookupBasicBuild = $this->getEntrypointsLookup('basic-build');
 
         $this->assertEquals(
-            ['origin' => 'http://127.0.0.1:5173', 'base' => '/build/'],
+            'http://127.0.0.1:5173',
             $entrypointsLookupBasicDev->getViteServer()
         );
 
         $this->assertEquals(
-            false,
+            null,
             $entrypointsLookupBasicBuild->getViteServer()
         );
 
@@ -90,14 +90,14 @@ class EntrypointsLookupTest extends TestCase
     /**
      * @dataProvider devfilesProvider
      */
-    public function testGetDevFiles($entryName, $files)
+    public function testGetDevFiles($entryName, $expectedFiles)
     {
         $entrypointsLookupBasicDev = $this->getEntrypointsLookup('basic-dev');
 
-        $this->assertEquals($files['css'], $entrypointsLookupBasicDev->getCSSFiles($entryName));
-        $this->assertEquals($files['dynamic'], $entrypointsLookupBasicDev->getJavascriptDynamicDependencies($entryName));
-        $this->assertEquals($files['js'], $entrypointsLookupBasicDev->getJSFiles($entryName));
-        $this->assertEquals($files['preload'], $entrypointsLookupBasicDev->getJavascriptDependencies($entryName));
+        $this->assertEquals($expectedFiles['css'], $entrypointsLookupBasicDev->getCSSFiles($entryName));
+        $this->assertEquals($expectedFiles['dynamic'], $entrypointsLookupBasicDev->getJavascriptDynamicDependencies($entryName));
+        $this->assertEquals($expectedFiles['js'], $entrypointsLookupBasicDev->getJSFiles($entryName));
+        $this->assertEquals($expectedFiles['preload'], $entrypointsLookupBasicDev->getJavascriptDependencies($entryName));
     }
 
     public function buildfilesProvider()
@@ -107,29 +107,29 @@ class EntrypointsLookupTest extends TestCase
                 'assets' => [],
                 'css' => [],
                 'dynamic' => [],
-                'js' => ['/build/assets/pageImports-53eb9fd1.js'],
+                'js' => ['/build/assets/app.js'],
                 'preload' => [],
             ]],
             ['theme', [
                 'assets' => [],
-                'css' => ['/build/assets/theme-62617963.css'],
+                'css' => ['/build/assets/theme.css'],
                 'dynamic' => [],
                 'js' => [],
                 'preload' => [],
             ]],
             ['with-dep', [
                 'assets' => [],
-                'css' => ['/build/assets/main-76fa9059.css'],
+                'css' => ['/build/assets/main.css'],
                 'dynamic' => [],
-                'js' => ['/build/assets/main-e664f4b5.js'],
-                'preload' => ['/build/assets/vue-2d05229a.js', '/build/assets/react-2d05228c.js'],
+                'js' => ['/build/assets/main.js'],
+                'preload' => ['/build/assets/vue.js', '/build/assets/react.js'],
             ]],
             ['with-async', [
                 'assets' => [],
-                'css' => ['/build/assets/main-76fa9059.css'],
-                'dynamic' => ['/build/assets/async-script-12324565.js'],
-                'js' => ['/build/assets/main-e664f4b5.js'],
-                'preload' => ['/build/assets/vue-2d05229a.js', '/build/assets/react-2d05228c.js'],
+                'css' => ['/build/assets/main.css'],
+                'dynamic' => ['/build/assets/async-script.js'],
+                'js' => ['/build/assets/main.js'],
+                'preload' => ['/build/assets/vue.js', '/build/assets/react.js'],
             ]],
         ];
     }
@@ -137,14 +137,14 @@ class EntrypointsLookupTest extends TestCase
     /**
      * @dataProvider buildfilesProvider
      */
-    public function testGetBuildFiles($entryName, $files)
+    public function testGetBuildFiles($entryName, $expectedFiles)
     {
         $entrypointsLookupBasicBuild = $this->getEntrypointsLookup('basic-build');
 
-        $this->assertEquals($files['css'], $entrypointsLookupBasicBuild->getCSSFiles($entryName));
-        $this->assertEquals($files['dynamic'], $entrypointsLookupBasicBuild->getJavascriptDynamicDependencies($entryName));
-        $this->assertEquals($files['js'], $entrypointsLookupBasicBuild->getJSFiles($entryName));
-        $this->assertEquals($files['preload'], $entrypointsLookupBasicBuild->getJavascriptDependencies($entryName));
+        $this->assertEquals($expectedFiles['css'], $entrypointsLookupBasicBuild->getCSSFiles($entryName));
+        $this->assertEquals($expectedFiles['dynamic'], $entrypointsLookupBasicBuild->getJavascriptDynamicDependencies($entryName));
+        $this->assertEquals($expectedFiles['js'], $entrypointsLookupBasicBuild->getJSFiles($entryName));
+        $this->assertEquals($expectedFiles['preload'], $entrypointsLookupBasicBuild->getJavascriptDependencies($entryName));
     }
 
     public function buildLegacyProvider()
@@ -154,17 +154,17 @@ class EntrypointsLookupTest extends TestCase
                 'assets' => [],
                 'css' => [],
                 'dynamic' => [],
-                'js' => ['/build/assets/app-23802617.js'],
+                'js' => ['/build/assets/app.js'],
                 'preload' => [],
-                'legacy_js' => '/build/assets/app-legacy-59951366.js',
+                'legacy_js' => '/build/assets/app-legacy.js',
             ]],
             ['theme', [
                 'assets' => [],
-                'css' => ['/build/assets/theme-5cd46aed.css'],
+                'css' => ['/build/assets/theme.css'],
                 'dynamic' => [],
                 'js' => [],
                 'preload' => [],
-                'legacy_js' => '/build/assets/theme-legacy-de9eb869.js',
+                'legacy_js' => '/build/assets/theme-legacy.js',
             ]],
         ];
     }
@@ -172,15 +172,15 @@ class EntrypointsLookupTest extends TestCase
     /**
      * @dataProvider buildLegacyProvider
      */
-    public function testGetBuildLegacyFiles($entryName, $files)
+    public function testGetBuildLegacyFiles($entryName, $expectedFiles)
     {
         $entrypointsLookupLegacyBuild = $this->getEntrypointsLookup('legacy-build');
 
-        $this->assertEquals($files['css'], $entrypointsLookupLegacyBuild->getCSSFiles($entryName));
-        $this->assertEquals($files['dynamic'], $entrypointsLookupLegacyBuild->getJavascriptDynamicDependencies($entryName));
-        $this->assertEquals($files['js'], $entrypointsLookupLegacyBuild->getJSFiles($entryName));
-        $this->assertEquals($files['preload'], $entrypointsLookupLegacyBuild->getJavascriptDependencies($entryName));
-        $this->assertEquals($files['legacy_js'], $entrypointsLookupLegacyBuild->getLegacyJSFile($entryName));
+        $this->assertEquals($expectedFiles['css'], $entrypointsLookupLegacyBuild->getCSSFiles($entryName));
+        $this->assertEquals($expectedFiles['dynamic'], $entrypointsLookupLegacyBuild->getJavascriptDynamicDependencies($entryName));
+        $this->assertEquals($expectedFiles['js'], $entrypointsLookupLegacyBuild->getJSFiles($entryName));
+        $this->assertEquals($expectedFiles['preload'], $entrypointsLookupLegacyBuild->getJavascriptDependencies($entryName));
+        $this->assertEquals($expectedFiles['legacy_js'], $entrypointsLookupLegacyBuild->getLegacyJSFile($entryName));
     }
 
     public function testHashOfFiles()
@@ -188,13 +188,13 @@ class EntrypointsLookupTest extends TestCase
         $entrypointsLookupBasicBuild = $this->getEntrypointsLookup('basic-build');
         $this->assertEquals(
             null,
-            $entrypointsLookupBasicBuild->getFileHash('/build/assets/pageImports-53eb9fd1.js')
+            $entrypointsLookupBasicBuild->getFileHash('/build/assets/app.js')
         );
 
         $entrypointsLookupMetadataBuild = $this->getEntrypointsLookup('metadata-build');
         $this->assertEquals(
-            'sha256-qABtt8+MbhDq8dts7DSJOnBqCO1QbV2S6zg24ylLkKY=',
-            $entrypointsLookupMetadataBuild->getFileHash('http://cdn.with-cdn.symfony-vite-dev.localhost/assets/pageVue-bda8ac3b.js')
+            'sha256-XYZ',
+            $entrypointsLookupMetadataBuild->getFileHash('/build/assets/app.js')
         );
 
         $entrypointsLookupMetadataBuild = $this->getEntrypointsLookup('metadata-build');

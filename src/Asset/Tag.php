@@ -35,9 +35,28 @@ class Tag
         return self::LINK_TAG === $this->tagName;
     }
 
+    public function isStylesheet(): bool
+    {
+        return self::LINK_TAG === $this->tagName
+            && isset($this->attributes['rel'])
+            && 'stylesheet' === $this->attributes['rel'];
+    }
+
+    public function isModulePreload(): bool
+    {
+        return self::LINK_TAG === $this->tagName
+            && isset($this->attributes['rel'])
+            && 'modulepreload' === $this->attributes['rel'];
+    }
+
     public function getAttributes(): array
     {
         return $this->attributes;
+    }
+
+    public function getAttribute($key): mixed
+    {
+        return key_exists($key, $this->attributes) ? $this->attributes[$key] : null;
     }
 
     /**

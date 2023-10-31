@@ -1,0 +1,28 @@
+{
+  "base": "/build-config1/",
+  "entryPoints": {
+    "app-1": {
+      "assets": [],
+      "css": [],
+      "dynamic": [],
+      "js": [
+        "/build-config1/assets/app-1.js"
+      ],
+      "legacy": false,
+      "preload": []
+    },
+    "theme-1": {
+      "assets": [],
+      "css": [
+        "/build-config1/assets/theme-1.css"
+      ],
+      "dynamic": [],
+      "js": [],
+      "legacy": false,
+      "preload": []
+    }
+  },
+  "legacy": false,
+  "metadatas": {},
+  "viteServer": null
+}

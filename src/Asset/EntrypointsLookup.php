@@ -37,8 +37,11 @@ class EntrypointsLookup
                 throw new \Exception('entrypoints.json not found at '.$this->fileInfos['entrypointsPath']);
             }
             $content = json_decode(file_get_contents($this->fileInfos['entrypointsPath']), true);
-            if (!isset($content['entryPoints'], $content['viteServer'])) {
-                throw new \Exception($this->fileInfos['entrypointsPath'].' : entryPoints or viteServer not exists');
+            if (!array_key_exists('entryPoints', $content)
+             || !array_key_exists('viteServer', $content)
+             || !array_key_exists('base', $content)
+            ) {
+                throw new \Exception($this->fileInfos['entrypointsPath'].' : entryPoints, base or viteServer not exists');
             }
 
             $this->fileInfos['content'] = $content;
@@ -67,12 +70,17 @@ class EntrypointsLookup
 
     public function isBuild(): bool
     {
-        return false === $this->getFileContent()['viteServer'];
+        return null === $this->getFileContent()['viteServer'];
     }
 
     public function getViteServer()
     {
         return $this->getFileContent()['viteServer'];
+    }
+
+    public function getBase()
+    {
+        return $this->getFileContent()['base'];
     }
 
     public function getJSFiles($entryName): array

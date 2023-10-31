@@ -11,14 +11,14 @@ class EntrypointRenderer
     private EntrypointsLookupCollection $entrypointsLookupCollection;
     private TagRendererCollection $tagRendererCollection;
     private bool $useAbsoluteUrl;
-    private RouterInterface $router;
-    private EventDispatcherInterface $eventDispatcher;
+    private ?RouterInterface $router;
+    private ?EventDispatcherInterface $eventDispatcher;
 
-    private $returnedViteClient = false;
-    private $returnedReactRefresh = false;
-    private $returnedPreloadedScripts = [];
+    private $returnedViteClients = [];
+    private $returnedReactRefresh = [];
+    private $returnedViteLegacyScripts = [];
 
-    private $hasReturnedViteLegacyScripts = false;
+    private $renderedFiles = [];
 
     public function __construct(
         EntrypointsLookupCollection $entrypointsLookupCollection,
@@ -57,7 +57,7 @@ class EntrypointRenderer
     {
         $viteServer = $this->getEntrypointsLookup($configName)->getViteServer($configName);
 
-        return false === $viteServer && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
+        return is_null($viteServer) && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
     }
 
     public function getMode(string $configName = null): ?string
@@ -73,9 +73,10 @@ class EntrypointRenderer
 
     public function reset()
     {
-        // resets the state of this service
-        $this->returnedViteClient = false;
-        $this->returnedReactRefresh = false;
+        $this->returnedViteClients = [];
+        $this->returnedReactRefresh = [];
+        $this->returnedViteLegacyScripts = [];
+        $this->renderedFiles = [];
     }
 
     public function renderScripts(
@@ -96,25 +97,27 @@ class EntrypointRenderer
         $tags = [];
         $viteServer = $entrypointsLookup->getViteServer();
         $isBuild = $entrypointsLookup->isBuild();
+        $base = $entrypointsLookup->getBase();
 
-        if (false !== $viteServer) {
+        if (!is_null($viteServer)) {
             // vite server is active
-            if (!$this->returnedViteClient) {
-                $tags[] = $tagRenderer->createViteClientScript($viteServer['origin'].$viteServer['base'].'@vite/client');
-                $this->returnedViteClient = true;
+            if (!isset($this->returnedViteClients[$configName])) {
+                $tags[] = $tagRenderer->createViteClientScript($viteServer.$base.'@vite/client');
+
+                $this->returnedViteClients[$configName] = true;
             }
 
             if (
-                !$this->returnedReactRefresh
+                !isset($this->returnedReactRefresh[$configName])
                 && isset($options['dependency']) && 'react' === $options['dependency']
             ) {
-                $tags[] = $tagRenderer->createReactRefreshScript($viteServer['origin'].$viteServer['base']);
+                $tags[] = $tagRenderer->createReactRefreshScript($viteServer.$base);
 
-                $this->$this->returnedReactRefresh = true;
+                $this->returnedReactRefresh[$configName] = true;
             }
         } elseif (
             $entrypointsLookup->isLegacyPluginEnabled()
-            && !$this->hasReturnedViteLegacyScripts
+            && !isset($this->returnedViteLegacyScripts[$configName])
         ) {
             /* legacy section when vite server is inactive */
             $tags[] = $tagRenderer->createDetectModernBrowserScript();
@@ -132,39 +135,48 @@ class EntrypointRenderer
                     ]
                 );
             }
-            $this->hasReturnedViteLegacyScripts = true;
+
+            $this->returnedViteLegacyScripts[$configName] = true;
         }
 
         /* normal js scripts */
         foreach ($entrypointsLookup->getJSFiles($entryName) as $filePath) {
-            $tags[] = $tagRenderer->createScriptTag(
-                array_merge(
-                    [
-                        'type' => 'module',
-                        'src' => $this->completeURL($filePath, $useAbsoluteUrl),
-                        'integrity' => $entrypointsLookup->getFileHash($filePath),
-                    ],
-                    $options['attr'] ?? []
-                )
-            );
+            if (false === \in_array($filePath, $this->renderedFiles, true)) {
+                $tags[] = $tagRenderer->createScriptTag(
+                    array_merge(
+                        [
+                            'type' => 'module',
+                            'src' => $this->completeURL($filePath, $useAbsoluteUrl),
+                            'integrity' => $entrypointsLookup->getFileHash($filePath),
+                        ],
+                        $options['attr'] ?? []
+                    )
+                );
+
+                $this->renderedFiles[] = $filePath;
+            }
         }
 
         /* legacy js scripts */
         if ($entrypointsLookup->hasLegacy($entryName)) {
             $id = self::pascalToKebab("vite-legacy-entry-$entryName");
 
-            $file = $entrypointsLookup->getLegacyJSFile($entryName);
-            $tags[] = $tagRenderer->createScriptTag(
-                [
-                    'nomodule' => true,
-                    'data-src' => $this->completeURL($file, $useAbsoluteUrl),
-                    'id' => $id,
-                    'crossorigin' => true,
-                    'class' => 'vite-legacy-entry',
-                    'integrity' => $entrypointsLookup->getFileHash($file),
-                ],
-                InlineContent::getSystemJSInlineCode($id)
-            );
+            $filePath = $entrypointsLookup->getLegacyJSFile($entryName);
+            if (false === \in_array($filePath, $this->renderedFiles, true)) {
+                $tags[] = $tagRenderer->createScriptTag(
+                    [
+                        'nomodule' => true,
+                        'data-src' => $this->completeURL($filePath, $useAbsoluteUrl),
+                        'id' => $id,
+                        'crossorigin' => true,
+                        'class' => 'vite-legacy-entry',
+                        'integrity' => $entrypointsLookup->getFileHash($filePath),
+                    ],
+                    InlineContent::getSystemJSInlineCode($id)
+                );
+
+                $this->renderedFiles[] = $filePath;
+            }
         }
 
         return $this->renderTags($tags, $isBuild, $toString);
@@ -189,32 +201,35 @@ class EntrypointRenderer
         $tags = [];
 
         foreach ($entrypointsLookup->getCSSFiles($entryName) as $filePath) {
-            $tags[] = $tagRenderer->createLinkStylesheetTag(
-                $this->completeURL($filePath, $useAbsoluteUrl),
-                array_merge(['integrity' => $entrypointsLookup->getFileHash($filePath)], $options['attr'] ?? [])
-            );
+            if (false === \in_array($filePath, $this->renderedFiles, true)) {
+                $tags[] = $tagRenderer->createLinkStylesheetTag(
+                    $this->completeURL($filePath, $useAbsoluteUrl),
+                    array_merge(['integrity' => $entrypointsLookup->getFileHash($filePath)], $options['attr'] ?? [])
+                );
+                $this->renderedFiles[] = $filePath;
+            }
         }
 
         if ($isBuild) {
             foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $filePath) {
-                if (false === \in_array($filePath, $this->returnedPreloadedScripts, true)) {
+                if (false === \in_array($filePath, $this->renderedFiles, true)) {
                     $tags[] = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($filePath, $useAbsoluteUrl),
                         ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->returnedPreloadedScripts[] = $filePath;
+                    $this->renderedFiles[] = $filePath;
                 }
             }
         }
 
         if ($isBuild && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $filePath) {
-                if (false === \in_array($filePath, $this->returnedPreloadedScripts, true)) {
+                if (false === \in_array($filePath, $this->renderedFiles, true)) {
                     $tags[] = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($filePath, $useAbsoluteUrl),
                         ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->returnedPreloadedScripts[] = $filePath;
+                    $this->renderedFiles[] = $filePath;
                 }
             }
         }
@@ -231,7 +246,7 @@ class EntrypointRenderer
         }
 
         return $toString
-        ? implode(PHP_EOL, array_map(function ($tagEvent) {
+        ? implode('', array_map(function ($tagEvent) {
             return TagRenderer::generateTag($tagEvent);
         }, $tags))
         : $tags;

@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RouterInterface;
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
     private string $publicPath;
-    private array $builds;
+    private array $configs;
     private $useAbsoluteUrl;
     private $router;
 
@@ -18,41 +18,44 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     private string $entrypointsPath;
     private $manifestData;
     private $entrypointsData;
-    private ?array $build = null;
+    private ?array $config = null;
     private bool $strictMode;
+    private ?string $mode = null;
 
     public function __construct(
         string $publicPath,
-        array $builds,
-        string $defaultBuildName,
+        array $configs,
+        string $defaultConfigName,
         bool $useAbsoluteUrl,
         RouterInterface $router = null,
         bool $strictMode = true
     ) {
         $this->publicPath = $publicPath;
-        $this->builds = $builds;
+        $this->configs = $configs;
         $this->strictMode = $strictMode;
         $this->useAbsoluteUrl = $useAbsoluteUrl;
         $this->router = $router;
 
-        $this->setBuildName($defaultBuildName);
+        $this->setConfig($defaultConfigName);
 
         if (($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
             throw new \Exception('You can\'t use a remote manifest with ViteAssetVersionStrategy');
         }
     }
 
-    public function setBuildName(string $buildName): void
+    public function setConfig(string $configName): void
     {
-        $this->build = $this->builds[$buildName];
-        $this->manifestPath = $this->publicPath.$this->build['base'].'manifest.json';
-        $this->entrypointsPath = $this->publicPath.$this->build['base'].'entrypoints.json';
+        $this->mode = null;
+        $this->config = $this->configs[$configName];
+        $this->manifestPath = $this->publicPath.$this->config['base'].'manifest.json';
+        $this->entrypointsPath = $this->publicPath.$this->config['base'].'entrypoints.json';
     }
 
     /**
      * With a entrypoints, we don't really know or care about what
      * the version is. Instead, this returns the path to the
-     * versioned file.
+     * versioned file. as it contains a hashed and different path
+     * with each new config, this is enough for us.
      */
     public function getVersion(string $path): string
     {
@@ -75,19 +78,21 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     private function getassetsPath(string $path): ?string
     {
-        if (null === $this->manifestData) {
+        if (null === $this->mode) {
             if (!is_file($this->entrypointsPath)) {
-                throw new RuntimeException(sprintf('assets entrypoints file "%s" does not exist. Did you forget configure your base in pentatrion_vite.yml?', $this->manifestPath));
+                throw new RuntimeException(sprintf('assets entrypoints file "%s" does not exist. Did you forget configure your `build_dir` in pentatrion_vite.yml?', $this->entrypointsPath));
             }
 
             if (is_file($this->manifestPath)) {
+                // when vite server is running manifest file doesn't exists
+                $this->mode = 'build';
                 try {
                     $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, 512, \JSON_THROW_ON_ERROR);
                 } catch (\JsonException $e) {
                     throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->manifestPath).$e->getMessage(), 0, $e);
                 }
             } else {
-                $this->manifestData = false;
+                $this->mode = 'dev';
                 try {
                     $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
                 } catch (\JsonException $e) {
@@ -96,12 +101,12 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
             }
         }
 
-        if (false !== $this->manifestData) {
+        if ('build' === $this->mode) {
             if (isset($this->manifestData[$path])) {
-                return $this->completeURL($this->build['base'].$this->manifestData[$path]['file']);
+                return $this->completeURL($this->config['base'].$this->manifestData[$path]['file']);
             }
         } else {
-            return $this->entrypointsData['viteServer']['origin'].$this->entrypointsData['viteServer']['base'].$path;
+            return $this->entrypointsData['viteServer'].$this->entrypointsData['base'].$path;
         }
 
         if ($this->strictMode) {

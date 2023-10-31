@@ -17,9 +17,10 @@ class Configuration implements ConfigurationInterface
         $rootNode
             ->children()
                 ->scalarNode('public_directory')
-                    ->defaultValue('public')
+                ->defaultValue('public')
                 ->end()
                 ->scalarNode('build_directory')
+                    ->info('we only need build_directory to locate entrypoints.json file, it\'s the "base" vite config parameter without slashes.')
                     ->defaultValue('build')
                 ->end()
                 ->scalarNode('proxy_origin')

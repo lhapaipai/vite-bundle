@@ -210,10 +210,7 @@ class EntrypointRendererTest extends TestCase
 
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            null,
-            null,
+            $this->getBasicTagRendererCollection()
         );
 
         $this->assertEquals(
@@ -237,10 +234,7 @@ class EntrypointRendererTest extends TestCase
         $entrypointsLookup = $this->getEntrypointsLookup('duplication-dev');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            null,
-            null,
+            $this->getBasicTagRendererCollection()
         );
 
         $this->assertEquals(
@@ -256,10 +250,7 @@ class EntrypointRendererTest extends TestCase
         $entrypointsLookup = $this->getEntrypointsLookup('duplication-dev');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            null,
-            null,
+            $this->getBasicTagRendererCollection()
         );
 
         $this->assertEquals(
@@ -276,10 +267,7 @@ class EntrypointRendererTest extends TestCase
         $entrypointsLookup = $this->getEntrypointsLookup('duplication-build');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            null,
-            null,
+            $this->getBasicTagRendererCollection()
         );
 
         $expectedScripts = '<script type="module" src="/build/assets/app-1.js"></script>'
@@ -327,10 +315,7 @@ class EntrypointRendererTest extends TestCase
         $entrypointsLookup = $this->getEntrypointsLookup('legacy-build');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            null,
-            null,
+            $this->getBasicTagRendererCollection()
         );
 
         $this->assertEquals(
@@ -378,6 +363,7 @@ class EntrypointRendererTest extends TestCase
             $this->getEntrypointsLookupCollection($entrypointsLookupBasicBuild),
             $this->getBasicTagRendererCollection(),
             true,
+            'link-tag',
             $router,
             null,
         );
@@ -391,6 +377,7 @@ class EntrypointRendererTest extends TestCase
             $this->getEntrypointsLookupCollection($entrypointsLookupBasicBuild),
             $this->getBasicTagRendererCollection(),
             false,
+            'link-tag',
             $router,
             null,
         );
@@ -404,6 +391,7 @@ class EntrypointRendererTest extends TestCase
             $this->getEntrypointsLookupCollection($entrypointsLookupBasicDev),
             $this->getBasicTagRendererCollection(),
             true,
+            'link-tag',
             $router,
             null,
         );
@@ -415,15 +403,46 @@ class EntrypointRendererTest extends TestCase
         );
     }
 
-    public function testRenderAndPreloadDynamicImports()
+    public function testRenderWithoutPreload()
     {
         $entrypointsLookup = $this->getEntrypointsLookup('basic-build');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
             $this->getBasicTagRendererCollection(),
             false,
-            null,
-            null,
+            'none'
+        );
+
+        $this->assertEquals(
+            '<link rel="stylesheet" href="/build/assets/main.css">',
+            $entrypointRenderer->renderLinks('with-async', [
+                'preloadDynamicImports' => true,
+            ]),
+            'render only css files'
+        );
+
+        $entrypointRenderer = new EntrypointRenderer(
+            $this->getEntrypointsLookupCollection($entrypointsLookup),
+            $this->getBasicTagRendererCollection(),
+            false,
+            'link-header'
+        );
+
+        $this->assertEquals(
+            '<link rel="stylesheet" href="/build/assets/main.css">',
+            $entrypointRenderer->renderLinks('with-async', [
+                'preloadDynamicImports' => true,
+            ]),
+            'render only css files'
+        );
+    }
+
+    public function testRenderAndPreloadDynamicImports()
+    {
+        $entrypointsLookup = $this->getEntrypointsLookup('basic-build');
+        $entrypointRenderer = new EntrypointRenderer(
+            $this->getEntrypointsLookupCollection($entrypointsLookup),
+            $this->getBasicTagRendererCollection()
         );
 
         $this->assertEquals(
@@ -472,6 +491,7 @@ class EntrypointRendererTest extends TestCase
             $this->getEntrypointsLookupCollection($entrypointsLookup),
             $this->getBasicTagRendererCollection(['defer' => true], ['referrerpolicy' => 'origin']),
             false,
+            'link-tag',
             null,
             $dispatcher,
         );
@@ -527,10 +547,7 @@ class EntrypointRendererTest extends TestCase
 
         $entrypointRenderer = new EntrypointRenderer(
             $entrypointsLookupCollection,
-            $tagRendererCollection,
-            false,
-            null,
-            null,
+            $tagRendererCollection
         );
 
         $this->assertEquals(
@@ -582,10 +599,7 @@ class EntrypointRendererTest extends TestCase
 
         $entrypointRenderer = new EntrypointRenderer(
             $entrypointsLookupCollection,
-            $tagRendererCollection,
-            false,
-            null,
-            null,
+            $tagRendererCollection
         );
 
         $expectedScripts = '<script type="module" src="http://127.0.0.1:5173/build-config1/@vite/client"></script>'

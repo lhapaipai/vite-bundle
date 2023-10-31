@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
 class PentatrionViteExtension extends Extension
 {
@@ -58,6 +59,15 @@ class PentatrionViteExtension extends Extension
             ];
         }
 
+        if ('link-header' === $bundleConfig['preload']) {
+            if (!class_exists(AddLinkHeaderListener::class)) {
+                throw new \LogicException('To use the "preload" option, the WebLink component must be installed. Try running "composer require symfony/web-link".');
+            }
+        } else {
+            $container->removeDefinition('pentatrion_vite.preload_assets_event_listener');
+        }
+        $container->setParameter('pentatrion_vite.preload', $bundleConfig['preload']);
+
         $container->setParameter('pentatrion_vite.public_directory', self::preparePublicDirectory($bundleConfig['public_directory']));
         $container->setParameter('pentatrion_vite.default_config', $defaultConfigName);
         $container->setParameter('pentatrion_vite.configs', $configs);
@@ -73,10 +83,6 @@ class PentatrionViteExtension extends Extension
         $container->getDefinition('pentatrion_vite.tag_renderer_collection')
             ->addArgument(ServiceLocatorTagPass::register($container, $tagRendererFactories))
             ->addArgument($defaultConfigName);
-
-        // $container->getDefinition('pentatrion_vite.tag_renderer')
-        //     ->replaceArgument(0, $defaultConfigName)
-        //     ->replaceArgument(1, $configs);
     }
 
     private function entrypointsLookupFactory(

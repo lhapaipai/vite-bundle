@@ -11,6 +11,7 @@ class EntrypointRenderer
     private EntrypointsLookupCollection $entrypointsLookupCollection;
     private TagRendererCollection $tagRendererCollection;
     private bool $useAbsoluteUrl;
+    private string $preload;
     private ?RouterInterface $router;
     private ?EventDispatcherInterface $eventDispatcher;
 
@@ -18,18 +19,23 @@ class EntrypointRenderer
     private $returnedReactRefresh = [];
     private $returnedViteLegacyScripts = [];
 
-    private $renderedFiles = [];
+    private $renderedFiles = [
+        'scripts' => [],
+        'styles' => [],
+    ];
 
     public function __construct(
         EntrypointsLookupCollection $entrypointsLookupCollection,
         TagRendererCollection $tagRendererCollection,
-        bool $useAbsoluteUrl,
+        bool $useAbsoluteUrl = false,
+        string $preload = 'link-tag',
         RouterInterface $router = null,
         EventDispatcherInterface $eventDispatcher = null
     ) {
         $this->entrypointsLookupCollection = $entrypointsLookupCollection;
         $this->tagRendererCollection = $tagRendererCollection;
         $this->useAbsoluteUrl = $useAbsoluteUrl;
+        $this->preload = $preload;
         $this->router = $router;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -71,12 +77,25 @@ class EntrypointRenderer
         return $entrypointsLookup->isBuild() ? 'build' : 'dev';
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->returnedViteClients = [];
         $this->returnedReactRefresh = [];
         $this->returnedViteLegacyScripts = [];
-        $this->renderedFiles = [];
+        $this->renderedFiles = [
+            'scripts' => [],
+            'styles' => [],
+        ];
+    }
+
+    public function getRenderedScripts(): array
+    {
+        return $this->renderedFiles['scripts'];
+    }
+
+    public function getRenderedStyles(): array
+    {
+        return $this->renderedFiles['styles'];
     }
 
     public function renderScripts(
@@ -141,7 +160,7 @@ class EntrypointRenderer
 
         /* normal js scripts */
         foreach ($entrypointsLookup->getJSFiles($entryName) as $filePath) {
-            if (false === \in_array($filePath, $this->renderedFiles, true)) {
+            if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
                 $tags[] = $tagRenderer->createScriptTag(
                     array_merge(
                         [
@@ -153,7 +172,7 @@ class EntrypointRenderer
                     )
                 );
 
-                $this->renderedFiles[] = $filePath;
+                $this->renderedFiles['scripts'][] = $filePath;
             }
         }
 
@@ -162,7 +181,7 @@ class EntrypointRenderer
             $id = self::pascalToKebab("vite-legacy-entry-$entryName");
 
             $filePath = $entrypointsLookup->getLegacyJSFile($entryName);
-            if (false === \in_array($filePath, $this->renderedFiles, true)) {
+            if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
                 $tags[] = $tagRenderer->createScriptTag(
                     [
                         'nomodule' => true,
@@ -175,7 +194,7 @@ class EntrypointRenderer
                     InlineContent::getSystemJSInlineCode($id)
                 );
 
-                $this->renderedFiles[] = $filePath;
+                $this->renderedFiles['scripts'][] = $filePath;
             }
         }
 
@@ -201,35 +220,35 @@ class EntrypointRenderer
         $tags = [];
 
         foreach ($entrypointsLookup->getCSSFiles($entryName) as $filePath) {
-            if (false === \in_array($filePath, $this->renderedFiles, true)) {
+            if (false === \in_array($filePath, $this->renderedFiles['styles'], true)) {
                 $tags[] = $tagRenderer->createLinkStylesheetTag(
                     $this->completeURL($filePath, $useAbsoluteUrl),
                     array_merge(['integrity' => $entrypointsLookup->getFileHash($filePath)], $options['attr'] ?? [])
                 );
-                $this->renderedFiles[] = $filePath;
+                $this->renderedFiles['styles'][] = $filePath;
             }
         }
 
         if ($isBuild) {
             foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $filePath) {
-                if (false === \in_array($filePath, $this->renderedFiles, true)) {
+                if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
                     $tags[] = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($filePath, $useAbsoluteUrl),
                         ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->renderedFiles[] = $filePath;
+                    $this->renderedFiles['scripts'][] = $filePath;
                 }
             }
         }
 
         if ($isBuild && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $filePath) {
-                if (false === \in_array($filePath, $this->renderedFiles, true)) {
+                if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
                     $tags[] = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($filePath, $useAbsoluteUrl),
                         ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->renderedFiles[] = $filePath;
+                    $this->renderedFiles['scripts'][] = $filePath;
                 }
             }
         }
@@ -243,6 +262,12 @@ class EntrypointRenderer
             foreach ($tags as $tag) {
                 $this->eventDispatcher->dispatch(new RenderAssetTagEvent($isBuild, $tag));
             }
+        }
+
+        if ('link-tag' !== $this->preload) {
+            $tags = array_filter($tags, function (Tag $tag) {
+                return !$tag->isModulePreload();
+            });
         }
 
         return $toString

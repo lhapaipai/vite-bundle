@@ -1,5 +1,5 @@
 {
-  "base": "/build/",
+  "base": "/build-config2/",
   "entryPoints": {
     "app-2": {
       "assets": [],

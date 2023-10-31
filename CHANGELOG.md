@@ -1,6 +1,8 @@
 ## Next
 
 - make services privates.
+- add tests for EntrypointRenderer, EntrypointsLookup and TagRenderer.
+- add preload option (symfony/web-link)
 
 ## v5.0.1
 

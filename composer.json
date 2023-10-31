@@ -39,7 +39,8 @@
         "friendsofphp/php-cs-fixer": "^3.9",
         "phpstan/phpstan": "^1.8",
         "phpunit/phpunit": "^9.5",
-        "symfony/phpunit-bridge": "^4.4 || ^5.0 || ^6.0 || ^7.0"
+        "symfony/phpunit-bridge": "^4.4 || ^5.0 || ^6.0 || ^7.0",
+        "symfony/web-link": "^4.4 || ^5.0 || ^6.0 || ^7.0"
     },
     "scripts": {
         "cs-fix": "php8.1 vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php",

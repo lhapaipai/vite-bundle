@@ -3,8 +3,7 @@
 namespace Pentatrion\ViteBundle\CacheWarmer;
 
 use Exception;
-use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
-use Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy;
+use Pentatrion\ViteBundle\Asset\FileAccessor;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
@@ -25,28 +24,21 @@ class EntrypointsCacheWarmer extends AbstractPhpFileCacheWarmer
 
     protected function doWarmUp(string $cacheDir, ArrayAdapter $arrayAdapter): bool
     {
-        foreach ($this->configs as $configName => $config) {
-            $entrypointsPath = $this->publicPath.$this->configs[$configName]['base'].'entrypoints.json';
+        $fileAccessor = new FileAccessor($this->publicPath, $this->configs, $arrayAdapter);
 
-            if (!file_exists($entrypointsPath)) {
-                continue;
+        foreach ($this->configs as $configName => $config) {
+            try {
+                if ($fileAccessor->hasFile($configName, 'entrypoints')) {
+                    $fileAccessor->getData($configName, 'entrypoints');
+                }
+            } catch (\Exception $e) {
+                // ignore exception
             }
 
-            $viteAssetVersionStrategy = new ViteAssetVersionStrategy(
-                $this->publicPath,
-                $this->configs,
-                $configName,
-                false,
-                $arrayAdapter,
-                null,
-                false
-            );
-            // $entrypointsLookup = new EntrypointsLookup($basePath, $configName, false, $arrayAdapter);
             try {
-                // any method that will call getFileContent and generate
-                // the file in cache.
-                // $entrypointsLookup->getBase();
-                $viteAssetVersionStrategy->applyVersion('/some-dummy-path');
+                if ($fileAccessor->hasFile($configName, 'manifest')) {
+                    $fileAccessor->getData($configName, 'manifest');
+                }
             } catch (\Exception $e) {
                 // ignore exception
             }

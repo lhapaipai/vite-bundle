@@ -56,9 +56,7 @@ class PentatrionViteExtension extends Extension
                 $configs[$configName] = $configPrepared = self::prepareConfig($config);
                 $lookupFactories[$configName] = $this->entrypointsLookupFactory(
                     $container,
-                    $configName,
-                    $configPrepared,
-                    $bundleConfig['cache']
+                    $configName
                 );
                 $tagRendererFactories[$configName] = $this->tagRendererFactory($container, $configName, $configPrepared);
             }
@@ -69,9 +67,7 @@ class PentatrionViteExtension extends Extension
             $lookupFactories = [
                 '_default' => $this->entrypointsLookupFactory(
                     $container,
-                    $defaultConfigName,
-                    $configPrepared,
-                    $bundleConfig['cache']
+                    $defaultConfigName
                 ),
             ];
             $tagRendererFactories = [
@@ -102,15 +98,12 @@ class PentatrionViteExtension extends Extension
     private function entrypointsLookupFactory(
         ContainerBuilder $container,
         string $configName,
-        array $config,
-        bool $cacheEnabled
     ): Reference {
         $id = $this->getServiceId('entrypoints_lookup', $configName);
         $arguments = [
-            $this->resolveBasePath($container, $config),
+            new Reference('pentatrion_vite.file_accessor'),
             $configName,
             '%pentatrion_vite.throw_on_missing_entry%',
-            $cacheEnabled ? new Reference('pentatrion_vite.cache') : null,
         ];
         $definition = new Definition(EntrypointsLookup::class, $arguments);
         $container->setDefinition($id, $definition);

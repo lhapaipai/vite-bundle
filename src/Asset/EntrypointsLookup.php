@@ -3,74 +3,49 @@
 namespace Pentatrion\ViteBundle\Asset;
 
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
-use Pentatrion\ViteBundle\Exception\EntrypointsFileNotFoundException;
-use Psr\Cache\CacheItemPoolInterface;
 
 class EntrypointsLookup
 {
     private string $configName;
     private bool $throwOnMissingEntry;
-    private ?CacheItemPoolInterface $cache;
+    private FileAccessor $fileAccessor;
 
-    private array $fileInfos;
+    private ?array $fileContent = null;
 
     public function __construct(
-        string $basePath,
+        FileAccessor $fileAccessor,
         ?string $configName, // for cache to retrieve content : configName is cache key
         bool $throwOnMissingEntry = false,
-        CacheItemPoolInterface $cache = null
     ) {
+        $this->fileAccessor = $fileAccessor;
         $this->configName = $configName;
         $this->throwOnMissingEntry = $throwOnMissingEntry;
-        $this->cache = $cache;
-        $entrypointsPath = $basePath.'entrypoints.json';
-
-        $this->fileInfos = [
-            'entrypointsPath' => $entrypointsPath,
-            'content' => null,
-            'fileExists' => file_exists($entrypointsPath),
-        ];
     }
 
     public function hasFile(): bool
     {
-        if (!isset($this->fileInfos)) {
-            return false;
-        }
-
-        return $this->fileInfos['fileExists'];
+        return $this->fileAccessor->hasFile($this->configName, 'entrypoints');
     }
 
     private function getFileContent(): array
     {
-        if ($this->cache) {
-            $entrypointsCacheItem = $this->cache->getItem("{$this->configName}.entrypoints");
+        if (is_null($this->fileContent)) {
+            $this->fileContent = $this->fileAccessor->getData($this->configName, 'entrypoints');
 
-            if ($entrypointsCacheItem->isHit()) {
-                $this->fileInfos['content'] = $entrypointsCacheItem->get();
-            }
-        }
-
-        if (!isset($this->fileInfos['content'])) {
-            if (!$this->fileInfos['fileExists']) {
-                throw new EntrypointsFileNotFoundException('entrypoints.json not found at '.$this->fileInfos['entrypointsPath']);
-            }
-            $content = json_decode(file_get_contents($this->fileInfos['entrypointsPath']), true);
-            if (!array_key_exists('entryPoints', $content)
-             || !array_key_exists('viteServer', $content)
-             || !array_key_exists('base', $content)
+            if (!array_key_exists('entryPoints', $this->fileContent)
+            || !array_key_exists('viteServer', $this->fileContent)
+            || !array_key_exists('base', $this->fileContent)
             ) {
-                throw new \Exception($this->fileInfos['entrypointsPath'].' : entryPoints, base or viteServer not exists');
+                throw new \Exception("$this->configName entrypoints.json : entryPoints, base or viteServer not exists");
             }
-
-            if (isset($entrypointsCacheItem)) {
-                $this->cache->save($entrypointsCacheItem->set($content));
-            }
-
-            $this->fileInfos['content'] = $content;
         }
 
-        return $this->fileInfos['content'];
+        return $this->fileContent;
+    }
+
+    public function setFileContent($content)
+    {
+        $this->fileContent = $content;
     }
 
     public function getFileHash(string $filePath): ?string

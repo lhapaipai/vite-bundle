@@ -5,6 +5,7 @@ namespace Pentatrion\ViteBundle\Tests\Asset;
 use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
 use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
 use Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection;
+use Pentatrion\ViteBundle\Asset\FileAccessor;
 use Pentatrion\ViteBundle\Asset\InlineContent;
 use Pentatrion\ViteBundle\Asset\TagRenderer;
 use Pentatrion\ViteBundle\Asset\TagRendererCollection;
@@ -46,12 +47,42 @@ class EntrypointRendererTest extends TestCase
 
     private function getEntrypointsLookup($prefix)
     {
+        /**
+         * @var FileAccessor|Stub $fileAccessor
+         */
+        $fileAccessor = $this->createStub(FileAccessor::class);
+
+        $fileAccessor
+            ->method('getData')
+            ->willReturnCallback(function ($prefix, $fileType) {
+                $path = __DIR__.'/../fixtures/entrypoints/'.$prefix.'/'.$fileType.'.json';
+
+                return json_decode(file_get_contents($path), true);
+            });
+
+        $fileAccessor
+            ->method('hasFile')
+            ->willReturnCallback(function ($prefix, $fileType) {
+                $path = __DIR__.'/../fixtures/entrypoints/'.$prefix.'/'.$fileType.'.json';
+
+                return file_exists($path);
+            });
+
         return new EntrypointsLookup(
-            __DIR__.'/../fixtures/entrypoints/'.$prefix.'/',
-            '_default',
+            $fileAccessor,
+            $prefix,
             true
         );
     }
+
+    // private function getEntrypointsLookup($prefix)
+    // {
+    //     return new EntrypointsLookup(
+    //         __DIR__.'/../fixtures/entrypoints/'.$prefix.'/',
+    //         '_default',
+    //         true
+    //     );
+    // }
 
     public function basicProvider()
     {

@@ -210,7 +210,7 @@ class EntrypointRenderer
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
-        if (!$entrypointsLookup->hasFile($configName)) {
+        if (!$entrypointsLookup->hasFile()) {
             return '';
         }
 

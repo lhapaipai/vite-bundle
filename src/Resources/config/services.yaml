@@ -64,11 +64,10 @@ services:
         # tags:
         #     - { name: assets.package, package: vite }
         arguments:
-            - "%kernel.project_dir%%pentatrion_vite.public_directory%"
+            - "@pentatrion_vite.file_accessor"
             - "%pentatrion_vite.configs%"
             - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
-            - "@?pentatrion_vite.cache"
             - "@?router"
             - true
 
@@ -79,6 +78,12 @@ services:
         arguments:
             - "@pentatrion_vite.entrypoint_renderer"
 
+    pentatrion_vite.file_accessor:
+        class: Pentatrion\ViteBundle\Asset\FileAccessor
+        arguments:
+            - "%kernel.project_dir%%pentatrion_vite.public_directory%"
+            - "%pentatrion_vite.configs%"
+            - "@pentatrion_vite.cache"
 
     pentatrion_vite.cache:
         class: Symfony\Component\Cache\Adapter\PhpArrayAdapter

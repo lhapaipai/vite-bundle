@@ -3,16 +3,39 @@
 namespace Pentatrion\ViteBundle\Tests\Asset;
 
 use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
+use Pentatrion\ViteBundle\Asset\FileAccessor;
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 class EntrypointsLookupTest extends TestCase
 {
     private function getEntrypointsLookup($prefix)
     {
+        /**
+         * @var FileAccessor|Stub $fileAccessor
+         */
+        $fileAccessor = $this->createStub(FileAccessor::class);
+
+        $fileAccessor
+            ->method('getData')
+            ->willReturnCallback(function ($prefix, $fileType) {
+                $path = __DIR__.'/../fixtures/entrypoints/'.$prefix.'/'.$fileType.'.json';
+
+                return json_decode(file_get_contents($path), true);
+            });
+
+        $fileAccessor
+            ->method('hasFile')
+            ->willReturnCallback(function ($prefix, $fileType) {
+                $path = __DIR__.'/../fixtures/entrypoints/'.$prefix.'/'.$fileType.'.json';
+
+                return file_exists($path);
+            });
+
         return new EntrypointsLookup(
-            __DIR__.'/../fixtures/entrypoints/'.$prefix.'/',
-            '_default',
+            $fileAccessor,
+            $prefix,
             true
         );
     }

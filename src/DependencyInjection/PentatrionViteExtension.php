@@ -47,9 +47,12 @@ class PentatrionViteExtension extends Extension
             $lookupFactories = [];
             $tagRendererFactories = [];
             $configs = [];
-            $cacheKeys = [];
 
             foreach ($bundleConfig['configs'] as $configName => $config) {
+                if (!preg_match('/^[a-zA-Z_]+$/', $configName)) {
+                    throw new \Exception('Invalid config name, you should use only a-z A-Z and _ characters.');
+                }
+
                 $configs[$configName] = $configPrepared = self::prepareConfig($config);
                 $lookupFactories[$configName] = $this->entrypointsLookupFactory(
                     $container,
@@ -58,7 +61,6 @@ class PentatrionViteExtension extends Extension
                     $bundleConfig['cache']
                 );
                 $tagRendererFactories[$configName] = $this->tagRendererFactory($container, $configName, $configPrepared);
-                $cacheKeys[] = $this->resolveBasePath($container, $configPrepared);
             }
         } else {
             $defaultConfigName = '_default';
@@ -75,7 +77,6 @@ class PentatrionViteExtension extends Extension
             $tagRendererFactories = [
                 '_default' => $this->tagRendererFactory($container, $defaultConfigName, $configPrepared),
             ];
-            $cacheKeys = [$this->resolveBasePath($container, $configPrepared)];
         }
 
         if ('link-header' === $bundleConfig['preload']) {
@@ -96,9 +97,6 @@ class PentatrionViteExtension extends Extension
         $container->getDefinition('pentatrion_vite.tag_renderer_collection')
             ->addArgument(ServiceLocatorTagPass::register($container, $tagRendererFactories))
             ->addArgument($defaultConfigName);
-
-        $container->getDefinition('pentatrion_vite.cache_warmer')
-            ->replaceArgument(0, $cacheKeys);
     }
 
     private function entrypointsLookupFactory(

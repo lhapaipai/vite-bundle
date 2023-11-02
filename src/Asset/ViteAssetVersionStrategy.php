@@ -2,6 +2,7 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
@@ -11,44 +12,46 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
     private string $publicPath;
     private array $configs;
+    private string $configName;
     private $useAbsoluteUrl;
-    private $router;
+    private ?CacheItemPoolInterface $cache;
+    private ?RouterInterface $router;
+    private bool $strictMode;
 
-    private string $manifestPath;
-    private string $entrypointsPath;
+    private ?string $viteMode = null;
+    private string $basePath;
     private $manifestData;
     private $entrypointsData;
-    private ?array $config = null;
-    private bool $strictMode;
-    private ?string $mode = null;
 
     public function __construct(
         string $publicPath,
         array $configs,
         string $defaultConfigName,
         bool $useAbsoluteUrl,
+        CacheItemPoolInterface $cache = null,
         RouterInterface $router = null,
         bool $strictMode = true
     ) {
         $this->publicPath = $publicPath;
         $this->configs = $configs;
-        $this->strictMode = $strictMode;
+        $this->configName = $defaultConfigName;
         $this->useAbsoluteUrl = $useAbsoluteUrl;
+        $this->cache = $cache;
         $this->router = $router;
+        $this->strictMode = $strictMode;
 
-        $this->setConfig($defaultConfigName);
+        $this->setConfig($this->configName);
 
-        if (($scheme = parse_url($this->manifestPath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+        if (($scheme = parse_url($this->basePath.'manifest.json', \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
             throw new \Exception('You can\'t use a remote manifest with ViteAssetVersionStrategy');
         }
     }
 
     public function setConfig(string $configName): void
     {
-        $this->mode = null;
-        $this->config = $this->configs[$configName];
-        $this->manifestPath = $this->publicPath.$this->config['base'].'manifest.json';
-        $this->entrypointsPath = $this->publicPath.$this->config['base'].'entrypoints.json';
+        $this->viteMode = null;
+        $this->configName = $configName;
+        $this->basePath = $this->publicPath.$this->configs[$configName]['base'];
     }
 
     /**
@@ -78,39 +81,65 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     private function getassetsPath(string $path): ?string
     {
-        if (null === $this->mode) {
-            if (!is_file($this->entrypointsPath)) {
-                throw new RuntimeException(sprintf('assets entrypoints file "%s" does not exist. Did you forget configure your `build_dir` in pentatrion_vite.yml?', $this->entrypointsPath));
+        if (null === $this->viteMode) {
+            $manifestPath = $this->basePath.'manifest.json';
+            $entrypointsPath = $this->basePath.'entrypoints.json';
+
+            $this->entrypointsData = null;
+            $this->manifestData = null;
+
+            $this->viteMode = is_file($manifestPath) ? 'build' : 'dev';
+
+            if (!is_file($entrypointsPath)) {
+                throw new RuntimeException(sprintf('assets entrypoints file "%s" does not exist. Did you forget configure your `build_dir` in pentatrion_vite.yml?', $entrypointsPath));
             }
 
-            if (is_file($this->manifestPath)) {
-                // when vite server is running manifest file doesn't exists
-                $this->mode = 'build';
-                try {
-                    $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, 512, \JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->manifestPath).$e->getMessage(), 0, $e);
+            if ('build' === $this->viteMode && $this->cache) {
+                $entrypointsCacheItem = $this->cache->getItem("{$this->configName}.entrypoints");
+                $manifestCacheItem = $this->cache->getItem("{$this->configName}.manifest");
+
+                if ($entrypointsCacheItem->isHit()) {
+                    $this->entrypointsData = $entrypointsCacheItem->get();
                 }
-            } else {
-                $this->mode = 'dev';
-                try {
-                    $this->entrypointsData = json_decode(file_get_contents($this->entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $this->manifestPath).$e->getMessage(), 0, $e);
+                if ($manifestCacheItem->isHit()) {
+                    $this->manifestData = $manifestCacheItem->get();
                 }
+            }
+
+            if ('build' === $this->viteMode && is_null($this->manifestData)) {
+                try {
+                    $this->manifestData = json_decode(file_get_contents($manifestPath), true, 512, \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $manifestPath).$e->getMessage(), 0, $e);
+                }
+            }
+
+            if (is_null($this->entrypointsData)) {
+                try {
+                    $this->entrypointsData = json_decode(file_get_contents($entrypointsPath), true, 512, \JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    throw new RuntimeException(sprintf('Error parsing JSON from entrypoints file "%s": ', $manifestPath).$e->getMessage(), 0, $e);
+                }
+            }
+
+            if (isset($entrypointsCacheItem)) {
+                $this->cache->save($entrypointsCacheItem->set($this->entrypointsData));
+            }
+            if (isset($manifestCacheItem)) {
+                $this->cache->save($manifestCacheItem->set($this->manifestData));
             }
         }
 
-        if ('build' === $this->mode) {
+        if ('build' === $this->viteMode) {
             if (isset($this->manifestData[$path])) {
-                return $this->completeURL($this->config['base'].$this->manifestData[$path]['file']);
+                return $this->completeURL($this->basePath.$this->manifestData[$path]['file']);
             }
         } else {
             return $this->entrypointsData['viteServer'].$this->entrypointsData['base'].$path;
         }
 
         if ($this->strictMode) {
-            $message = sprintf('assets "%s" not found in manifest file "%s".', $path, $this->manifestPath);
+            $message = sprintf('assets "%s" not found in manifest file "%s".', $path, $manifestPath);
             $alternatives = $this->findAlternatives($path, $this->manifestData);
             if (\count($alternatives) > 0) {
                 $message .= sprintf(' Did you mean one of these? "%s".', implode('", "', $alternatives));

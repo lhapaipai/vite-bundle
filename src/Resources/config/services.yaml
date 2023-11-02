@@ -68,8 +68,10 @@ services:
             - "%pentatrion_vite.configs%"
             - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
+            - "@?pentatrion_vite.cache"
             - "@?router"
             - true
+
 
     pentatrion_vite.preload_assets_event_listener:
         class: Pentatrion\ViteBundle\EventListener\PreloadAssetsEventListener
@@ -77,20 +79,22 @@ services:
         arguments:
             - "@pentatrion_vite.entrypoint_renderer"
 
-    pentatrion_vite.cache_warmer:
-        class:  Pentatrion\ViteBundle\CacheWarmer\EntrypointsCacheWarmer
-        tags: ["kernel.cache_warmer"]
-        arguments:
-            - []
-            - '%kernel.cache_dir%/pentatrion_vite.cache.php'
 
     pentatrion_vite.cache:
         class: Symfony\Component\Cache\Adapter\PhpArrayAdapter
         factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
         arguments:
             - '%kernel.cache_dir%/pentatrion_vite.cache.php'
-            - '@cache.pentatrion_vite'
+            - '@cache.pentatrion_vite_fallback'
 
-    cache.pentatrion_vite:
+    pentatrion_vite.cache_warmer:
+        class:  Pentatrion\ViteBundle\CacheWarmer\EntrypointsCacheWarmer
+        tags: ["kernel.cache_warmer"]
+        arguments:
+            - "%kernel.project_dir%%pentatrion_vite.public_directory%"
+            - "%pentatrion_vite.configs%"
+            - '%kernel.cache_dir%/pentatrion_vite.cache.php'
+
+    cache.pentatrion_vite_fallback:
         tags: ["cache.pool"]
         parent: cache.system

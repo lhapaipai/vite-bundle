@@ -16,7 +16,7 @@ class EntrypointsLookup
 
     public function __construct(
         string $basePath,
-        string $configName = '_default',
+        ?string $configName, // for cache to retrieve content : configName is cache key
         bool $throwOnMissingEntry = false,
         CacheItemPoolInterface $cache = null
     ) {
@@ -44,10 +44,10 @@ class EntrypointsLookup
     private function getFileContent(): array
     {
         if ($this->cache) {
-            $cached = $this->cache->getItem($this->configName);
+            $entrypointsCacheItem = $this->cache->getItem("{$this->configName}.entrypoints");
 
-            if ($cached->isHit()) {
-                $this->fileInfos['content'] = $cached->get();
+            if ($entrypointsCacheItem->isHit()) {
+                $this->fileInfos['content'] = $entrypointsCacheItem->get();
             }
         }
 
@@ -63,8 +63,8 @@ class EntrypointsLookup
                 throw new \Exception($this->fileInfos['entrypointsPath'].' : entryPoints, base or viteServer not exists');
             }
 
-            if (isset($cached)) {
-                $this->cache->save($cached->set($content));
+            if (isset($entrypointsCacheItem)) {
+                $this->cache->save($entrypointsCacheItem->set($content));
             }
 
             $this->fileInfos['content'] = $content;

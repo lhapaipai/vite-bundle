@@ -48,6 +48,7 @@ class EntrypointRendererTest extends TestCase
     {
         return new EntrypointsLookup(
             __DIR__.'/../fixtures/entrypoints/'.$prefix.'/',
+            '_default',
             true
         );
     }

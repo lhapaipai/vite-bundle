@@ -22,29 +22,27 @@ jobs:
       - name: Lint PHP
         run: find -L . -path ./vendor -prune -o -type f -name '*.php' -print0 | xargs -0 -n 1 -P $(nproc) php -l
 
-      - name: Declare variables
-        if: matrix.php-versions == 8.1
-        id: vars
-        run: |
-          echo "::set-output name=composer_cache_dir::$(composer config cache-files-dir)"
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache composer
-        if: matrix.php-versions == 8.1
         uses: actions/cache@v3
         with:
-          path: ${{ steps.vars.outputs.composer_cache_dir }}
+          path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
+          restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
-        if: matrix.php-versions == 8.1
         run: composer install --no-interaction --no-ansi
 
       - name: Validate coding standards
-        if: matrix.php-versions == 8.1
+        if: matrix.php-versions == 8.2
         run: php vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php --verbose --diff --dry-run --stop-on-violation --using-cache=no
 
       - name: Static analysis
-        if: matrix.php-versions == 8.1
         run: php vendor/bin/phpstan analyse --configuration=phpstan.neon --verbose
+
+      - name: Tests
+        if: matrix.php-versions == 8.2
+        run: php bin/phpunit

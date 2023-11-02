@@ -97,7 +97,7 @@ class PentatrionViteExtension extends Extension
 
     private function entrypointsLookupFactory(
         ContainerBuilder $container,
-        string $configName,
+        string $configName
     ): Reference {
         $id = $this->getServiceId('entrypoints_lookup', $configName);
         $arguments = [

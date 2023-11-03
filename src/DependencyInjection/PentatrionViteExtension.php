@@ -93,6 +93,11 @@ class PentatrionViteExtension extends Extension
         $container->getDefinition('pentatrion_vite.tag_renderer_collection')
             ->addArgument(ServiceLocatorTagPass::register($container, $tagRendererFactories))
             ->addArgument($defaultConfigName);
+
+        if ($bundleConfig['cache']) {
+            $container->getDefinition('pentatrion_vite.file_accessor')
+                ->replaceArgument(2, new Reference('pentatrion_vite.cache'));
+        }
     }
 
     private function entrypointsLookupFactory(

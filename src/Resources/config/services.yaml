@@ -83,7 +83,7 @@ services:
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_directory%"
             - "%pentatrion_vite.configs%"
-            - "@pentatrion_vite.cache"
+            - null
 
     pentatrion_vite.cache:
         class: Symfony\Component\Cache\Adapter\PhpArrayAdapter

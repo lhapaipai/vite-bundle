@@ -36,14 +36,14 @@ class InlineContent
             })();\n
         INLINE;
 
-    public static function getSystemJSInlineCode($id): string
+    public static function getSystemJSInlineCode(string $id): string
     {
         $content = 'System.import(document.getElementById("__ID__").getAttribute("data-src"))';
 
         return str_replace('__ID__', $id, $content);
     }
 
-    public static function getReactRefreshInlineCode(string $devServerUrl)
+    public static function getReactRefreshInlineCode(string $devServerUrl): string
     {
         return <<<INLINE
             \n    import RefreshRuntime from "$devServerUrl@react-refresh"

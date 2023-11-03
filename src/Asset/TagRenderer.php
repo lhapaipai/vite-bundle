@@ -8,14 +8,14 @@ class TagRenderer
     private array $globalLinkAttributes;
 
     public function __construct(
-        $scriptAttributes = [],
-        $linkAttributes = []
+        array $scriptAttributes = [],
+        array $linkAttributes = []
     ) {
         $this->globalScriptAttributes = $scriptAttributes;
         $this->globalLinkAttributes = $linkAttributes;
     }
 
-    public function createViteClientScript($src): Tag
+    public function createViteClientScript(string $src): Tag
     {
         return $this->createInternalScriptTag(
             [
@@ -25,7 +25,7 @@ class TagRenderer
         );
     }
 
-    public function createReactRefreshScript($devServerUrl): Tag
+    public function createReactRefreshScript(string $devServerUrl): Tag
     {
         return $this->createInternalScriptTag(
             ['type' => 'module'],
@@ -57,7 +57,7 @@ class TagRenderer
         );
     }
 
-    public function createInternalScriptTag($attributes = [], $content = ''): Tag
+    public function createInternalScriptTag(array $attributes = [], string $content = ''): Tag
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
@@ -69,7 +69,7 @@ class TagRenderer
         return $tag;
     }
 
-    public function createScriptTag($attributes = [], $content = ''): Tag
+    public function createScriptTag(array $attributes = [], string $content = ''): Tag
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
@@ -80,7 +80,7 @@ class TagRenderer
         return $tag;
     }
 
-    public function createLinkStylesheetTag($fileName, $extraAttributes = []): Tag
+    public function createLinkStylesheetTag(string $fileName, array $extraAttributes = []): Tag
     {
         $attributes = [
             'rel' => 'stylesheet',
@@ -95,7 +95,7 @@ class TagRenderer
         return $tag;
     }
 
-    public function createModulePreloadLinkTag($fileName, $extraAttributes = []): Tag
+    public function createModulePreloadLinkTag(string $fileName, array $extraAttributes = []): Tag
     {
         $attributes = [
             'rel' => 'modulepreload',

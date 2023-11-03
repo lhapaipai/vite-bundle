@@ -12,7 +12,7 @@ class Tag
     private string $content;
     private bool $internal;
 
-    public function __construct($tagName, $attributes, $content = '', $internal = false)
+    public function __construct(string $tagName, array $attributes, string $content = '', bool $internal = false)
     {
         $this->tagName = $tagName;
         $this->attributes = $attributes;
@@ -54,7 +54,7 @@ class Tag
         return $this->attributes;
     }
 
-    public function getAttribute($key): mixed
+    public function getAttribute(string $key): mixed
     {
         return key_exists($key, $this->attributes) ? $this->attributes[$key] : null;
     }
@@ -63,7 +63,7 @@ class Tag
      * @param string      $name  The attribute name
      * @param string|bool $value Value can be "true" to have an attribute without a value (e.g. "defer")
      */
-    public function setAttribute(string $name, $value): self
+    public function setAttribute(string $name, mixed $value): self
     {
         $this->attributes[$name] = $value;
 

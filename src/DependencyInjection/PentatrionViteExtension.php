@@ -116,17 +116,6 @@ class PentatrionViteExtension extends Extension
         return new Reference($id);
     }
 
-    /**
-     * Return absolute path to the build directory with final slash
-     * ex: "/path-to-your-project/public/build/".
-     */
-    private function resolveBasePath(ContainerBuilder $container, $config): string
-    {
-        return $container->getParameter('kernel.project_dir')
-            .$container->getParameter('pentatrion_vite.public_directory')
-            .$config['base'];
-    }
-
     private function tagRendererFactory(
         ContainerBuilder $container,
         string $configName,
@@ -161,7 +150,7 @@ class PentatrionViteExtension extends Extension
         ];
     }
 
-    public static function preparePublicDirectory($publicDir)
+    public static function preparePublicDirectory(string $publicDir)
     {
         $publicDir = '/' !== substr($publicDir, 0, 1) ? '/'.$publicDir : $publicDir;
         $publicDir = rtrim($publicDir, '/');

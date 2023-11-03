@@ -55,7 +55,7 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
         return new Link($rel, $href);
     }
 
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
         return [
             // must run before AddLinkHeaderListener

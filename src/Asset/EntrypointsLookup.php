@@ -43,7 +43,7 @@ class EntrypointsLookup
         return $this->fileContent;
     }
 
-    public function setFileContent($content)
+    public function setFileContent(string $content): void
     {
         $this->fileContent = $content;
     }
@@ -71,45 +71,45 @@ class EntrypointsLookup
         return null === $this->getFileContent()['viteServer'];
     }
 
-    public function getViteServer()
+    public function getViteServer(): ?string
     {
         return $this->getFileContent()['viteServer'];
     }
 
-    public function getBase()
+    public function getBase(): string
     {
         return $this->getFileContent()['base'];
     }
 
-    public function getJSFiles($entryName): array
+    public function getJSFiles(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
 
         return $this->getFileContent()['entryPoints'][$entryName]['js'] ?? [];
     }
 
-    public function getCSSFiles($entryName): array
+    public function getCSSFiles(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
 
         return $this->getFileContent()['entryPoints'][$entryName]['css'] ?? [];
     }
 
-    public function getJavascriptDependencies($entryName): array
+    public function getJavascriptDependencies(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
 
         return $this->getFileContent()['entryPoints'][$entryName]['preload'] ?? [];
     }
 
-    public function getJavascriptDynamicDependencies($entryName): array
+    public function getJavascriptDynamicDependencies(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
 
         return $this->getFileContent()['entryPoints'][$entryName]['dynamic'] ?? [];
     }
 
-    public function hasLegacy($entryName): bool
+    public function hasLegacy(string $entryName): bool
     {
         $this->throwIfEntrypointIsMissing($entryName);
 
@@ -118,7 +118,7 @@ class EntrypointsLookup
         return isset($entryInfos['entryPoints'][$entryName]['legacy']) && false !== $entryInfos['entryPoints'][$entryName]['legacy'];
     }
 
-    public function getLegacyJSFile($entryName): string
+    public function getLegacyJSFile(string $entryName): string
     {
         $this->throwIfEntrypointIsMissing($entryName);
 

@@ -61,7 +61,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return $this->getassetsPath($path) ?: $path;
     }
 
-    private function completeURL(string $path)
+    private function completeURL(string $path): string
     {
         if (false === $this->useAbsoluteUrl || null === $this->router) {
             return $path;

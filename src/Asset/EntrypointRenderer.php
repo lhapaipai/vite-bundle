@@ -50,7 +50,7 @@ class EntrypointRenderer
         return $this->tagRendererCollection->getTagRenderer($configName);
     }
 
-    private function completeURL(string $path, $useAbsoluteUrl = false)
+    private function completeURL(string $path, bool $useAbsoluteUrl = false): string
     {
         if (false === $useAbsoluteUrl || null === $this->router) {
             return $path;
@@ -59,7 +59,7 @@ class EntrypointRenderer
         return $this->router->getContext()->getScheme().'://'.$this->router->getContext()->getHost().$path;
     }
 
-    private function shouldUseAbsoluteURL(array $options, $configName)
+    private function shouldUseAbsoluteURL(array $options, string $configName = null): bool
     {
         $viteServer = $this->getEntrypointsLookup($configName)->getViteServer($configName);
 
@@ -98,12 +98,15 @@ class EntrypointRenderer
         return $this->renderedFiles['styles'];
     }
 
+    /**
+     * @return string|array
+     */
     public function renderScripts(
         string $entryName,
         array $options = [],
-        $configName = null,
-        $toString = true
-    ): string {
+        string $configName = null,
+        bool $toString = true
+    ): mixed {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -201,12 +204,15 @@ class EntrypointRenderer
         return $this->renderTags($tags, $isBuild, $toString);
     }
 
+    /**
+     * @return string|array
+     */
     public function renderLinks(
         string $entryName,
         array $options = [],
-        $configName = null,
-        $toString = true
-    ): string {
+        string $configName = null,
+        bool $toString = true
+    ): mixed {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -256,7 +262,11 @@ class EntrypointRenderer
         return $this->renderTags($tags, $isBuild, $toString);
     }
 
-    public function renderTags(array $tags, $isBuild, $toString)
+
+    /**
+     * @return string|array
+     */
+    public function renderTags(array $tags, bool $isBuild, bool $toString): mixed
     {
         if (null !== $this->eventDispatcher) {
             foreach ($tags as $tag) {

@@ -24,18 +24,18 @@ class EntryFilesTwigExtension extends AbstractExtension
         ];
     }
 
-    public function getViteMode(string $buildName = null): ?string
+    public function getViteMode(?string $configName = null): ?string
     {
-        return $this->entrypointRenderer->getMode($buildName);
+        return $this->entrypointRenderer->getMode($configName);
     }
 
-    public function renderViteScriptTags(string $entryName, array $options = [], $buildName = null): string
+    public function renderViteScriptTags(string $entryName, array $options = [], ?string $configName = null): string
     {
-        return $this->entrypointRenderer->renderScripts($entryName, $options, $buildName);
+        return $this->entrypointRenderer->renderScripts($entryName, $options, $configName);
     }
 
-    public function renderViteLinkTags(string $entryName, array $options = [], $buildName = null): string
+    public function renderViteLinkTags(string $entryName, array $options = [], ?string $configName = null): string
     {
-        return $this->entrypointRenderer->renderLinks($entryName, $options, $buildName);
+        return $this->entrypointRenderer->renderLinks($entryName, $options, $configName);
     }
 }

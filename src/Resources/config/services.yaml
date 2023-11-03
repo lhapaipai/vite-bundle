@@ -61,8 +61,6 @@ services:
             - "%pentatrion_vite.proxy_origin%"
 
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
-        # tags:
-        #     - { name: assets.package, package: vite }
         arguments:
             - "@pentatrion_vite.file_accessor"
             - "%pentatrion_vite.configs%"

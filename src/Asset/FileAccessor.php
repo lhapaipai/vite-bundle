@@ -27,12 +27,12 @@ class FileAccessor
         $this->cache = $cache;
     }
 
-    public function hasFile($configName, $fileType)
+    public function hasFile(string $configName, string $fileType): bool
     {
         return file_exists($this->publicPath.$this->configs[$configName]['base'].self::FILES[$fileType]);
     }
 
-    public function getData($configName, $fileType)
+    public function getData(string $configName, string $fileType): array
     {
         if (!isset($this->content[$configName][$fileType])) {
             if ($this->cache) {

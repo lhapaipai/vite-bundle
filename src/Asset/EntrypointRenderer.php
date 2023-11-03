@@ -262,7 +262,6 @@ class EntrypointRenderer
         return $this->renderTags($tags, $isBuild, $toString);
     }
 
-
     /**
      * @return string|array
      */

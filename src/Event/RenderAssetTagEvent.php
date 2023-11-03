@@ -6,7 +6,7 @@
 
 namespace Pentatrion\ViteBundle\Event;
 
-use Pentatrion\ViteBundle\Asset\Tag;
+use Pentatrion\ViteBundle\Model\Tag;
 
 /**
  * Dispatched each time a script or link tag is rendered.

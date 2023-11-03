@@ -25,8 +25,9 @@ body:
   - type: input
     id: context
     attributes:
-      label: Symfony version, PHP version, your OS (node version ?)
-      placeholder: "symfony 7.3, PHP 8.2, node 20.5, OS Linux"
+      label: your OS, Symfony version, PHP version, Node version
+      placeholder: "OS Linux, symfony 7.3, PHP 8.2, node 20.5"
+      description: Depending on the context choose the most appropriate informations
   - type: textarea
     id: description
     attributes:

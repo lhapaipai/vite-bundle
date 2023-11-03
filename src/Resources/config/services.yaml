@@ -1,24 +1,12 @@
 services:
     pentatrion_vite.entrypoints_lookup_collection:
-        class: Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection
+        class: Pentatrion\ViteBundle\Service\EntrypointsLookupCollection
 
-    Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection:
+    Pentatrion\ViteBundle\Service\EntrypointsLookupCollection:
         alias: pentatrion_vite.entrypoints_lookup_collection
 
-    # TODO readd for user customisation
-    # pentatrion_vite.entrypoints_lookup:
-    #     class: Pentatrion\ViteBundle\Asset\EntrypointsLookup
-    #     arguments:
-    #         - "%kernel.project_dir%%pentatrion_vite.public_directory%"
-    #         - "%pentatrion_vite.default_config%"
-    #         - "%pentatrion_vite.configs%"
-    #         - "%pentatrion_vite.throw_on_missing_entry%"
-
-    # Pentatrion\ViteBundle\Asset\EntrypointsLookup:
-    #     alias: "pentatrion_vite.entrypoints_lookup"
-
     pentatrion_vite.entrypoint_renderer:
-        class: Pentatrion\ViteBundle\Asset\EntrypointRenderer
+        class: Pentatrion\ViteBundle\Service\EntrypointRenderer
         arguments:
             - "@pentatrion_vite.entrypoints_lookup_collection"
             - "@pentatrion_vite.tag_renderer_collection"
@@ -27,23 +15,14 @@ services:
             - "@?router"
             - "@?event_dispatcher"
 
-    Pentatrion\ViteBundle\Asset\EntrypointRenderer:
+    Pentatrion\ViteBundle\Service\EntrypointRenderer:
         alias: "pentatrion_vite.entrypoint_renderer"
 
     pentatrion_vite.tag_renderer_collection:
-        class: Pentatrion\ViteBundle\Asset\TagRendererCollection
+        class: Pentatrion\ViteBundle\Service\TagRendererCollection
 
-    Pentatrion\ViteBundle\Asset\TagRendererCollection:
+    Pentatrion\ViteBundle\Service\TagRendererCollection:
         alias: pentatrion_vite.tag_renderer_collection
-
-    # TODO readd for user customisation
-    # pentatrion_vite.tag_renderer:
-    #     class: Pentatrion\ViteBundle\Asset\TagRenderer
-    #     arguments:
-    #         - []      # Default script_attributes
-    #         - []      # Default link_attributes
-
-    
 
     pentatrion_vite.twig_entry_files_extension:
         class: Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension
@@ -77,7 +56,7 @@ services:
             - "@pentatrion_vite.entrypoint_renderer"
 
     pentatrion_vite.file_accessor:
-        class: Pentatrion\ViteBundle\Asset\FileAccessor
+        class: Pentatrion\ViteBundle\Service\FileAccessor
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_directory%"
             - "%pentatrion_vite.configs%"

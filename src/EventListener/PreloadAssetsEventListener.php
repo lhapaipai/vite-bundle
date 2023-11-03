@@ -2,7 +2,7 @@
 
 namespace Pentatrion\ViteBundle\EventListener;
 
-use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
+use Pentatrion\ViteBundle\Service\EntrypointRenderer;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\WebLink\GenericLinkProvider;

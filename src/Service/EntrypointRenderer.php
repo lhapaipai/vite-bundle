@@ -1,8 +1,10 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Asset;
+namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
+use Pentatrion\ViteBundle\Model\Tag;
+use Pentatrion\ViteBundle\Util\InlineContent;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 

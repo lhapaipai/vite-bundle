@@ -1,6 +1,6 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Asset;
+namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
 

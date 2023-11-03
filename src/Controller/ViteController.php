@@ -2,7 +2,7 @@
 
 namespace Pentatrion\ViteBundle\Controller;
 
-use Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection;
+use Pentatrion\ViteBundle\Service\EntrypointsLookupCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 

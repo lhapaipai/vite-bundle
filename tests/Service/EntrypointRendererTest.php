@@ -1,14 +1,14 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Tests\Asset;
+namespace Pentatrion\ViteBundle\Tests\Service;
 
-use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
-use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
-use Pentatrion\ViteBundle\Asset\EntrypointsLookupCollection;
-use Pentatrion\ViteBundle\Asset\FileAccessor;
-use Pentatrion\ViteBundle\Asset\InlineContent;
-use Pentatrion\ViteBundle\Asset\TagRenderer;
-use Pentatrion\ViteBundle\Asset\TagRendererCollection;
+use Pentatrion\ViteBundle\Service\EntrypointRenderer;
+use Pentatrion\ViteBundle\Service\EntrypointsLookup;
+use Pentatrion\ViteBundle\Service\EntrypointsLookupCollection;
+use Pentatrion\ViteBundle\Service\FileAccessor;
+use Pentatrion\ViteBundle\Util\InlineContent;
+use Pentatrion\ViteBundle\Service\TagRenderer;
+use Pentatrion\ViteBundle\Service\TagRendererCollection;
 use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

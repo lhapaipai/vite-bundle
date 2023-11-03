@@ -1,9 +1,9 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Tests\Asset;
+namespace Pentatrion\ViteBundle\Tests\Service;
 
-use Pentatrion\ViteBundle\Asset\Tag;
-use Pentatrion\ViteBundle\Asset\TagRenderer;
+use Pentatrion\ViteBundle\Model\Tag;
+use Pentatrion\ViteBundle\Service\TagRenderer;
 use PHPUnit\Framework\TestCase;
 
 class TagRendererTest extends TestCase

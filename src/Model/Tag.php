@@ -1,6 +1,6 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Asset;
+namespace Pentatrion\ViteBundle\Model;
 
 class Tag
 {

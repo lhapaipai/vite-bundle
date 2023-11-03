@@ -2,8 +2,8 @@
 
 namespace Pentatrion\ViteBundle\DependencyInjection;
 
-use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
-use Pentatrion\ViteBundle\Asset\TagRenderer;
+use Pentatrion\ViteBundle\Service\EntrypointsLookup;
+use Pentatrion\ViteBundle\Service\TagRenderer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;

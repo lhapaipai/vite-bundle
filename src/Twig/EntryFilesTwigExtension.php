@@ -2,7 +2,7 @@
 
 namespace Pentatrion\ViteBundle\Twig;
 
-use Pentatrion\ViteBundle\Asset\EntrypointRenderer;
+use Pentatrion\ViteBundle\Service\EntrypointRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 

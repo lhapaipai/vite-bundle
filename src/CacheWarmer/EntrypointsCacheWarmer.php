@@ -3,7 +3,7 @@
 namespace Pentatrion\ViteBundle\CacheWarmer;
 
 use Exception;
-use Pentatrion\ViteBundle\Asset\FileAccessor;
+use Pentatrion\ViteBundle\Service\FileAccessor;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\AbstractPhpFileCacheWarmer;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 

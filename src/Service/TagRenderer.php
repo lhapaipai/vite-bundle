@@ -1,6 +1,9 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Asset;
+namespace Pentatrion\ViteBundle\Service;
+
+use Pentatrion\ViteBundle\Model\Tag;
+use Pentatrion\ViteBundle\Util\InlineContent;
 
 class TagRenderer
 {

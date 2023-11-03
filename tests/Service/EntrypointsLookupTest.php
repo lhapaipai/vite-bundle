@@ -1,9 +1,9 @@
 <?php
 
-namespace Pentatrion\ViteBundle\Tests\Asset;
+namespace Pentatrion\ViteBundle\Tests\Service;
 
-use Pentatrion\ViteBundle\Asset\EntrypointsLookup;
-use Pentatrion\ViteBundle\Asset\FileAccessor;
+use Pentatrion\ViteBundle\Service\EntrypointsLookup;
+use Pentatrion\ViteBundle\Service\FileAccessor;
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;

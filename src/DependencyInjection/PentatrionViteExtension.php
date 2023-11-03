@@ -49,7 +49,7 @@ class PentatrionViteExtension extends Extension
             $configs = [];
 
             foreach ($bundleConfig['configs'] as $configName => $config) {
-                if (!preg_match('/^[a-zA-Z_]+$/', $configName)) {
+                if (!preg_match('/^[0-9a-zA-Z_]+$/', $configName)) {
                     throw new \Exception('Invalid config name, you should use only a-z A-Z and _ characters.');
                 }
 

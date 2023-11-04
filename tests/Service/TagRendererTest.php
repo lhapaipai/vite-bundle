@@ -74,8 +74,10 @@ class TagRendererTest extends TestCase
     public function testGenerateScript(array $attributes, string $expectedString, string $message)
     {
         $tagRenderer = new TagRenderer(
+            [],
             ['defer' => true],
-            []
+            ['dummy-1' => 'value'],
+            ['dummy-2' => 'value'],
         );
 
         $tag = $tagRenderer->createScriptTag($attributes);
@@ -108,7 +110,9 @@ class TagRendererTest extends TestCase
     {
         $tagRenderer = new TagRenderer(
             [],
-            ['referrerpolicy' => 'origin']
+            ['dummy-1' => 'value'],
+            ['referrerpolicy' => 'origin'],
+            ['dummy-2' => 'value'],
         );
 
         $tag = $tagRenderer->createLinkStylesheetTag($fileName, $extraAttributes);
@@ -122,8 +126,8 @@ class TagRendererTest extends TestCase
             [
                 '/dependency.js',
                 [],
-                '<link rel="modulepreload" href="/dependency.js">',
-                'global link/script attributes are not added',
+                '<link referrerpolicy="origin" rel="modulepreload" href="/dependency.js">',
+                'global preload attributes are added',
             ],
         ];
     }
@@ -134,7 +138,9 @@ class TagRendererTest extends TestCase
     public function testGenerateLinkPreload(string $fileName, array $extraAttributes, string $expectedString, string $message)
     {
         $tagRenderer = new TagRenderer(
-            ['defer' => true],
+            [],
+            ['dummy-1' => 'value'],
+            ['dummy-2' => 'value'],
             ['referrerpolicy' => 'origin']
         );
 
@@ -146,6 +152,7 @@ class TagRendererTest extends TestCase
     public function testSpecialTag()
     {
         $tagRenderer = new TagRenderer(
+            [],
             ['defer' => true],
             ['referrerpolicy' => 'origin']
         );
@@ -185,6 +192,18 @@ class TagRendererTest extends TestCase
         $this->assertEquals(
             file_get_contents(__DIR__.'/../fixtures/modern-browser.html'),
             $tagRenderer->generateTag($tag)
+        );
+
+        $tagRendererCrossOrigin = new TagRenderer(
+            ['crossorigin' => 'anonymous'],
+            ['defer' => true],
+            ['referrerpolicy' => 'origin']
+        );
+        $tag = $tagRendererCrossOrigin->createInternalScriptTag(['src' => '/internal.js']);
+        $this->assertEquals(
+            '<script crossorigin="anonymous" src="/internal.js"></script>',
+            $tagRendererCrossOrigin->generateTag($tag),
+            'internal script tag has global default attributes'
         );
     }
 }

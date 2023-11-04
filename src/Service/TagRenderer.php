@@ -7,15 +7,21 @@ use Pentatrion\ViteBundle\Util\InlineContent;
 
 class TagRenderer
 {
+    private array $globalDefaultAttributes;
     private array $globalScriptAttributes;
     private array $globalLinkAttributes;
+    private array $globalPreloadAttributes;
 
     public function __construct(
+        array $defaultAttributes = [],
         array $scriptAttributes = [],
-        array $linkAttributes = []
+        array $linkAttributes = [],
+        array $preloadAttributes = []
     ) {
+        $this->globalDefaultAttributes = $defaultAttributes;
         $this->globalScriptAttributes = $scriptAttributes;
         $this->globalLinkAttributes = $linkAttributes;
+        $this->globalPreloadAttributes = $preloadAttributes;
     }
 
     public function createViteClientScript(string $src): Tag
@@ -64,7 +70,7 @@ class TagRenderer
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
-            $attributes,
+            array_merge($this->globalDefaultAttributes, $attributes),
             $content,
             true
         );
@@ -76,7 +82,11 @@ class TagRenderer
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
-            array_merge($this->globalScriptAttributes, $attributes),
+            array_merge(
+                $this->globalDefaultAttributes,
+                $this->globalScriptAttributes,
+                $attributes
+            ),
             $content
         );
 
@@ -92,7 +102,12 @@ class TagRenderer
 
         $tag = new Tag(
             Tag::LINK_TAG,
-            array_merge($this->globalLinkAttributes, $attributes, $extraAttributes)
+            array_merge(
+                $this->globalDefaultAttributes,
+                $this->globalLinkAttributes,
+                $attributes,
+                $extraAttributes
+            )
         );
 
         return $tag;
@@ -107,7 +122,12 @@ class TagRenderer
 
         $tag = new Tag(
             Tag::LINK_TAG,
-            array_merge($attributes, $extraAttributes)
+            array_merge(
+                $this->globalDefaultAttributes,
+                $this->globalPreloadAttributes,
+                $attributes,
+                $extraAttributes
+            )
         );
 
         return $tag;

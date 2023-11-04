@@ -32,6 +32,12 @@ class PentatrionViteExtension extends Extension
             $bundleConfig['default_config'] = $bundleConfig['default_build'];
         }
 
+        $defaultAttributes = [];
+
+        if (false !== $bundleConfig['crossorigin']) {
+            $defaultAttributes['crossorigin'] = $bundleConfig['crossorigin'];
+        }
+
         $container->setParameter('pentatrion_vite.preload', $bundleConfig['preload']);
         $container->setParameter('pentatrion_vite.public_directory', self::preparePublicDirectory($bundleConfig['public_directory']));
         $container->setParameter('pentatrion_vite.absolute_url', $bundleConfig['absolute_url']);
@@ -58,7 +64,12 @@ class PentatrionViteExtension extends Extension
                     $container,
                     $configName
                 );
-                $tagRendererFactories[$configName] = $this->tagRendererFactory($container, $configName, $configPrepared);
+                $tagRendererFactories[$configName] = $this->tagRendererFactory(
+                    $container,
+                    $defaultAttributes,
+                    $configName,
+                    $configPrepared
+                );
             }
         } else {
             $defaultConfigName = '_default';
@@ -71,7 +82,12 @@ class PentatrionViteExtension extends Extension
                 ),
             ];
             $tagRendererFactories = [
-                '_default' => $this->tagRendererFactory($container, $defaultConfigName, $configPrepared),
+                '_default' => $this->tagRendererFactory(
+                    $container,
+                    $defaultAttributes,
+                    $defaultConfigName,
+                    $configPrepared
+                ),
             ];
         }
 
@@ -118,13 +134,16 @@ class PentatrionViteExtension extends Extension
 
     private function tagRendererFactory(
         ContainerBuilder $container,
+        $defaultAttributes,
         string $configName,
         array $config
     ): Reference {
         $id = $this->getServiceId('tag_renderer', $configName);
         $arguments = [
+            $defaultAttributes,
             $config['script_attributes'],
             $config['link_attributes'],
+            $config['preload_attributes'],
         ];
         $definition = new Definition(TagRenderer::class, $arguments);
         $container->setDefinition($id, $definition);
@@ -147,6 +166,7 @@ class PentatrionViteExtension extends Extension
             'base' => $base,
             'script_attributes' => $config['script_attributes'],
             'link_attributes' => $config['link_attributes'],
+            'preload_attributes' => $config['preload_attributes'],
         ];
     }
 

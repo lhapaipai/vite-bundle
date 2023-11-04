@@ -20,7 +20,7 @@ class EntrypointRendererTest extends TestCase
 {
     private function getBasicTagRendererCollection($scriptAttributes = [], $linkAttributes = []): TagRendererCollection
     {
-        $tagRenderer = new TagRenderer($scriptAttributes, $linkAttributes);
+        $tagRenderer = new TagRenderer([], $scriptAttributes, $linkAttributes);
         /**
          * @var TagRendererCollection|Stub $tagRendererCollection
          */
@@ -515,8 +515,8 @@ class EntrypointRendererTest extends TestCase
                 ['config2-dev', $entrypointsLookupConfig2],
             ]));
 
-        $tagRendererConfig1 = new TagRenderer([], []);
-        $tagRendererConfig2 = new TagRenderer(['defer' => true], ['referrerpolicy' => 'origin']);
+        $tagRendererConfig1 = new TagRenderer([], [], []);
+        $tagRendererConfig2 = new TagRenderer([], ['defer' => true], ['referrerpolicy' => 'origin']);
 
         /**
          * @var TagRendererCollection|Stub $tagRendererCollection

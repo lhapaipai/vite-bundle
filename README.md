@@ -7,7 +7,12 @@
 This bundle helping you render all of the dynamic `script` and `link` tags needed.
 Essentially, he provides two twig functions to load the correct scripts into your templates.
 
-⚠️ This repository is a "subtree split": a read-only subset of that main repository [symfony-vite-dev](https://github.com/lhapaipai/symfony-vite-dev).
+⚠️ This repository is a "subtree split": a read-only subset of that main repository [symfony-vite-dev](https://github.com/lhapaipai/symfony-vite-dev) which delivers to packagist only the necessary code.
+
+if you want to view the source code or open issues you are in the right place.
+
+If you want to contribute, make PRs or consult examples you will have to go to the [symfony-vite-dev](https://github.com/lhapaipai/symfony-vite-dev) repository.
+
 
 ## Installation
 
@@ -45,8 +50,8 @@ Add this twig functions in any template or base layout where you need to include
 
 | Package                                                                 | Description               |
 | ----------------------------------------------------------------------- | :------------------------ |
-| [vite-bundle](https://github.com/lhapaipai/vite-bundle)                 | Symfony Bundle            |
-| [vite-plugin-symfony](https://github.com/lhapaipai/vite-plugin-symfony) | Vite plugin               |
+| [vite-bundle](https://github.com/lhapaipai/vite-bundle)                 | Symfony Bundle (read-only)|
+| [vite-plugin-symfony](https://github.com/lhapaipai/vite-plugin-symfony) | Vite plugin (read-only)   |
 | [symfony-vite-dev](https://github.com/lhapaipai/symfony-vite-dev)       | Package for contributors  |
 
 ## License

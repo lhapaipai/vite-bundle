@@ -1,8 +1,14 @@
-## Next
+## v6.0.0
 
 - make services privates.
 - add tests for EntrypointRenderer, EntrypointsLookup and TagRenderer.
 - add preload option (symfony/web-link)
+- add cache option
+- add crossorigin option
+- add preload_attributes option
+- change default_build/builds to default_config/configs
+- fix baseUrl to files #67
+- refactor RenderAssetTagEvent 
 
 ## v5.0.1
 

@@ -54,7 +54,7 @@ class EntrypointRenderer
 
     private function completeURL(string $path, bool $useAbsoluteUrl = false): string
     {
-        if (false === $useAbsoluteUrl || null === $this->router) {
+        if (0 === strpos($path, 'http') || false === $useAbsoluteUrl || null === $this->router) {
             return $path;
         }
 

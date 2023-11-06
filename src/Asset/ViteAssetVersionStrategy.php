@@ -64,7 +64,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     private function completeURL(string $path): string
     {
-        if (false === $this->useAbsoluteUrl || null === $this->router) {
+        if (0 === strpos($path, 'http') || false === $this->useAbsoluteUrl || null === $this->router) {
             return $path;
         }
 

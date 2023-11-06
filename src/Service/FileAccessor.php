@@ -61,14 +61,13 @@ class FileAccessor
                 $content = json_decode(file_get_contents($filePath), true);
 
                 if (self::ENTRYPOINTS === $fileType) {
-                    $pluginMajorVersion = array_key_exists('version', $content)
-                        ? intval(explode('.', $content['version'])[0])
-                        : null;
+                    $pluginVersion = array_key_exists('version', $content) ? $content['version'] : null;
                     if (
-                        is_null($pluginMajorVersion)
-                        || PentatrionViteBundle::MAJOR_VERSION !== $pluginMajorVersion
+                        is_null($pluginVersion)
+                        // VERSION[1] => Major version number
+                        || PentatrionViteBundle::VERSION[1] !== $pluginVersion[1]
                     ) {
-                        throw new VersionMismatchException('your vite-plugin-symfony is outdated, run : npm install vite-plugin-symfony@^'.PentatrionViteBundle::MAJOR_VERSION);
+                        throw new VersionMismatchException('your vite-plugin-symfony is outdated, run : npm install vite-plugin-symfony@^'.PentatrionViteBundle::VERSION[1]);
                     }
                 }
 

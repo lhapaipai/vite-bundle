@@ -3,7 +3,7 @@
 namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Exception\UndefinedConfigNameException;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocator;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class TagRendererCollection
 {

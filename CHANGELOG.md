@@ -1,14 +1,4 @@
-## v6.0.0
-
-- make services privates.
-- add tests for EntrypointRenderer, EntrypointsLookup and TagRenderer.
-- add preload option (symfony/web-link)
-- add cache option
-- add crossorigin option
-- add preload_attributes option
-- change default_build/builds to default_config/configs
-- fix baseUrl to files #67
-- refactor RenderAssetTagEvent 
+since version 6.0.0 changelogs are managed by the symfony-vite-dev repository
 
 ## v5.0.1
 

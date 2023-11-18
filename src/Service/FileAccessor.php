@@ -34,7 +34,9 @@ class FileAccessor
 
     public function hasFile(string $configName, string $fileType): bool
     {
-        return file_exists($this->publicPath.$this->configs[$configName]['base'].self::FILES[$fileType]);
+        $basePath = $this->publicPath.$this->configs[$configName]['base'];
+
+        return file_exists($basePath.'.vite/'.self::FILES[$fileType]) || file_exists($basePath.self::FILES[$fileType]);
     }
 
     public function getData(string $configName, string $fileType): array
@@ -50,14 +52,20 @@ class FileAccessor
 
             if (!isset($this->content[$configName][$fileType])) {
                 $filePath = $this->publicPath.$this->configs[$configName]['base'].self::FILES[$fileType];
+                $basePath = $this->publicPath.$this->configs[$configName]['base'];
 
                 if (($scheme = parse_url($filePath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
                     throw new \Exception('You can\'t use a remote manifest with pentatrion/vite-bundle');
                 }
 
-                if (!file_exists($filePath)) {
-                    throw new EntrypointsFileNotFoundException("$fileType not found at $filePath. Did you forget configure your `build_directory` in pentatrion_vite.yml");
+                if (file_exists($basePath.'.vite/'.self::FILES[$fileType])) {
+                    $filePath = $basePath.'.vite/'.self::FILES[$fileType];
+                } elseif (file_exists($basePath.self::FILES[$fileType])) {
+                    $filePath = $basePath.self::FILES[$fileType];
+                } else {
+                    throw new EntrypointsFileNotFoundException("$fileType not found at $basePath. Did you forget configure your `build_directory` in pentatrion_vite.yml");
                 }
+
                 $content = json_decode(file_get_contents($filePath), true);
 
                 if (self::ENTRYPOINTS === $fileType) {

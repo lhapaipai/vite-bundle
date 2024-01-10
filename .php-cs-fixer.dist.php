@@ -8,7 +8,6 @@ $config
     ])
     ->getFinder()
     ->in(__DIR__.'/src')
-    ->append([__FILE__])
 ;
 
 return $config;

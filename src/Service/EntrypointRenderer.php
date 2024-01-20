@@ -7,8 +7,9 @@ use Pentatrion\ViteBundle\Model\Tag;
 use Pentatrion\ViteBundle\Util\InlineContent;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
-class EntrypointRenderer
+class EntrypointRenderer implements ResetInterface
 {
     private EntrypointsLookupCollection $entrypointsLookupCollection;
     private TagRendererCollection $tagRendererCollection;

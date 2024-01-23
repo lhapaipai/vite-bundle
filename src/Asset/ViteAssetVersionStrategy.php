@@ -5,7 +5,7 @@ namespace Pentatrion\ViteBundle\Asset;
 use Pentatrion\ViteBundle\Service\FileAccessor;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
@@ -13,7 +13,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     private array $configs;
     private string $configName;
     private $useAbsoluteUrl;
-    private ?RouterInterface $router;
+    private ?RequestStack $requestStack;
     private bool $strictMode;
 
     private ?string $viteMode = null;
@@ -26,14 +26,14 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         array $configs,
         string $defaultConfigName,
         bool $useAbsoluteUrl,
-        RouterInterface $router = null,
+        RequestStack $requestStack = null,
         bool $strictMode = true
     ) {
         $this->fileAccessor = $fileAccessor;
         $this->configs = $configs;
         $this->configName = $defaultConfigName;
         $this->useAbsoluteUrl = $useAbsoluteUrl;
-        $this->router = $router;
+        $this->requestStack = $requestStack;
         $this->strictMode = $strictMode;
 
         $this->setConfig($this->configName);
@@ -64,11 +64,11 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     private function completeURL(string $path): string
     {
-        if (0 === strpos($path, 'http') || false === $this->useAbsoluteUrl || null === $this->router) {
+        if (0 === strpos($path, 'http') || false === $this->useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
             return $path;
         }
 
-        return $this->router->getContext()->getScheme().'://'.$this->router->getContext()->getHost().$path;
+        return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
     private function getassetsPath(string $path): ?string

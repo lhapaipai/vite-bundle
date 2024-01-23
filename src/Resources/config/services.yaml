@@ -14,7 +14,7 @@ services:
             - "@pentatrion_vite.tag_renderer_collection"
             - "%pentatrion_vite.absolute_url%"
             - "%pentatrion_vite.preload%"
-            - "@?router"
+            - "@?request_stack"
             - "@?event_dispatcher"
 
     Pentatrion\ViteBundle\Service\EntrypointRenderer:
@@ -47,7 +47,7 @@ services:
             - "%pentatrion_vite.configs%"
             - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
-            - "@?router"
+            - "@?request_stack"
             - true
 
 

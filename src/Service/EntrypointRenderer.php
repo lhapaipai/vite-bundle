@@ -5,7 +5,7 @@ namespace Pentatrion\ViteBundle\Service;
 use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use Pentatrion\ViteBundle\Model\Tag;
 use Pentatrion\ViteBundle\Util\InlineContent;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -15,7 +15,7 @@ class EntrypointRenderer implements ResetInterface
     private TagRendererCollection $tagRendererCollection;
     private bool $useAbsoluteUrl;
     private string $preload;
-    private ?RouterInterface $router;
+    private ?RequestStack $requestStack;
     private ?EventDispatcherInterface $eventDispatcher;
 
     private $returnedViteClients = [];
@@ -32,14 +32,14 @@ class EntrypointRenderer implements ResetInterface
         TagRendererCollection $tagRendererCollection,
         bool $useAbsoluteUrl = false,
         string $preload = 'link-tag',
-        RouterInterface $router = null,
+        RequestStack $requestStack = null,
         EventDispatcherInterface $eventDispatcher = null
     ) {
         $this->entrypointsLookupCollection = $entrypointsLookupCollection;
         $this->tagRendererCollection = $tagRendererCollection;
         $this->useAbsoluteUrl = $useAbsoluteUrl;
         $this->preload = $preload;
-        $this->router = $router;
+        $this->requestStack = $requestStack;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -55,11 +55,11 @@ class EntrypointRenderer implements ResetInterface
 
     private function completeURL(string $path, bool $useAbsoluteUrl = false): string
     {
-        if (0 === strpos($path, 'http') || false === $useAbsoluteUrl || null === $this->router) {
+        if (0 === strpos($path, 'http') || false === $useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
             return $path;
         }
 
-        return $this->router->getContext()->getScheme().'://'.$this->router->getContext()->getHost().$path;
+        return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
     private function shouldUseAbsoluteURL(array $options, string $configName = null): bool

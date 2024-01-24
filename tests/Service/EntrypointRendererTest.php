@@ -12,6 +12,8 @@ use Pentatrion\ViteBundle\Service\TagRendererCollection;
 use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -322,23 +324,24 @@ class EntrypointRendererTest extends TestCase
     public function testRenderWithAbsoluteUrl()
     {
         /**
-         * @var Stub|RequestContext $context
+         * @var Stub|Request $requestStack
          */
-        $context = $this->createStub(RequestContext::class);
-        $context
-            ->method('getScheme')
-            ->willReturn('http');
+        $request = $this->createStub(Request::class);
 
-        $context
-            ->method('getHost')
-            ->willReturn('mydomain.local');
+        $request
+            ->method('getUriForPath')
+            ->willReturnCallback(function ($path) {
+                return 'http://mydomain.local' . $path;
+            })
+        ;
+
         /**
-         * @var Stub|RouterInterface $router
+         * @var Stub|RequestStack $requestStack
          */
-        $router = $this->createStub(RouterInterface::class);
-        $router
-            ->method('getContext')
-            ->willReturn($context);
+        $requestStack = $this->createStub(RequestStack::class);
+        $requestStack
+            ->method('getCurrentRequest')
+            ->willReturn($request);
 
         $entrypointsLookupBasicBuild = $this->getEntrypointsLookup('basic-build');
         $entrypointsLookupBasicDev = $this->getEntrypointsLookup('basic-dev');
@@ -348,7 +351,7 @@ class EntrypointRendererTest extends TestCase
             $this->getBasicTagRendererCollection(),
             true,
             'link-tag',
-            $router,
+            $requestStack,
             null,
         );
         $this->assertEquals(
@@ -362,7 +365,7 @@ class EntrypointRendererTest extends TestCase
             $this->getBasicTagRendererCollection(),
             false,
             'link-tag',
-            $router,
+            $requestStack,
             null,
         );
         $this->assertEquals(
@@ -376,7 +379,7 @@ class EntrypointRendererTest extends TestCase
             $this->getBasicTagRendererCollection(),
             true,
             'link-tag',
-            $router,
+            $requestStack,
             null,
         );
         $this->assertEquals(

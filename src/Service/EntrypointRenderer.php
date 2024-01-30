@@ -91,6 +91,9 @@ class EntrypointRenderer implements ResetInterface
         ];
     }
 
+    /**
+     * @return array<string, Tag>
+     */
     public function getRenderedScripts(): array
     {
         return $this->renderedFiles['scripts'];
@@ -166,8 +169,8 @@ class EntrypointRenderer implements ResetInterface
 
         /* normal js scripts */
         foreach ($entrypointsLookup->getJSFiles($entryName) as $filePath) {
-            if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
-                $tags[] = $tagRenderer->createScriptTag(
+            if (!isset($this->renderedFiles['scripts'][$filePath])) {
+                $tag = $tagRenderer->createScriptTag(
                     array_merge(
                         [
                             'type' => 'module',
@@ -178,7 +181,9 @@ class EntrypointRenderer implements ResetInterface
                     )
                 );
 
-                $this->renderedFiles['scripts'][] = $filePath;
+                $tags[] = $tag;
+
+                $this->renderedFiles['scripts'][$filePath] = $tag;
             }
         }
 
@@ -187,8 +192,8 @@ class EntrypointRenderer implements ResetInterface
             $id = self::pascalToKebab("vite-legacy-entry-$entryName");
 
             $filePath = $entrypointsLookup->getLegacyJSFile($entryName);
-            if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
-                $tags[] = $tagRenderer->createScriptTag(
+            if (!isset($this->renderedFiles['scripts'][$filePath])) {
+                $tag = $tagRenderer->createScriptTag(
                     [
                         'nomodule' => true,
                         'data-src' => $this->completeURL($filePath, $useAbsoluteUrl),
@@ -200,7 +205,9 @@ class EntrypointRenderer implements ResetInterface
                     InlineContent::getSystemJSInlineCode($id)
                 );
 
-                $this->renderedFiles['scripts'][] = $filePath;
+                $tags[] = $tag;
+
+                $this->renderedFiles['scripts'][$filePath] = $tag;
             }
         }
 
@@ -240,24 +247,30 @@ class EntrypointRenderer implements ResetInterface
 
         if ($isBuild) {
             foreach ($entrypointsLookup->getJavascriptDependencies($entryName) as $filePath) {
-                if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
-                    $tags[] = $tagRenderer->createModulePreloadLinkTag(
+                if (!isset($this->renderedFiles['scripts'][$filePath])) {
+                    $tag = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($filePath, $useAbsoluteUrl),
                         ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->renderedFiles['scripts'][] = $filePath;
+
+                    $tags[] = $tag;
+
+                    $this->renderedFiles['scripts'][$filePath] = $tag;
                 }
             }
         }
 
         if ($isBuild && isset($options['preloadDynamicImports']) && true === $options['preloadDynamicImports']) {
             foreach ($entrypointsLookup->getJavascriptDynamicDependencies($entryName) as $filePath) {
-                if (false === \in_array($filePath, $this->renderedFiles['scripts'], true)) {
-                    $tags[] = $tagRenderer->createModulePreloadLinkTag(
+                if (!isset($this->renderedFiles['scripts'][$filePath])) {
+                    $tag = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($filePath, $useAbsoluteUrl),
                         ['integrity' => $entrypointsLookup->getFileHash($filePath)]
                     );
-                    $this->renderedFiles['scripts'][] = $filePath;
+
+                    $tags[] = $tag;
+
+                    $this->renderedFiles['scripts'][$filePath] = $tag;
                 }
             }
         }

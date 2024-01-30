@@ -35,8 +35,12 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
         /** @var GenericLinkProvider $linkProvider */
         $linkProvider = $request->attributes->get('_links');
 
-        foreach ($this->entrypointRenderer->getRenderedScripts() as $href) {
+        foreach ($this->entrypointRenderer->getRenderedScripts() as $href => $tag) {
             $link = $this->createLink('preload', $href)->withAttribute('as', 'script');
+
+            if ('module' === $tag->getAttribute('type')) {
+                $link = $link->withAttribute('crossorigin', true);
+            }
 
             $linkProvider = $linkProvider->withLink($link);
         }

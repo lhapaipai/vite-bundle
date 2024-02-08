@@ -29,7 +29,7 @@ class ViteController
         $this->proxyOrigin = $proxyOrigin;
     }
 
-    public function proxyBuild(string $path, string $configName = null): Response
+    public function proxyBuild(string $path, ?string $configName = null): Response
     {
         if (is_null($configName)) {
             $configName = $this->defaultConfig;

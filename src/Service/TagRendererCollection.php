@@ -18,7 +18,7 @@ class TagRendererCollection
         $this->defaultConfigName = $defaultConfigName;
     }
 
-    public function getTagRenderer(string $configName = null): TagRenderer
+    public function getTagRenderer(?string $configName = null): TagRenderer
     {
         if (is_null($configName)) {
             $configName = $this->defaultConfigName;

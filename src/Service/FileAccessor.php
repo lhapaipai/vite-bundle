@@ -25,7 +25,7 @@ class FileAccessor
     public function __construct(
         string $publicPath,
         array $configs,
-        CacheItemPoolInterface $cache = null
+        ?CacheItemPoolInterface $cache = null
     ) {
         $this->publicPath = $publicPath;
         $this->configs = $configs;

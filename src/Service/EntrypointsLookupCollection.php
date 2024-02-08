@@ -18,7 +18,7 @@ class EntrypointsLookupCollection
         $this->defaultConfigName = $defaultConfigName;
     }
 
-    public function getEntrypointsLookup(string $configName = null): EntrypointsLookup
+    public function getEntrypointsLookup(?string $configName = null): EntrypointsLookup
     {
         if (is_null($configName)) {
             $configName = $this->defaultConfigName;

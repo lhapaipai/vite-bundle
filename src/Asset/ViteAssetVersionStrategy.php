@@ -26,7 +26,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         array $configs,
         string $defaultConfigName,
         bool $useAbsoluteUrl,
-        RequestStack $requestStack = null,
+        ?RequestStack $requestStack = null,
         bool $strictMode = true
     ) {
         $this->fileAccessor = $fileAccessor;

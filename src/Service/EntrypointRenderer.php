@@ -32,8 +32,8 @@ class EntrypointRenderer implements ResetInterface
         TagRendererCollection $tagRendererCollection,
         bool $useAbsoluteUrl = false,
         string $preload = 'link-tag',
-        RequestStack $requestStack = null,
-        EventDispatcherInterface $eventDispatcher = null
+        ?RequestStack $requestStack = null,
+        ?EventDispatcherInterface $eventDispatcher = null
     ) {
         $this->entrypointsLookupCollection = $entrypointsLookupCollection;
         $this->tagRendererCollection = $tagRendererCollection;
@@ -43,12 +43,12 @@ class EntrypointRenderer implements ResetInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    private function getEntrypointsLookup(string $configName = null): EntrypointsLookup
+    private function getEntrypointsLookup(?string $configName = null): EntrypointsLookup
     {
         return $this->entrypointsLookupCollection->getEntrypointsLookup($configName);
     }
 
-    private function getTagRenderer(string $configName = null): TagRenderer
+    private function getTagRenderer(?string $configName = null): TagRenderer
     {
         return $this->tagRendererCollection->getTagRenderer($configName);
     }
@@ -62,14 +62,14 @@ class EntrypointRenderer implements ResetInterface
         return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
-    private function shouldUseAbsoluteURL(array $options, string $configName = null): bool
+    private function shouldUseAbsoluteURL(array $options, ?string $configName = null): bool
     {
         $viteServer = $this->getEntrypointsLookup($configName)->getViteServer($configName);
 
         return is_null($viteServer) && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
     }
 
-    public function getMode(string $configName = null): ?string
+    public function getMode(?string $configName = null): ?string
     {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
 
@@ -107,7 +107,7 @@ class EntrypointRenderer implements ResetInterface
     public function renderScripts(
         string $entryName,
         array $options = [],
-        string $configName = null,
+        ?string $configName = null,
         bool $toString = true
     ): mixed {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
@@ -213,7 +213,7 @@ class EntrypointRenderer implements ResetInterface
     public function renderLinks(
         string $entryName,
         array $options = [],
-        string $configName = null,
+        ?string $configName = null,
         bool $toString = true
     ): mixed {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);

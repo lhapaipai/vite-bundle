@@ -47,7 +47,7 @@ class Configuration implements ConfigurationInterface
                 ->enumNode('crossorigin')
                     ->defaultFalse()
                     ->values([false, 'anonymous', 'use-credentials'])
-                    ->info('crossorigin value when Encore.enableIntegrityHashes() is used, can be false (default), anonymous or use-credentials')
+                    ->info('crossorigin value, can be false (default), anonymous or use-credentials')
                 ->end()
                 ->arrayNode('script_attributes')
                     ->info('Key/value pair of attributes to render on all script tags')

@@ -11,10 +11,12 @@ use Symfony\Component\WebLink\Link;
 class PreloadAssetsEventListener implements EventSubscriberInterface
 {
     private EntrypointRenderer $entrypointRenderer;
+    private string|bool $crossOriginAttribute;
 
-    public function __construct(EntrypointRenderer $entrypointRenderer)
+    public function __construct(EntrypointRenderer $entrypointRenderer, string|bool $crossOriginAttribute)
     {
         $this->entrypointRenderer = $entrypointRenderer;
+        $this->crossOriginAttribute = $crossOriginAttribute;
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -39,7 +41,7 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
             $link = $this->createLink('preload', $href)->withAttribute('as', 'script');
 
             if ('module' === $tag->getAttribute('type')) {
-                $link = $link->withAttribute('crossorigin', true);
+                $link = $link->withAttribute('crossorigin', $this->crossOriginAttribute ?: 'anonymous');
             }
 
             $linkProvider = $linkProvider->withLink($link);

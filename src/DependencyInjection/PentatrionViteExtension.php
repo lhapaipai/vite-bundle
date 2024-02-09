@@ -43,6 +43,7 @@ class PentatrionViteExtension extends Extension
         $container->setParameter('pentatrion_vite.absolute_url', $bundleConfig['absolute_url']);
         $container->setParameter('pentatrion_vite.proxy_origin', $bundleConfig['proxy_origin']);
         $container->setParameter('pentatrion_vite.throw_on_missing_entry', $bundleConfig['throw_on_missing_entry']);
+        $container->setParameter('pentatrion_vite.crossorigin', $bundleConfig['crossorigin']);
 
         if (
             count($bundleConfig['configs']) > 0) {

@@ -18,11 +18,11 @@ class EntrypointRenderer implements ResetInterface
     private ?RequestStack $requestStack;
     private ?EventDispatcherInterface $eventDispatcher;
 
-    private $returnedViteClients = [];
-    private $returnedReactRefresh = [];
-    private $returnedViteLegacyScripts = [];
+    private array $returnedViteClients = [];
+    private array $returnedReactRefresh = [];
+    private array $returnedViteLegacyScripts = [];
 
-    private $renderedFiles = [
+    private array $renderedFiles = [
         'scripts' => [],
         'styles' => [],
     ];

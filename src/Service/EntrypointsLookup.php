@@ -43,11 +43,6 @@ class EntrypointsLookup
         return $this->fileContent;
     }
 
-    public function setFileContent(string $content): void
-    {
-        $this->fileContent = $content;
-    }
-
     public function getFileHash(string $filePath): ?string
     {
         $infos = $this->getFileContent();

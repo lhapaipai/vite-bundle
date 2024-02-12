@@ -64,7 +64,7 @@ class EntrypointRenderer implements ResetInterface
 
     private function shouldUseAbsoluteURL(array $options, ?string $configName = null): bool
     {
-        $viteServer = $this->getEntrypointsLookup($configName)->getViteServer($configName);
+        $viteServer = $this->getEntrypointsLookup($configName)->getViteServer();
 
         return is_null($viteServer) && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
     }
@@ -73,7 +73,7 @@ class EntrypointRenderer implements ResetInterface
     {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
 
-        if (!$entrypointsLookup->hasFile($configName)) {
+        if (!$entrypointsLookup->hasFile()) {
             return null;
         }
 

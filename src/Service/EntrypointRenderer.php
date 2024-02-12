@@ -55,7 +55,7 @@ class EntrypointRenderer implements ResetInterface
 
     private function completeURL(string $path, bool $useAbsoluteUrl = false): string
     {
-        if (0 === strpos($path, 'http') || false === $useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
+        if (str_starts_with($path, 'http') || false === $useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
             return $path;
         }
 

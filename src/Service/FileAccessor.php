@@ -54,7 +54,7 @@ class FileAccessor
                 $filePath = $this->publicPath.$this->configs[$configName]['base'].self::FILES[$fileType];
                 $basePath = $this->publicPath.$this->configs[$configName]['base'];
 
-                if (($scheme = parse_url($filePath, \PHP_URL_SCHEME)) && 0 === strpos($scheme, 'http')) {
+                if (($scheme = parse_url($filePath, \PHP_URL_SCHEME)) && str_starts_with($scheme, 'http')) {
                     throw new \Exception('You can\'t use a remote manifest with pentatrion/vite-bundle');
                 }
 

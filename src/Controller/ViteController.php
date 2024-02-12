@@ -41,7 +41,7 @@ class ViteController
         $base = $entrypointsLookup->getBase();
 
         if (is_null($viteDevServer)) {
-            return new \Exception('Vite dev server not available');
+            throw new \Exception('Vite dev server not available');
         }
 
         $origin = $this->proxyOrigin ?? $viteDevServer;

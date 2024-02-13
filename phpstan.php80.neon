@@ -4,6 +4,8 @@ includes:
 parameters:
 	ignoreErrors:
 		- '#^PHPDoc type for property Pentatrion\\ViteBundle\\Service\\EntrypointsLookupCollection\:\:\$entrypointsLookupLocator contains generic type Symfony\\Component\\DependencyInjection\\ServiceLocator\<Pentatrion\\ViteBundle\\Service\\EntrypointsLookup\> but class Symfony\\Component\\DependencyInjection\\ServiceLocator is not generic\.$#'
+		- '#^PHPDoc tag @param for parameter \$entrypointsLookupLocator contains generic type Symfony\\Component\\DependencyInjection\\ServiceLocator\<Pentatrion\\ViteBundle\\Service\\EntrypointsLookup\> but class Symfony\\Component\\DependencyInjection\\ServiceLocator is not generic\.$#'
 		- '#^PHPDoc type for property Pentatrion\\ViteBundle\\Service\\TagRendererCollection\:\:\$tagRendererLocator contains generic type Symfony\\Component\\DependencyInjection\\ServiceLocator\<Pentatrion\\ViteBundle\\Service\\TagRenderer\> but class Symfony\\Component\\DependencyInjection\\ServiceLocator is not generic\.$#'
+		- '#^PHPDoc tag @param for parameter \$tagRendererLocator contains generic type Symfony\\Component\\DependencyInjection\\ServiceLocator\<Pentatrion\\ViteBundle\\Service\\TagRenderer\> but class Symfony\\Component\\DependencyInjection\\ServiceLocator is not generic\.$#'
 		- '#^Method Pentatrion\\ViteBundle\\Service\\EntrypointsLookupCollection\:\:getEntrypointsLookup\(\) should return Pentatrion\\ViteBundle\\Service\\EntrypointsLookup but returns mixed\.$#'
 		- '#^Method Pentatrion\\ViteBundle\\Service\\TagRendererCollection\:\:getTagRenderer\(\) should return Pentatrion\\ViteBundle\\Service\\TagRenderer but returns mixed\.$#'

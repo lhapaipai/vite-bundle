@@ -12,14 +12,14 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     private FileAccessor $fileAccessor;
     private array $configs;
     private string $configName;
-    private $useAbsoluteUrl;
+    private bool $useAbsoluteUrl;
     private ?RequestStack $requestStack;
     private bool $strictMode;
 
     private ?string $viteMode = null;
     private string $basePath;
-    private $manifestData;
-    private $entrypointsData;
+    private ?array $manifestData = null;
+    private array $entrypointsData = [];
 
     public function __construct(
         FileAccessor $fileAccessor,

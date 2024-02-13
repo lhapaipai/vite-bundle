@@ -8,11 +8,11 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ViteController
 {
-    public $httpClient;
-    public string $defaultConfig;
-    public array $configs;
-    private $entrypointsLookupCollection;
-    private $proxyOrigin;
+    private HttpClientInterface $httpClient;
+    private string $defaultConfig;
+    private array $configs;
+    private EntrypointsLookupCollection $entrypointsLookupCollection;
+    private ?string $proxyOrigin;
 
     public function __construct(
         string $defaultConfig,

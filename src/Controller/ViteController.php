@@ -8,22 +8,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class ViteController
 {
-    private HttpClientInterface $httpClient;
-    private string $defaultConfig;
-    private EntrypointsLookupCollection $entrypointsLookupCollection;
-    private ?string $proxyOrigin;
-
     public function __construct(
-        string $defaultConfig,
-        HttpClientInterface $httpClient,
-        EntrypointsLookupCollection $entrypointsLookupCollection,
-        ?string $proxyOrigin
+        private string $defaultConfig,
+        private HttpClientInterface $httpClient,
+        private EntrypointsLookupCollection $entrypointsLookupCollection,
+        private ?string $proxyOrigin
     ) {
-        $this->defaultConfig = $defaultConfig;
-        $this->httpClient = $httpClient;
-
-        $this->entrypointsLookupCollection = $entrypointsLookupCollection;
-        $this->proxyOrigin = $proxyOrigin;
     }
 
     public function proxyBuild(string $path, ?string $configName = null): Response

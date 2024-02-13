@@ -7,21 +7,12 @@ use Pentatrion\ViteBundle\Util\InlineContent;
 
 class TagRenderer
 {
-    private array $globalDefaultAttributes;
-    private array $globalScriptAttributes;
-    private array $globalLinkAttributes;
-    private array $globalPreloadAttributes;
-
     public function __construct(
-        array $defaultAttributes = [],
-        array $scriptAttributes = [],
-        array $linkAttributes = [],
-        array $preloadAttributes = []
+        private array $globalDefaultAttributes = [],
+        private array $globalScriptAttributes = [],
+        private array $globalLinkAttributes = [],
+        private array $globalPreloadAttributes = []
     ) {
-        $this->globalDefaultAttributes = $defaultAttributes;
-        $this->globalScriptAttributes = $scriptAttributes;
-        $this->globalLinkAttributes = $linkAttributes;
-        $this->globalPreloadAttributes = $preloadAttributes;
     }
 
     public function createViteClientScript(string $src): Tag

@@ -9,33 +9,19 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
-    private FileAccessor $fileAccessor;
-    private array $configs;
-    private string $configName;
-    private bool $useAbsoluteUrl;
-    private ?RequestStack $requestStack;
-    private bool $strictMode;
-
     private ?string $viteMode = null;
     private string $basePath;
     private ?array $manifestData = null;
     private array $entrypointsData = [];
 
     public function __construct(
-        FileAccessor $fileAccessor,
-        array $configs,
-        string $defaultConfigName,
-        bool $useAbsoluteUrl,
-        ?RequestStack $requestStack = null,
-        bool $strictMode = true
+        private FileAccessor $fileAccessor,
+        private array $configs,
+        private string $configName,
+        private bool $useAbsoluteUrl,
+        private ?RequestStack $requestStack = null,
+        private bool $strictMode = true
     ) {
-        $this->fileAccessor = $fileAccessor;
-        $this->configs = $configs;
-        $this->configName = $defaultConfigName;
-        $this->useAbsoluteUrl = $useAbsoluteUrl;
-        $this->requestStack = $requestStack;
-        $this->strictMode = $strictMode;
-
         $this->setConfig($this->configName);
     }
 

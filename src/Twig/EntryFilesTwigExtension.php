@@ -8,11 +8,8 @@ use Twig\TwigFunction;
 
 class EntryFilesTwigExtension extends AbstractExtension
 {
-    private EntrypointRenderer $entrypointRenderer;
-
-    public function __construct(EntrypointRenderer $entrypointRenderer)
+    public function __construct(private EntrypointRenderer $entrypointRenderer)
     {
-        $this->entrypointRenderer = $entrypointRenderer;
     }
 
     public function getFunctions(): array

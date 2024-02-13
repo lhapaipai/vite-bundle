@@ -6,20 +6,14 @@ use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
 
 class EntrypointsLookup
 {
-    private string $configName;
-    private bool $throwOnMissingEntry;
-    private FileAccessor $fileAccessor;
-
     private ?array $fileContent = null;
 
     public function __construct(
-        FileAccessor $fileAccessor,
-        string $configName, // for cache to retrieve content : configName is cache key
-        bool $throwOnMissingEntry = false
+        private FileAccessor $fileAccessor,
+        private string $configName,
+        // for cache to retrieve content : configName is cache key
+        private bool $throwOnMissingEntry = false
     ) {
-        $this->fileAccessor = $fileAccessor;
-        $this->configName = $configName;
-        $this->throwOnMissingEntry = $throwOnMissingEntry;
     }
 
     public function hasFile(): bool

@@ -7,17 +7,12 @@ class Tag
     public const SCRIPT_TAG = 'script';
     public const LINK_TAG = 'link';
 
-    private string $tagName;
-    private array $attributes;
-    private string $content;
-    private bool $internal;
-
-    public function __construct(string $tagName, array $attributes, string $content = '', bool $internal = false)
-    {
-        $this->tagName = $tagName;
-        $this->attributes = $attributes;
-        $this->content = $content;
-        $this->internal = $internal;
+    public function __construct(
+        private string $tagName,
+        private array $attributes,
+        private string $content = '',
+        private bool $internal = false
+    ) {
     }
 
     public function getTagName(): string

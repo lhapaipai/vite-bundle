@@ -17,19 +17,13 @@ class FileAccessor
         self::MANIFEST => 'manifest.json',
     ];
 
-    private array $configs;
-    private ?CacheItemPoolInterface $cache;
     private array $content;
-    private string $publicPath;
 
     public function __construct(
-        string $publicPath,
-        array $configs,
-        ?CacheItemPoolInterface $cache = null
+        private string $publicPath,
+        private array $configs,
+        private ?CacheItemPoolInterface $cache = null
     ) {
-        $this->publicPath = $publicPath;
-        $this->configs = $configs;
-        $this->cache = $cache;
     }
 
     public function hasFile(string $configName, string $fileType): bool

@@ -7,19 +7,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class EntrypointsLookupCollection
 {
-    /** @var ServiceLocator<EntrypointsLookup> */
-    private ServiceLocator $entrypointsLookupLocator;
-    private string $defaultConfigName;
-
     /**
      * @param ServiceLocator<EntrypointsLookup> $entrypointsLookupLocator
      */
     public function __construct(
-        ServiceLocator $entrypointsLookupLocator,
-        string $defaultConfigName
+        private ServiceLocator $entrypointsLookupLocator,
+        private string $defaultConfigName
     ) {
-        $this->entrypointsLookupLocator = $entrypointsLookupLocator;
-        $this->defaultConfigName = $defaultConfigName;
     }
 
     public function getEntrypointsLookup(?string $configName = null): EntrypointsLookup

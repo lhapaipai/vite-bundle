@@ -11,13 +11,6 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class EntrypointRenderer implements ResetInterface
 {
-    private EntrypointsLookupCollection $entrypointsLookupCollection;
-    private TagRendererCollection $tagRendererCollection;
-    private bool $useAbsoluteUrl;
-    private string $preload;
-    private ?RequestStack $requestStack;
-    private ?EventDispatcherInterface $eventDispatcher;
-
     private array $returnedViteClients = [];
     private array $returnedReactRefresh = [];
     private array $returnedViteLegacyScripts = [];
@@ -28,19 +21,13 @@ class EntrypointRenderer implements ResetInterface
     ];
 
     public function __construct(
-        EntrypointsLookupCollection $entrypointsLookupCollection,
-        TagRendererCollection $tagRendererCollection,
-        bool $useAbsoluteUrl = false,
-        string $preload = 'link-tag',
-        ?RequestStack $requestStack = null,
-        ?EventDispatcherInterface $eventDispatcher = null
+        private EntrypointsLookupCollection $entrypointsLookupCollection,
+        private TagRendererCollection $tagRendererCollection,
+        private bool $useAbsoluteUrl = false,
+        private string $preload = 'link-tag',
+        private ?RequestStack $requestStack = null,
+        private ?EventDispatcherInterface $eventDispatcher = null
     ) {
-        $this->entrypointsLookupCollection = $entrypointsLookupCollection;
-        $this->tagRendererCollection = $tagRendererCollection;
-        $this->useAbsoluteUrl = $useAbsoluteUrl;
-        $this->preload = $preload;
-        $this->requestStack = $requestStack;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     private function getEntrypointsLookup(?string $configName = null): EntrypointsLookup

@@ -10,13 +10,10 @@ use Symfony\Component\WebLink\Link;
 
 class PreloadAssetsEventListener implements EventSubscriberInterface
 {
-    private EntrypointRenderer $entrypointRenderer;
-    private string|bool $crossOriginAttribute;
-
-    public function __construct(EntrypointRenderer $entrypointRenderer, string|bool $crossOriginAttribute)
-    {
-        $this->entrypointRenderer = $entrypointRenderer;
-        $this->crossOriginAttribute = $crossOriginAttribute;
+    public function __construct(
+        private EntrypointRenderer $entrypointRenderer,
+        private string|bool $crossOriginAttribute
+    ) {
     }
 
     public function onKernelResponse(ResponseEvent $event): void

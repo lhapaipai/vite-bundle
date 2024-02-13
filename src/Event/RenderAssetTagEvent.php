@@ -13,13 +13,10 @@ use Pentatrion\ViteBundle\Model\Tag;
  */
 final class RenderAssetTagEvent
 {
-    private bool $build;
-    private Tag $tag;
-
-    public function __construct(bool $build, Tag $tag)
-    {
-        $this->build = $build;
-        $this->tag = $tag;
+    public function __construct(
+        private bool $build,
+        private Tag $tag
+    ) {
     }
 
     public function isBuild(): bool

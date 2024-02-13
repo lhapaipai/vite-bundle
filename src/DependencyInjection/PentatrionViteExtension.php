@@ -20,8 +20,9 @@ class PentatrionViteExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
         $loader->load('services.yaml');
 
+        $configuration = new Configuration();
         $bundleConfig = $this->processConfiguration(
-            $this->getConfiguration($bundleConfigs, $container),
+            $configuration,
             $bundleConfigs
         );
 

@@ -4,11 +4,8 @@ parameters:
 		- "#Method [a-zA-Z0-9\\_\\\\:\\(\\)]+ has parameter \\$[a-zA-Z0-9_]+ with no value type specified in iterable type array#"
 		- "#Method [a-zA-Z0-9\\_\\\\:\\(\\)]+ return type has no value type specified in iterable type array#"
 		- "#Property [a-zA-Z0-9\\$\\_\\\\:\\(\\)]+ type has no value type specified in iterable type array#"
-		-
-		    message: '#^Cannot call method scalarNode\(\) on Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface\|null\.$#'
-		    path: src/DependencyInjection/Configuration.php
-		-
-		    message: '#^Parameter \#1 \$configuration of method Symfony\\Component\\DependencyInjection\\Extension\\Extension\:\:processConfiguration\(\) expects Symfony\\Component\\Config\\Definition\\ConfigurationInterface, Symfony\\Component\\Config\\Definition\\ConfigurationInterface\|null given\.$#'
-		    path: src/DependencyInjection/PentatrionViteExtension.php
 	paths:
 		- src
+
+includes:
+    - vendor/phpstan/phpstan-symfony/extension.neon

@@ -7,6 +7,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class TagRendererCollection
 {
+    /** @var ServiceLocator<TagRenderer> */
     private ServiceLocator $tagRendererLocator;
     private string $defaultConfigName;
 

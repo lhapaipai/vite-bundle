@@ -18,7 +18,7 @@ class FileAccessor
     ];
 
     private array $configs;
-    private ?CacheItemPoolInterface $cache = null;
+    private ?CacheItemPoolInterface $cache;
     private array $content;
     private string $publicPath;
 
@@ -41,6 +41,7 @@ class FileAccessor
 
     public function getData(string $configName, string $fileType): array
     {
+        $cacheItem = null;
         if (!isset($this->content[$configName][$fileType])) {
             if ($this->cache) {
                 $cacheItem = $this->cache->getItem("$configName.$fileType");
@@ -66,7 +67,8 @@ class FileAccessor
                     throw new EntrypointsFileNotFoundException("$fileType not found at $basePath. Did you forget configure your `build_directory` in pentatrion_vite.yml");
                 }
 
-                $content = json_decode(file_get_contents($filePath), true);
+                /** @var array<mixed> $content */
+                $content = json_decode((string) file_get_contents($filePath), true, flags: \JSON_THROW_ON_ERROR);
 
                 if (self::ENTRYPOINTS === $fileType) {
                     $pluginVersion = array_key_exists('version', $content) ? $content['version'] : null;
@@ -79,7 +81,7 @@ class FileAccessor
                     }
                 }
 
-                if (isset($cacheItem)) {
+                if ($this->cache && null !== $cacheItem) {
                     $this->cache->save($cacheItem->set($content));
                 }
 

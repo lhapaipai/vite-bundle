@@ -14,7 +14,7 @@ class EntrypointsLookup
 
     public function __construct(
         FileAccessor $fileAccessor,
-        ?string $configName, // for cache to retrieve content : configName is cache key
+        string $configName, // for cache to retrieve content : configName is cache key
         bool $throwOnMissingEntry = false
     ) {
         $this->fileAccessor = $fileAccessor;

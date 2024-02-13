@@ -105,14 +105,14 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @return string|array
+     * @phpstan-return ($toString is true ? string : array)
      */
     public function renderScripts(
         string $entryName,
         array $options = [],
         ?string $configName = null,
         bool $toString = true
-    ): mixed {
+    ): string|array {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -215,14 +215,14 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @return string|array
+     * @phpstan-return ($toString is true ? string : array)
      */
     public function renderLinks(
         string $entryName,
         array $options = [],
         ?string $configName = null,
         bool $toString = true
-    ): mixed {
+    ): string|array {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -279,9 +279,9 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @return string|array
+     * @phpstan-return ($toString is true ? string : array)
      */
-    public function renderTags(array $tags, bool $isBuild, bool $toString): mixed
+    public function renderTags(array $tags, bool $isBuild, bool $toString): string|array
     {
         if (null !== $this->eventDispatcher) {
             foreach ($tags as $tag) {
@@ -304,6 +304,6 @@ class EntrypointRenderer implements ResetInterface
 
     public static function pascalToKebab(string $str): string
     {
-        return strtolower(preg_replace('/[A-Z]/', '-\\0', lcfirst($str)));
+        return strtolower((string) preg_replace('/[A-Z]/', '-\\0', lcfirst($str)));
     }
 }

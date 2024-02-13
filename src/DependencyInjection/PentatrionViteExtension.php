@@ -135,7 +135,7 @@ class PentatrionViteExtension extends Extension
 
     private function tagRendererFactory(
         ContainerBuilder $container,
-        $defaultAttributes,
+        array $defaultAttributes,
         string $configName,
         array $config
     ): Reference {
@@ -171,7 +171,7 @@ class PentatrionViteExtension extends Extension
         ];
     }
 
-    public static function preparePublicDirectory(string $publicDir)
+    public static function preparePublicDirectory(string $publicDir): string
     {
         $publicDir = '/' !== substr($publicDir, 0, 1) ? '/'.$publicDir : $publicDir;
         $publicDir = rtrim($publicDir, '/');

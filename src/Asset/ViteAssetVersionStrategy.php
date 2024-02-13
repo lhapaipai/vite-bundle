@@ -59,7 +59,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     public function applyVersion(string $path): string
     {
-        return $this->getassetsPath($path) ?: $path;
+        return $this->getAssetPath($path) ?: $path;
     }
 
     private function completeURL(string $path): string
@@ -71,7 +71,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
-    private function getassetsPath(string $path): ?string
+    private function getAssetPath(string $path): ?string
     {
         if (null === $this->viteMode) {
             $this->viteMode = $this->fileAccessor->hasFile($this->configName, FileAccessor::MANIFEST) ? 'build' : 'dev';

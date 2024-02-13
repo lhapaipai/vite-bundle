@@ -31,7 +31,7 @@ class EntrypointsCacheWarmer extends AbstractPhpFileCacheWarmer
                 if ($fileAccessor->hasFile($configName, 'entrypoints')) {
                     $fileAccessor->getData($configName, 'entrypoints');
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // ignore exception
             }
 
@@ -39,7 +39,7 @@ class EntrypointsCacheWarmer extends AbstractPhpFileCacheWarmer
                 if ($fileAccessor->hasFile($configName, 'manifest')) {
                     $fileAccessor->getData($configName, 'manifest');
                 }
-            } catch (\Exception $e) {
+            } catch (\Exception) {
                 // ignore exception
             }
         }

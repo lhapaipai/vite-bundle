@@ -160,8 +160,8 @@ class PentatrionViteExtension extends Extension
     public static function prepareConfig(array $config): array
     {
         $base = $config['build_directory'];
-        $base = '/' !== substr($base, 0, 1) ? '/'.$base : $base;
-        $base = '/' !== substr($base, -1) ? $base.'/' : $base;
+        $base = !str_starts_with($base, '/') ? '/'.$base : $base;
+        $base = !str_ends_with($base, '/') ? $base.'/' : $base;
 
         return [
             'base' => $base,
@@ -173,9 +173,6 @@ class PentatrionViteExtension extends Extension
 
     public static function preparePublicDirectory(string $publicDir): string
     {
-        $publicDir = '/' !== substr($publicDir, 0, 1) ? '/'.$publicDir : $publicDir;
-        $publicDir = rtrim($publicDir, '/');
-
-        return $publicDir;
+        return '/' . trim($publicDir, '/');
     }
 }

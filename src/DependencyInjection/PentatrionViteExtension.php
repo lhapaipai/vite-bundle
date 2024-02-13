@@ -159,9 +159,7 @@ class PentatrionViteExtension extends Extension
 
     public static function prepareConfig(array $config): array
     {
-        $base = $config['build_directory'];
-        $base = !str_starts_with($base, '/') ? '/'.$base : $base;
-        $base = !str_ends_with($base, '/') ? $base.'/' : $base;
+        $base = '/' . trim($config['build_directory'], '/') . '/';
 
         return [
             'base' => $base,

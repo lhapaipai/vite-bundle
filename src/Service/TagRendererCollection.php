@@ -11,6 +11,9 @@ class TagRendererCollection
     private ServiceLocator $tagRendererLocator;
     private string $defaultConfigName;
 
+    /**
+     * @param ServiceLocator<TagRenderer> $tagRendererLocator
+     */
     public function __construct(
         ServiceLocator $tagRendererLocator,
         string $defaultConfigName

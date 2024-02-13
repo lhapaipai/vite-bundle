@@ -27,7 +27,7 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        if (null === $linkProvider = $request->attributes->get('_links')) {
+        if (!$request->attributes->has('_links')) {
             $request->attributes->set(
                 '_links',
                 new GenericLinkProvider()

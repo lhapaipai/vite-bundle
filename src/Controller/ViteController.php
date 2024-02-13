@@ -10,19 +10,16 @@ class ViteController
 {
     private HttpClientInterface $httpClient;
     private string $defaultConfig;
-    private array $configs;
     private EntrypointsLookupCollection $entrypointsLookupCollection;
     private ?string $proxyOrigin;
 
     public function __construct(
         string $defaultConfig,
-        array $configs,
         HttpClientInterface $httpClient,
         EntrypointsLookupCollection $entrypointsLookupCollection,
         ?string $proxyOrigin
     ) {
         $this->defaultConfig = $defaultConfig;
-        $this->configs = $configs;
         $this->httpClient = $httpClient;
 
         $this->entrypointsLookupCollection = $entrypointsLookupCollection;

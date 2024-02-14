@@ -7,7 +7,7 @@ services:
 
     pentatrion_vite.entrypoint_renderer:
         class: Pentatrion\ViteBundle\Service\EntrypointRenderer
-        tags: 
+        tags:
             - { name: "kernel.reset", method: reset }
         arguments:
             - "@pentatrion_vite.entrypoints_lookup_collection"
@@ -32,6 +32,22 @@ services:
         arguments:
             - "@pentatrion_vite.entrypoint_renderer"
 
+    Pentatrion\ViteBundle\DataCollector\ViteCollector:
+        tags:
+            - { name: "data_collector", id: pentatrion_vite.vite_collector }
+        arguments:
+            - "@pentatrion_vite.entrypoint_renderer"
+
+    Pentatrion\ViteBundle\Service\Debug:
+        alias: pentatrion_vite.debug
+
+    pentatrion_vite.debug:
+        class: Pentatrion\ViteBundle\Service\Debug
+        arguments:
+            - "%pentatrion_vite.configs%"
+            - "@http_client"
+            - "@pentatrion_vite.entrypoints_lookup_collection"
+
     Pentatrion\ViteBundle\Controller\ViteController:
         tags: ["controller.service_arguments"]
         arguments:
@@ -41,6 +57,12 @@ services:
             - "@pentatrion_vite.entrypoints_lookup_collection"
             - "%pentatrion_vite.proxy_origin%"
 
+    Pentatrion\ViteBundle\Controller\ProfilerController:
+        tags: ["controller.service_arguments"]
+        arguments:
+            - "@pentatrion_vite.debug"
+            - "@twig"
+
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
         arguments:
             - "@pentatrion_vite.file_accessor"
@@ -49,7 +71,6 @@ services:
             - "%pentatrion_vite.absolute_url%"
             - "@?request_stack"
             - true
-
 
     pentatrion_vite.preload_assets_event_listener:
         class: Pentatrion\ViteBundle\EventListener\PreloadAssetsEventListener
@@ -69,16 +90,16 @@ services:
         class: Symfony\Component\Cache\Adapter\PhpArrayAdapter
         factory: [Symfony\Component\Cache\Adapter\PhpArrayAdapter, create]
         arguments:
-            - '%kernel.cache_dir%/pentatrion_vite.cache.php'
-            - '@cache.pentatrion_vite_fallback'
+            - "%kernel.cache_dir%/pentatrion_vite.cache.php"
+            - "@cache.pentatrion_vite_fallback"
 
     pentatrion_vite.cache_warmer:
-        class:  Pentatrion\ViteBundle\CacheWarmer\EntrypointsCacheWarmer
+        class: Pentatrion\ViteBundle\CacheWarmer\EntrypointsCacheWarmer
         tags: ["kernel.cache_warmer"]
         arguments:
             - "%kernel.project_dir%%pentatrion_vite.public_directory%"
             - "%pentatrion_vite.configs%"
-            - '%kernel.cache_dir%/pentatrion_vite.cache.php'
+            - "%kernel.cache_dir%/pentatrion_vite.cache.php"
 
     cache.pentatrion_vite_fallback:
         tags: ["cache.pool"]

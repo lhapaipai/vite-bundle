@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="lang">
+  <head>
+    <meta charset="charset">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:;base64,iBORw0KGgo=">
+
+    <title>Document</title>
+
+    <style type="text/css">
+      body
+      {
+        background-color: #fff;
+        color: #222;
+        font-family: sans-serif;
+      }
+
+      pre
+      {
+        margin: 0;
+        font-family: monospace;
+      }
+
+      a:hover
+      {
+        text-decoration: underline;
+      }
+
+      table
+      {
+        border-collapse: collapse;
+        border: 0;
+        width: 934px;
+        box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .center
+      {
+        text-align: center;
+      }
+
+      .center table
+      {
+        margin: 1em auto;
+        text-align: left;
+      }
+
+      .center th
+      {
+        text-align: center !important;
+      }
+
+      td,
+      th
+      {
+        border: 1px solid #666;
+        font-size: 75%;
+        vertical-align: baseline;
+        padding: 4px 5px;
+      }
+
+      th
+      {
+        position: sticky;
+        top: 0;
+        background: inherit;
+      }
+
+      h1
+      {
+        font-size: 150%;
+      }
+
+      h2
+      {
+        font-size: 125%;
+      }
+
+      h2 a:link,
+      h2 a:visited
+      {
+        color: inherit;
+        background: inherit;
+      }
+
+      .p
+      {
+        text-align: left;
+      }
+
+      .key
+      {
+        background-color: #ccf;
+        width: 300px;
+        font-weight: bold;
+      }
+
+      thead tr
+      {
+        background-color: #99c;
+        font-weight: bold;
+      }
+
+      .value
+      {
+        background-color: #ddd;
+        max-width: 300px;
+        overflow-x: auto;
+        word-wrap: break-word;
+      }
+      .value i
+      {
+        color: #999;
+      }
+      .value ul
+      {
+        margin: 0;
+        padding-left: 1rem;
+      }
+
+      img
+      {
+        float: right;
+        border: 0;
+      }
+
+      hr
+      {
+        width: 934px;
+        background-color: #ccc;
+        border: 0;
+        height: 1px;
+      }
+
+      :root
+      {
+        --php-dark-grey: #333;
+        --php-dark-blue: #4F5B93;
+        --php-medium-blue: #8892BF;
+        --php-light-blue: #E2E4EF;
+        --php-accent-purple: #793862
+      }
+
+      @media(prefers-color-scheme: dark)
+      {
+        body
+        {
+          background: var(--php-dark-grey);
+          color: var(--php-light-blue)
+        }
+
+        .h td,
+        td.e,
+        th
+        {
+          border-color: #606A90
+        }
+
+        td
+        {
+          border-color: #505153
+        }
+
+        .key
+        {
+          background-color: #404A77
+        }
+
+        thead tr
+        {
+          background-color: var(--php-dark-blue)
+        }
+
+        .value
+        {
+          background-color: var(--php-dark-grey)
+        }
+
+        hr
+        {
+          background-color: #505153
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="center">
+      <a href="https://vitejs.dev">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="128" height="128" preserveaspectratio="xMidYMid meet" viewbox="0 0 256 256">
+          <defs>
+            <linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%">
+              <stop offset="0%" stop-color="#41D1FF"></stop>
+              <stop offset="100%" stop-color="#BD34FE"></stop>
+            </linearGradient>
+            <linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%">
+              <stop offset="0%" stop-color="#FFEA83"></stop>
+              <stop offset="8.333%" stop-color="#FFDD35"></stop>
+              <stop offset="100%" stop-color="#FFA800"></stop>
+            </linearGradient>
+          </defs>
+          <path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path>
+          <path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path>
+        </svg>
+      </a>
+
+      {% for viteConfig in viteConfigs %}
+        <h2>{{ viteConfig.configName }}</h2>
+
+        {% for groupKey, groupValues in viteConfig.content %}
+          <table>
+            <thead>
+              <tr>
+                <th colspan="2">{{ groupKey }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for key, value in groupValues %}
+                <tr>
+                  <td class="key">{{ key }}</td>
+                  <td class="value">{{ value | stringify }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endfor %}
+
+        <hr/>
+      {% endfor %}
+
+    </div>
+
+  </body>
+</html>

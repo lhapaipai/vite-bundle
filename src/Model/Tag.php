@@ -7,9 +7,12 @@ class Tag
     public const SCRIPT_TAG = 'script';
     public const LINK_TAG = 'link';
 
+    /**
+     * @param array<string, bool|string> $attributes
+     */
     public function __construct(
         private string $tagName,
-        private array $attributes,
+        private array $attributes = [],
         private string $content = '',
         private bool $internal = false
     ) {
@@ -44,11 +47,17 @@ class Tag
             && 'modulepreload' === $this->attributes['rel'];
     }
 
+    /**
+     * @return array<string, bool|string|null>
+     */
     public function getAttributes(): array
     {
         return $this->attributes;
     }
 
+    /**
+     * @return bool|string|null
+     */
     public function getAttribute(string $key): mixed
     {
         return key_exists($key, $this->attributes) ? $this->attributes[$key] : null;

@@ -9,6 +9,9 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class EntrypointsCacheWarmer extends AbstractPhpFileCacheWarmer
 {
+    /**
+     * @param array<string, array<mixed>> $configs
+     */
     public function __construct(
         private string $publicPath,
         private array $configs,

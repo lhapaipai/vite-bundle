@@ -6,6 +6,7 @@ use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
 
 class EntrypointsLookup
 {
+    /** @var array<mixed>|null */
     private ?array $fileContent = null;
 
     public function __construct(
@@ -21,6 +22,9 @@ class EntrypointsLookup
         return $this->fileAccessor->hasFile($this->configName, 'entrypoints');
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function getFileContent(): array
     {
         if (is_null($this->fileContent)) {
@@ -70,6 +74,9 @@ class EntrypointsLookup
         return $this->getFileContent()['base'];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getJSFiles(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -77,6 +84,9 @@ class EntrypointsLookup
         return $this->getFileContent()['entryPoints'][$entryName]['js'] ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getCSSFiles(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -84,6 +94,9 @@ class EntrypointsLookup
         return $this->getFileContent()['entryPoints'][$entryName]['css'] ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getJavascriptDependencies(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -91,6 +104,9 @@ class EntrypointsLookup
         return $this->getFileContent()['entryPoints'][$entryName]['preload'] ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getJavascriptDynamicDependencies(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);

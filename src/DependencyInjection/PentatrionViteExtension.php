@@ -134,6 +134,10 @@ class PentatrionViteExtension extends Extension
         return new Reference($id);
     }
 
+    /**
+     * @param array<string, bool|string|null> $defaultAttributes
+     * @param array<string, mixed>            $config
+     */
     private function tagRendererFactory(
         ContainerBuilder $container,
         array $defaultAttributes,
@@ -158,6 +162,11 @@ class PentatrionViteExtension extends Extension
         return sprintf('pentatrion_vite.%s[%s]', $prefix, $configName);
     }
 
+    /**
+     * @param array<string, mixed> $config
+     *
+     * @return array<string, mixed>
+     */
     public static function prepareConfig(array $config): array
     {
         $base = '/'.trim($config['build_directory'], '/').'/';

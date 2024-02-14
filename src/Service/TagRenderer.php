@@ -7,6 +7,12 @@ use Pentatrion\ViteBundle\Util\InlineContent;
 
 class TagRenderer
 {
+    /**
+     * @param array<string, bool|string|null> $globalDefaultAttributes
+     * @param array<string, bool|string|null> $globalScriptAttributes
+     * @param array<string, bool|string|null> $globalLinkAttributes
+     * @param array<string, bool|string|null> $globalPreloadAttributes
+     */
     public function __construct(
         private array $globalDefaultAttributes = [],
         private array $globalScriptAttributes = [],
@@ -57,6 +63,7 @@ class TagRenderer
         );
     }
 
+    /** @param array<string, bool|string|null> $attributes */
     public function createInternalScriptTag(array $attributes = [], string $content = ''): Tag
     {
         $tag = new Tag(
@@ -69,6 +76,7 @@ class TagRenderer
         return $tag;
     }
 
+    /** @param array<string, bool|string|null> $attributes */
     public function createScriptTag(array $attributes = [], string $content = ''): Tag
     {
         $tag = new Tag(
@@ -84,6 +92,7 @@ class TagRenderer
         return $tag;
     }
 
+    /** @param array<string, bool|string|null> $extraAttributes */
     public function createLinkStylesheetTag(string $fileName, array $extraAttributes = []): Tag
     {
         $attributes = [
@@ -104,6 +113,7 @@ class TagRenderer
         return $tag;
     }
 
+    /** @param array<string, bool|string|null> $extraAttributes */
     public function createModulePreloadLinkTag(string $fileName, array $extraAttributes = []): Tag
     {
         $attributes = [
@@ -139,6 +149,7 @@ class TagRenderer
         );
     }
 
+    /** @param array<string, bool|string|null> $attributes */
     private static function convertArrayToAttributes(array $attributes): string
     {
         $nonNullAttributes = array_filter(

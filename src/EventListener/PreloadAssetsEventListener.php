@@ -44,10 +44,12 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
             $linkProvider = $linkProvider->withLink($link);
         }
 
-        foreach ($this->entrypointRenderer->getRenderedStyles() as $href) {
-            $link = $this->createLink('preload', $href)->withAttribute('as', 'style');
-
-            $linkProvider = $linkProvider->withLink($link);
+        foreach ($this->entrypointRenderer->getRenderedStyles() as $filePath => $tag) {
+            $href = $tag->getAttribute('href');
+            if (is_string($href)) {
+                $link = $this->createLink('preload', $href)->withAttribute('as', 'style');
+                $linkProvider = $linkProvider->withLink($link);
+            }
         }
 
         $request->attributes->set('_links', $linkProvider);

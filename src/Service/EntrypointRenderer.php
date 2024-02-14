@@ -11,10 +11,16 @@ use Symfony\Contracts\Service\ResetInterface;
 
 class EntrypointRenderer implements ResetInterface
 {
+    /** @var array<string, bool> */
     private array $returnedViteClients = [];
+
+    /** @var array<string, bool> */
     private array $returnedReactRefresh = [];
+
+    /** @var array<string, bool> */
     private array $returnedViteLegacyScripts = [];
 
+    /** @var array<'scripts'|'styles', array<string, Tag>> */
     private array $renderedFiles = [
         'scripts' => [],
         'styles' => [],
@@ -86,6 +92,9 @@ class EntrypointRenderer implements ResetInterface
         return $this->renderedFiles['scripts'];
     }
 
+    /**
+     * @return array<string, Tag>
+     */
     public function getRenderedStyles(): array
     {
         return $this->renderedFiles['styles'];
@@ -223,12 +232,15 @@ class EntrypointRenderer implements ResetInterface
         $tags = [];
 
         foreach ($entrypointsLookup->getCSSFiles($entryName) as $filePath) {
-            if (false === \in_array($filePath, $this->renderedFiles['styles'], true)) {
-                $tags[] = $tagRenderer->createLinkStylesheetTag(
+            if (!isset($this->renderedFiles['styles'][$filePath])) {
+                $tag = $tagRenderer->createLinkStylesheetTag(
                     $this->completeURL($filePath, $useAbsoluteUrl),
                     array_merge(['integrity' => $entrypointsLookup->getFileHash($filePath)], $options['attr'] ?? [])
                 );
-                $this->renderedFiles['styles'][] = $filePath;
+
+                $tags[] = $tag;
+
+                $this->renderedFiles['styles'][$filePath] = $tag;
             }
         }
 

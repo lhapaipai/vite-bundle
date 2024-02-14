@@ -17,8 +17,10 @@ class FileAccessor
         self::MANIFEST => 'manifest.json',
     ];
 
+    /** @var array<string, array<key-of<FileAccessor::FILES>,array<mixed>>> */
     private array $content;
 
+    /** @param array<string, array<mixed>> $configs */
     public function __construct(
         private string $publicPath,
         private array $configs,
@@ -33,6 +35,11 @@ class FileAccessor
         return file_exists($basePath.'.vite/'.self::FILES[$fileType]) || file_exists($basePath.self::FILES[$fileType]);
     }
 
+    /**
+     * @param key-of<FileAccessor::FILES> $fileType
+     *
+     * @return array<mixed>
+     */
     public function getData(string $configName, string $fileType): array
     {
         $cacheItem = null;
@@ -41,7 +48,9 @@ class FileAccessor
                 $cacheItem = $this->cache->getItem("$configName.$fileType");
 
                 if ($cacheItem->isHit()) {
-                    $this->content[$configName][$fileType] = $cacheItem->get();
+                    /** @var array<mixed> $data */
+                    $data = $cacheItem->get();
+                    $this->content[$configName][$fileType] = $data;
                 }
             }
 

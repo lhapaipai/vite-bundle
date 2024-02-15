@@ -47,7 +47,7 @@ class FileAccessor
         self::MANIFEST => 'manifest.json',
     ];
 
-    /** @var array<string, array<string, mixed>> */
+    /** @var array<string, array<string, EntryPointsFile|ManifestFile>> */
     private array $content;
 
     /** @param array<string, array<mixed>> $configs */
@@ -78,7 +78,7 @@ class FileAccessor
                 $cacheItem = $this->cache->getItem("$configName.$fileType");
 
                 if ($cacheItem->isHit()) {
-                    /** @var array<mixed> $data */
+                    /** @var EntryPointsFile|ManifestFile $data */
                     $data = $cacheItem->get();
                     $this->content[$configName][$fileType] = $data;
                 }
@@ -100,16 +100,14 @@ class FileAccessor
                     throw new EntrypointsFileNotFoundException("$fileType not found at $basePath. Did you forget configure your `build_directory` in pentatrion_vite.yml");
                 }
 
-                /** @var array<mixed> $content */
+                /** @var EntryPointsFile|ManifestFile $content */
                 $content = json_decode((string) file_get_contents($filePath), true, flags: \JSON_THROW_ON_ERROR);
 
                 if (self::ENTRYPOINTS === $fileType) {
-                    $pluginVersion = array_key_exists('version', $content) ? $content['version'] : null;
-                    if (
-                        is_null($pluginVersion)
-                        // VERSION[1] => Major version number
-                        || PentatrionViteBundle::VERSION[1] !== $pluginVersion[1]
-                    ) {
+                    /** @var EntryPointsFile $content */
+                    $pluginVersion = $content['version'];
+                    // VERSION[1] => Major version number
+                    if (PentatrionViteBundle::VERSION[1] !== $pluginVersion[1]) {
                         throw new VersionMismatchException('your vite-plugin-symfony is outdated, run : npm install vite-plugin-symfony@^'.PentatrionViteBundle::VERSION[1]);
                     }
                 }

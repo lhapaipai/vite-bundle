@@ -2,18 +2,29 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Pentatrion\ViteBundle\DependencyInjection\PentatrionViteExtension;
 use Pentatrion\ViteBundle\Service\FileAccessor;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @phpstan-import-type EntryPointsFile from FileAccessor
+ * @phpstan-import-type ManifestFile from FileAccessor
+ * @phpstan-import-type ViteConfigs from PentatrionViteExtension
+ */
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
     private ?string $viteMode = null;
     private string $basePath;
+    /** @var ManifestFile|null */
     private ?array $manifestData = null;
-    private array $entrypointsData = [];
+    /** @var EntryPointsFile */
+    private array $entrypointsData;
 
+    /**
+     * @param ViteConfigs $configs
+     */
     public function __construct(
         private FileAccessor $fileAccessor,
         private array $configs,
@@ -87,6 +98,11 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return null;
     }
 
+    /**
+     * @param ManifestFile|null $manifestData
+     *
+     * @return array<string>
+     */
     private function findAlternatives(string $path, ?array $manifestData): array
     {
         $path = strtolower($path);

@@ -7,6 +7,36 @@ use Pentatrion\ViteBundle\Exception\VersionMismatchException;
 use Pentatrion\ViteBundle\PentatrionViteBundle;
 use Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * @phpstan-type EntryPoint array{
+ *  assets?: array<string>,
+ *  js?: array<string>,
+ *  css?: array<string>,
+ *  preload?: array<string>,
+ *  dynamic?: array<string>,
+ *  legacy: false|string,
+ * }
+ * @phpstan-type FileMetadatas array{
+ *  hash: string|null
+ * }
+ * @phpstan-type EntryPointsFile array{
+ *  base: string,
+ *  entryPoints: array<string, EntryPoint>,
+ *  legacy: bool,
+ *  metadatas: array<string, FileMetadatas>,
+ *  version: array{0: string, 1: int, 2: int, 3: int},
+ *  viteServer: string|null
+ * }
+ * @phpstan-type ManifestEntry array{
+ *  file: string,
+ *  src?: string,
+ *  isDynamicEntry?: bool,
+ *  isEntry?: bool,
+ *  imports?: array<string>,
+ *  css?: array<string>
+ * }
+ * @phpstan-type ManifestFile array<string, ManifestEntry>
+ */
 class FileAccessor
 {
     public const ENTRYPOINTS = 'entrypoints';
@@ -17,7 +47,7 @@ class FileAccessor
         self::MANIFEST => 'manifest.json',
     ];
 
-    /** @var array<string, array<key-of<FileAccessor::FILES>,array<mixed>>> */
+    /** @var array<string, array<string, mixed>> */
     private array $content;
 
     /** @param array<string, array<mixed>> $configs */
@@ -38,7 +68,7 @@ class FileAccessor
     /**
      * @param key-of<FileAccessor::FILES> $fileType
      *
-     * @return array<mixed>
+     * @phpstan-return ($fileType is 'entrypoints' ? EntryPointsFile : ManifestFile)
      */
     public function getData(string $configName, string $fileType): array
     {

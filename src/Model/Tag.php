@@ -8,7 +8,7 @@ class Tag
     public const LINK_TAG = 'link';
 
     /**
-     * @param array<string, bool|string> $attributes
+     * @param array<string, bool|string|null> $attributes
      */
     public function __construct(
         private string $tagName,

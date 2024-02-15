@@ -4,11 +4,16 @@ namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use Pentatrion\ViteBundle\Model\Tag;
+use Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension;
 use Pentatrion\ViteBundle\Util\InlineContent;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
+/**
+ * @phpstan-import-type ViteEntryScriptTagsOptions from EntryFilesTwigExtension
+ * @phpstan-import-type ViteEntryLinkTagsOptions from EntryFilesTwigExtension
+ */
 class EntrypointRenderer implements ResetInterface
 {
     /** @var array<string, bool> */
@@ -55,6 +60,9 @@ class EntrypointRenderer implements ResetInterface
         return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
+    /**
+     * @param ViteEntryScriptTagsOptions|ViteEntryLinkTagsOptions $options
+     */
     private function shouldUseAbsoluteURL(array $options, ?string $configName = null): bool
     {
         $viteServer = $this->getEntrypointsLookup($configName)->getViteServer();
@@ -101,7 +109,9 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @phpstan-return ($toString is true ? string : array)
+     * @param ViteEntryScriptTagsOptions $options
+     *
+     * @phpstan-return ($toString is true ? string : array<Tag>)
      */
     public function renderScripts(
         string $entryName,
@@ -211,7 +221,9 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @phpstan-return ($toString is true ? string : array)
+     * @param ViteEntryLinkTagsOptions $options
+     *
+     * @phpstan-return ($toString is true ? string : array<Tag>)
      */
     public function renderLinks(
         string $entryName,
@@ -278,7 +290,9 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @phpstan-return ($toString is true ? string : array)
+     * @param array<Tag> $tags
+     *
+     * @phpstan-return ($toString is true ? string : array<Tag>)
      */
     public function renderTags(array $tags, bool $isBuild, bool $toString): string|array
     {

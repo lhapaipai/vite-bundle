@@ -4,9 +4,12 @@ namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
 
+/**
+ * @phpstan-import-type EntryPointsFile from FileAccessor
+ */
 class EntrypointsLookup
 {
-    /** @var array<mixed>|null */
+    /** @var EntryPointsFile|null */
     private ?array $fileContent = null;
 
     public function __construct(
@@ -23,7 +26,7 @@ class EntrypointsLookup
     }
 
     /**
-     * @return array<mixed>
+     * @phpstan-return EntryPointsFile
      */
     private function getFileContent(): array
     {
@@ -45,6 +48,7 @@ class EntrypointsLookup
     {
         $infos = $this->getFileContent();
 
+        /* @phpstan-ignore-next-line always evaluate to false but can be possible with legacy vite-plugin-symfony versions */
         if (is_null($infos['metadatas']) || !array_key_exists($filePath, $infos['metadatas'])) {
             return null;
         }
@@ -131,7 +135,17 @@ class EntrypointsLookup
 
         $legacyEntryName = $entryInfos['entryPoints'][$entryName]['legacy'];
 
-        return $entryInfos['entryPoints'][$legacyEntryName]['js'][0];
+        if (!is_string($legacyEntryName)) {
+            throw new \Exception("Entrypoint doesn't have legacy entrypoint");
+        }
+
+        $legacyEntry = $entryInfos['entryPoints'][$legacyEntryName];
+
+        if (!isset($legacyEntry['js'][0])) {
+            throw new \Exception("Entrypoint legacy doesn't have js script");
+        }
+
+        return $legacyEntry['js'][0];
     }
 
     private function throwIfEntrypointIsMissing(string $entryName): void

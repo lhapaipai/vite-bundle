@@ -13,6 +13,38 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
+/**
+ * @phpstan-type BundleConfig array{
+ *  public_directory: string,
+ *  build_directory: string,
+ *  proxy_origin: null|string,
+ *  absolute_url: bool,
+ *  throw_on_missing_entry: bool,
+ *  cache: bool,
+ *  preload: "none"|"link-tag"|"link-header",
+ *  crossorigin: false|"anonymous"|"use-credentials",
+ *  script_attributes: array<string, bool|string|null>,
+ *  link_attributes: array<string, bool|string|null>,
+ *  preload_attributes: array<string, bool|string|null>,
+ *  default_config: null|string,
+ *  configs: array<string, ExtraConfig>,
+ *  default_build: null|string,
+ *  builds: array<string, ExtraConfig>
+ * }
+ * @phpstan-type ExtraConfig array{
+ *  build_directory: string,
+ *  script_attributes: array<string, bool|string|null>,
+ *  link_attributes: array<string, bool|string|null>,
+ *  preload_attributes: array<string, bool|string|null>
+ * }
+ * @phpstan-type ResolvedConfig array{
+ *  base: string,
+ *  script_attributes: array<string, bool|string|null>,
+ *  link_attributes: array<string, bool|string|null>,
+ *  preload_attributes: array<string, bool|string|null>
+ * }
+ * @phpstan-type ViteConfigs array<string, ResolvedConfig>
+ */
 class PentatrionViteExtension extends Extension
 {
     public function load(array $bundleConfigs, ContainerBuilder $container): void
@@ -21,11 +53,13 @@ class PentatrionViteExtension extends Extension
         $loader->load('services.yaml');
 
         $configuration = new Configuration();
+        /** @var BundleConfig $bundleConfig */
         $bundleConfig = $this->processConfiguration(
             $configuration,
             $bundleConfigs
         );
 
+        /* @phpstan-ignore-next-line can be possible with deprecations */
         if (isset($bundleConfig['builds']) && !isset($bundleConfig['configs'])) {
             $bundleConfig['configs'] = $bundleConfig['builds'];
         }
@@ -54,6 +88,7 @@ class PentatrionViteExtension extends Extension
             $defaultConfigName = $bundleConfig['default_config'];
             $lookupFactories = [];
             $tagRendererFactories = [];
+            /** @var array<string, ResolvedConfig> $configs */
             $configs = [];
 
             foreach ($bundleConfig['configs'] as $configName => $config) {
@@ -136,7 +171,7 @@ class PentatrionViteExtension extends Extension
 
     /**
      * @param array<string, bool|string|null> $defaultAttributes
-     * @param array<string, mixed>            $config
+     * @param ResolvedConfig                  $config
      */
     private function tagRendererFactory(
         ContainerBuilder $container,
@@ -163,9 +198,9 @@ class PentatrionViteExtension extends Extension
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param BundleConfig|ExtraConfig $config
      *
-     * @return array<string, mixed>
+     * @return ResolvedConfig
      */
     public static function prepareConfig(array $config): array
     {

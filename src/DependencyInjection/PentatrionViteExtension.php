@@ -13,6 +13,38 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
+/**
+ * @phpstan-type BundleConfig array{
+ *  public_directory: string,
+ *  build_directory: string,
+ *  proxy_origin: null|string,
+ *  absolute_url: bool,
+ *  throw_on_missing_entry: bool,
+ *  cache: bool,
+ *  preload: "none"|"link-tag"|"link-header",
+ *  crossorigin: false|"anonymous"|"use-credentials",
+ *  script_attributes: array<string, bool|string|null>,
+ *  link_attributes: array<string, bool|string|null>,
+ *  preload_attributes: array<string, bool|string|null>,
+ *  default_config: null|string,
+ *  configs: array<string, ExtraConfig>,
+ *  default_build: null|string,
+ *  builds: array<string, ExtraConfig>
+ * }
+ * @phpstan-type ExtraConfig array{
+ *  build_directory: string,
+ *  script_attributes: array<string, bool|string|null>,
+ *  link_attributes: array<string, bool|string|null>,
+ *  preload_attributes: array<string, bool|string|null>
+ * }
+ * @phpstan-type ResolvedConfig array{
+ *  base: string,
+ *  script_attributes: array<string, bool|string|null>,
+ *  link_attributes: array<string, bool|string|null>,
+ *  preload_attributes: array<string, bool|string|null>
+ * }
+ * @phpstan-type ViteConfigs array<string, ResolvedConfig>
+ */
 class PentatrionViteExtension extends Extension
 {
     public function load(array $bundleConfigs, ContainerBuilder $container): void
@@ -20,11 +52,14 @@ class PentatrionViteExtension extends Extension
         $loader = new YamlFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));
         $loader->load('services.yaml');
 
+        $configuration = new Configuration();
+        /** @var BundleConfig $bundleConfig */
         $bundleConfig = $this->processConfiguration(
-            $this->getConfiguration($bundleConfigs, $container),
+            $configuration,
             $bundleConfigs
         );
 
+        /* @phpstan-ignore-next-line can be possible with deprecations */
         if (isset($bundleConfig['builds']) && !isset($bundleConfig['configs'])) {
             $bundleConfig['configs'] = $bundleConfig['builds'];
         }
@@ -53,6 +88,7 @@ class PentatrionViteExtension extends Extension
             $defaultConfigName = $bundleConfig['default_config'];
             $lookupFactories = [];
             $tagRendererFactories = [];
+            /** @var array<string, ResolvedConfig> $configs */
             $configs = [];
 
             foreach ($bundleConfig['configs'] as $configName => $config) {
@@ -133,9 +169,13 @@ class PentatrionViteExtension extends Extension
         return new Reference($id);
     }
 
+    /**
+     * @param array<string, bool|string|null> $defaultAttributes
+     * @param ResolvedConfig                  $config
+     */
     private function tagRendererFactory(
         ContainerBuilder $container,
-        $defaultAttributes,
+        array $defaultAttributes,
         string $configName,
         array $config
     ): Reference {
@@ -157,11 +197,14 @@ class PentatrionViteExtension extends Extension
         return sprintf('pentatrion_vite.%s[%s]', $prefix, $configName);
     }
 
+    /**
+     * @param BundleConfig|ExtraConfig $config
+     *
+     * @return ResolvedConfig
+     */
     public static function prepareConfig(array $config): array
     {
-        $base = $config['build_directory'];
-        $base = '/' !== substr($base, 0, 1) ? '/'.$base : $base;
-        $base = '/' !== substr($base, -1) ? $base.'/' : $base;
+        $base = '/'.trim($config['build_directory'], '/').'/';
 
         return [
             'base' => $base,
@@ -171,11 +214,8 @@ class PentatrionViteExtension extends Extension
         ];
     }
 
-    public static function preparePublicDirectory(string $publicDir)
+    public static function preparePublicDirectory(string $publicDir): string
     {
-        $publicDir = '/' !== substr($publicDir, 0, 1) ? '/'.$publicDir : $publicDir;
-        $publicDir = rtrim($publicDir, '/');
-
-        return $publicDir;
+        return '/'.trim($publicDir, '/');
     }
 }

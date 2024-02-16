@@ -52,7 +52,6 @@ services:
         tags: ["controller.service_arguments"]
         arguments:
             - "%pentatrion_vite.default_config%"
-            - "%pentatrion_vite.configs%"
             - "@http_client"
             - "@pentatrion_vite.entrypoints_lookup_collection"
             - "%pentatrion_vite.proxy_origin%"

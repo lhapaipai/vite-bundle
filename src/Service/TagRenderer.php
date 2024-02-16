@@ -7,21 +7,18 @@ use Pentatrion\ViteBundle\Util\InlineContent;
 
 class TagRenderer
 {
-    private array $globalDefaultAttributes;
-    private array $globalScriptAttributes;
-    private array $globalLinkAttributes;
-    private array $globalPreloadAttributes;
-
+    /**
+     * @param array<string, bool|string|null> $globalDefaultAttributes
+     * @param array<string, bool|string|null> $globalScriptAttributes
+     * @param array<string, bool|string|null> $globalLinkAttributes
+     * @param array<string, bool|string|null> $globalPreloadAttributes
+     */
     public function __construct(
-        array $defaultAttributes = [],
-        array $scriptAttributes = [],
-        array $linkAttributes = [],
-        array $preloadAttributes = []
+        private array $globalDefaultAttributes = [],
+        private array $globalScriptAttributes = [],
+        private array $globalLinkAttributes = [],
+        private array $globalPreloadAttributes = []
     ) {
-        $this->globalDefaultAttributes = $defaultAttributes;
-        $this->globalScriptAttributes = $scriptAttributes;
-        $this->globalLinkAttributes = $linkAttributes;
-        $this->globalPreloadAttributes = $preloadAttributes;
     }
 
     public function createViteClientScript(string $src): Tag
@@ -66,6 +63,7 @@ class TagRenderer
         );
     }
 
+    /** @param array<string, bool|string|null> $attributes */
     public function createInternalScriptTag(array $attributes = [], string $content = ''): Tag
     {
         $tag = new Tag(
@@ -78,6 +76,7 @@ class TagRenderer
         return $tag;
     }
 
+    /** @param array<string, bool|string|null> $attributes */
     public function createScriptTag(array $attributes = [], string $content = ''): Tag
     {
         $tag = new Tag(
@@ -93,6 +92,7 @@ class TagRenderer
         return $tag;
     }
 
+    /** @param array<string, bool|string|null> $extraAttributes */
     public function createLinkStylesheetTag(string $fileName, array $extraAttributes = []): Tag
     {
         $attributes = [
@@ -113,6 +113,7 @@ class TagRenderer
         return $tag;
     }
 
+    /** @param array<string, bool|string|null> $extraAttributes */
     public function createModulePreloadLinkTag(string $fileName, array $extraAttributes = []): Tag
     {
         $attributes = [
@@ -148,6 +149,7 @@ class TagRenderer
         );
     }
 
+    /** @param array<string, bool|string|null> $attributes */
     private static function convertArrayToAttributes(array $attributes): string
     {
         $nonNullAttributes = array_filter(

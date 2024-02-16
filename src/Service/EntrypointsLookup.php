@@ -4,22 +4,20 @@ namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Exception\EntrypointNotFoundException;
 
+/**
+ * @phpstan-import-type EntryPointsFile from FileAccessor
+ */
 class EntrypointsLookup
 {
-    private string $configName;
-    private bool $throwOnMissingEntry;
-    private FileAccessor $fileAccessor;
-
+    /** @var EntryPointsFile|null */
     private ?array $fileContent = null;
 
     public function __construct(
-        FileAccessor $fileAccessor,
-        ?string $configName, // for cache to retrieve content : configName is cache key
-        bool $throwOnMissingEntry = false
+        private FileAccessor $fileAccessor,
+        private string $configName,
+        // for cache to retrieve content : configName is cache key
+        private bool $throwOnMissingEntry = false
     ) {
-        $this->fileAccessor = $fileAccessor;
-        $this->configName = $configName;
-        $this->throwOnMissingEntry = $throwOnMissingEntry;
     }
 
     public function hasFile(): bool
@@ -27,6 +25,9 @@ class EntrypointsLookup
         return $this->fileAccessor->hasFile($this->configName, 'entrypoints');
     }
 
+    /**
+     * @phpstan-return EntryPointsFile
+     */
     private function getFileContent(): array
     {
         if (is_null($this->fileContent)) {
@@ -43,15 +44,11 @@ class EntrypointsLookup
         return $this->fileContent;
     }
 
-    public function setFileContent(string $content): void
-    {
-        $this->fileContent = $content;
-    }
-
     public function getFileHash(string $filePath): ?string
     {
         $infos = $this->getFileContent();
 
+        /* @phpstan-ignore-next-line always evaluate to false but can be possible with legacy vite-plugin-symfony versions */
         if (is_null($infos['metadatas']) || !array_key_exists($filePath, $infos['metadatas'])) {
             return null;
         }
@@ -81,6 +78,9 @@ class EntrypointsLookup
         return $this->getFileContent()['base'];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getJSFiles(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -88,6 +88,9 @@ class EntrypointsLookup
         return $this->getFileContent()['entryPoints'][$entryName]['js'] ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getCSSFiles(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -95,6 +98,9 @@ class EntrypointsLookup
         return $this->getFileContent()['entryPoints'][$entryName]['css'] ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getJavascriptDependencies(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -102,6 +108,9 @@ class EntrypointsLookup
         return $this->getFileContent()['entryPoints'][$entryName]['preload'] ?? [];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getJavascriptDynamicDependencies(string $entryName): array
     {
         $this->throwIfEntrypointIsMissing($entryName);
@@ -126,7 +135,17 @@ class EntrypointsLookup
 
         $legacyEntryName = $entryInfos['entryPoints'][$entryName]['legacy'];
 
-        return $entryInfos['entryPoints'][$legacyEntryName]['js'][0];
+        if (!is_string($legacyEntryName)) {
+            throw new \Exception("Entrypoint doesn't have legacy entrypoint");
+        }
+
+        $legacyEntry = $entryInfos['entryPoints'][$legacyEntryName];
+
+        if (!isset($legacyEntry['js'][0])) {
+            throw new \Exception("Entrypoint legacy doesn't have js script");
+        }
+
+        return $legacyEntry['js'][0];
     }
 
     private function throwIfEntrypointIsMissing(string $entryName): void

@@ -2,40 +2,37 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
+use Pentatrion\ViteBundle\DependencyInjection\PentatrionViteExtension;
 use Pentatrion\ViteBundle\Service\FileAccessor;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
+/**
+ * @phpstan-import-type EntryPointsFile from FileAccessor
+ * @phpstan-import-type ManifestFile from FileAccessor
+ * @phpstan-import-type ViteConfigs from PentatrionViteExtension
+ */
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
-    private FileAccessor $fileAccessor;
-    private array $configs;
-    private string $configName;
-    private $useAbsoluteUrl;
-    private ?RequestStack $requestStack;
-    private bool $strictMode;
-
     private ?string $viteMode = null;
     private string $basePath;
-    private $manifestData;
-    private $entrypointsData;
+    /** @var ManifestFile|null */
+    private ?array $manifestData = null;
+    /** @var EntryPointsFile */
+    private array $entrypointsData;
 
+    /**
+     * @param ViteConfigs $configs
+     */
     public function __construct(
-        FileAccessor $fileAccessor,
-        array $configs,
-        string $defaultConfigName,
-        bool $useAbsoluteUrl,
-        ?RequestStack $requestStack = null,
-        bool $strictMode = true
+        private FileAccessor $fileAccessor,
+        private array $configs,
+        private string $configName,
+        private bool $useAbsoluteUrl,
+        private ?RequestStack $requestStack = null,
+        private bool $strictMode = true
     ) {
-        $this->fileAccessor = $fileAccessor;
-        $this->configs = $configs;
-        $this->configName = $defaultConfigName;
-        $this->useAbsoluteUrl = $useAbsoluteUrl;
-        $this->requestStack = $requestStack;
-        $this->strictMode = $strictMode;
-
         $this->setConfig($this->configName);
     }
 
@@ -59,19 +56,19 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
     public function applyVersion(string $path): string
     {
-        return $this->getassetsPath($path) ?: $path;
+        return $this->getAssetPath($path) ?: $path;
     }
 
     private function completeURL(string $path): string
     {
-        if (0 === strpos($path, 'http') || false === $this->useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
+        if (str_starts_with($path, 'http') || false === $this->useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
             return $path;
         }
 
         return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
-    private function getassetsPath(string $path): ?string
+    private function getAssetPath(string $path): ?string
     {
         if (null === $this->viteMode) {
             $this->viteMode = $this->fileAccessor->hasFile($this->configName, FileAccessor::MANIFEST) ? 'build' : 'dev';
@@ -101,6 +98,11 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return null;
     }
 
+    /**
+     * @param ManifestFile|null $manifestData
+     *
+     * @return array<string>
+     */
     private function findAlternatives(string $path, ?array $manifestData): array
     {
         $path = strtolower($path);

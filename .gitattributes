@@ -6,3 +6,4 @@
 .php-cs-fixer.dist.php export-ignore
 composer.lock export-ignore
 phpstan.neon export-ignore
+phpstan.php80.neon export-ignore

@@ -6,13 +6,22 @@ use Pentatrion\ViteBundle\Service\EntrypointRenderer;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
+/**
+ * @phpstan-type ViteEntryScriptTagsOptions array{
+ *  absolute_url?: bool,
+ *  attr?: array<string, bool|string|null>,
+ *  dependency?: "react"|null
+ * }
+ * @phpstan-type ViteEntryLinkTagsOptions array{
+ *  absolute_url?: bool,
+ *  attr?: array<string, bool|string|null>,
+ *  preloadDynamicImports?: bool
+ * }
+ */
 class EntryFilesTwigExtension extends AbstractExtension
 {
-    private $entrypointRenderer;
-
-    public function __construct(EntrypointRenderer $entrypointRenderer)
+    public function __construct(private EntrypointRenderer $entrypointRenderer)
     {
-        $this->entrypointRenderer = $entrypointRenderer;
     }
 
     public function getFunctions(): array
@@ -29,11 +38,17 @@ class EntryFilesTwigExtension extends AbstractExtension
         return $this->entrypointRenderer->getMode($configName);
     }
 
+    /**
+     * @param ViteEntryScriptTagsOptions $options
+     */
     public function renderViteScriptTags(string $entryName, array $options = [], ?string $configName = null): string
     {
         return $this->entrypointRenderer->renderScripts($entryName, $options, $configName);
     }
 
+    /**
+     * @param ViteEntryLinkTagsOptions $options
+     */
     public function renderViteLinkTags(string $entryName, array $options = [], ?string $configName = null): string
     {
         return $this->entrypointRenderer->renderLinks($entryName, $options, $configName);

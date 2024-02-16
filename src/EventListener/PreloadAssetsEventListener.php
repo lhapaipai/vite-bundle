@@ -10,13 +10,10 @@ use Symfony\Component\WebLink\Link;
 
 class PreloadAssetsEventListener implements EventSubscriberInterface
 {
-    private EntrypointRenderer $entrypointRenderer;
-    private string|bool $crossOriginAttribute;
-
-    public function __construct(EntrypointRenderer $entrypointRenderer, string|bool $crossOriginAttribute)
-    {
-        $this->entrypointRenderer = $entrypointRenderer;
-        $this->crossOriginAttribute = $crossOriginAttribute;
+    public function __construct(
+        private EntrypointRenderer $entrypointRenderer,
+        private string|bool $crossOriginAttribute
+    ) {
     }
 
     public function onKernelResponse(ResponseEvent $event): void
@@ -27,7 +24,7 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        if (null === $linkProvider = $request->attributes->get('_links')) {
+        if (!$request->attributes->has('_links')) {
             $request->attributes->set(
                 '_links',
                 new GenericLinkProvider()
@@ -47,10 +44,12 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
             $linkProvider = $linkProvider->withLink($link);
         }
 
-        foreach ($this->entrypointRenderer->getRenderedStyles() as $href) {
-            $link = $this->createLink('preload', $href)->withAttribute('as', 'style');
-
-            $linkProvider = $linkProvider->withLink($link);
+        foreach ($this->entrypointRenderer->getRenderedStyles() as $filePath => $tag) {
+            $href = $tag->getAttribute('href');
+            if (is_string($href)) {
+                $link = $this->createLink('preload', $href)->withAttribute('as', 'style');
+                $linkProvider = $linkProvider->withLink($link);
+            }
         }
 
         $request->attributes->set('_links', $linkProvider);

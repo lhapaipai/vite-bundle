@@ -4,43 +4,41 @@ namespace Pentatrion\ViteBundle\Service;
 
 use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use Pentatrion\ViteBundle\Model\Tag;
+use Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension;
 use Pentatrion\ViteBundle\Util\InlineContent;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
+/**
+ * @phpstan-import-type ViteEntryScriptTagsOptions from EntryFilesTwigExtension
+ * @phpstan-import-type ViteEntryLinkTagsOptions from EntryFilesTwigExtension
+ */
 class EntrypointRenderer implements ResetInterface
 {
-    private EntrypointsLookupCollection $entrypointsLookupCollection;
-    private TagRendererCollection $tagRendererCollection;
-    private bool $useAbsoluteUrl;
-    private string $preload;
-    private ?RequestStack $requestStack;
-    private ?EventDispatcherInterface $eventDispatcher;
+    /** @var array<string, bool> */
+    private array $returnedViteClients = [];
 
-    private $returnedViteClients = [];
-    private $returnedReactRefresh = [];
-    private $returnedViteLegacyScripts = [];
+    /** @var array<string, bool> */
+    private array $returnedReactRefresh = [];
 
-    private $renderedFiles = [
+    /** @var array<string, bool> */
+    private array $returnedViteLegacyScripts = [];
+
+    /** @var array<'scripts'|'styles', array<string, Tag>> */
+    private array $renderedFiles = [
         'scripts' => [],
         'styles' => [],
     ];
 
     public function __construct(
-        EntrypointsLookupCollection $entrypointsLookupCollection,
-        TagRendererCollection $tagRendererCollection,
-        bool $useAbsoluteUrl = false,
-        string $preload = 'link-tag',
-        ?RequestStack $requestStack = null,
-        ?EventDispatcherInterface $eventDispatcher = null
+        private EntrypointsLookupCollection $entrypointsLookupCollection,
+        private TagRendererCollection $tagRendererCollection,
+        private bool $useAbsoluteUrl = false,
+        private string $preload = 'link-tag',
+        private ?RequestStack $requestStack = null,
+        private ?EventDispatcherInterface $eventDispatcher = null
     ) {
-        $this->entrypointsLookupCollection = $entrypointsLookupCollection;
-        $this->tagRendererCollection = $tagRendererCollection;
-        $this->useAbsoluteUrl = $useAbsoluteUrl;
-        $this->preload = $preload;
-        $this->requestStack = $requestStack;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
     private function getEntrypointsLookup(?string $configName = null): EntrypointsLookup
@@ -55,16 +53,19 @@ class EntrypointRenderer implements ResetInterface
 
     private function completeURL(string $path, bool $useAbsoluteUrl = false): string
     {
-        if (0 === strpos($path, 'http') || false === $useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
+        if (str_starts_with($path, 'http') || false === $useAbsoluteUrl || null === $this->requestStack || null === $this->requestStack->getCurrentRequest()) {
             return $path;
         }
 
         return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
+    /**
+     * @param ViteEntryScriptTagsOptions|ViteEntryLinkTagsOptions $options
+     */
     private function shouldUseAbsoluteURL(array $options, ?string $configName = null): bool
     {
-        $viteServer = $this->getEntrypointsLookup($configName)->getViteServer($configName);
+        $viteServer = $this->getEntrypointsLookup($configName)->getViteServer();
 
         return is_null($viteServer) && ($this->useAbsoluteUrl || (isset($options['absolute_url']) && true === $options['absolute_url']));
     }
@@ -73,7 +74,7 @@ class EntrypointRenderer implements ResetInterface
     {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
 
-        if (!$entrypointsLookup->hasFile($configName)) {
+        if (!$entrypointsLookup->hasFile()) {
             return null;
         }
 
@@ -99,20 +100,25 @@ class EntrypointRenderer implements ResetInterface
         return $this->renderedFiles['scripts'];
     }
 
+    /**
+     * @return array<string, Tag>
+     */
     public function getRenderedStyles(): array
     {
         return $this->renderedFiles['styles'];
     }
 
     /**
-     * @return string|array
+     * @param ViteEntryScriptTagsOptions $options
+     *
+     * @phpstan-return ($toString is true ? string : array<Tag>)
      */
     public function renderScripts(
         string $entryName,
         array $options = [],
         ?string $configName = null,
         bool $toString = true
-    ): mixed {
+    ): string|array {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -215,14 +221,16 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @return string|array
+     * @param ViteEntryLinkTagsOptions $options
+     *
+     * @phpstan-return ($toString is true ? string : array<Tag>)
      */
     public function renderLinks(
         string $entryName,
         array $options = [],
         ?string $configName = null,
         bool $toString = true
-    ): mixed {
+    ): string|array {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -236,12 +244,15 @@ class EntrypointRenderer implements ResetInterface
         $tags = [];
 
         foreach ($entrypointsLookup->getCSSFiles($entryName) as $filePath) {
-            if (false === \in_array($filePath, $this->renderedFiles['styles'], true)) {
-                $tags[] = $tagRenderer->createLinkStylesheetTag(
+            if (!isset($this->renderedFiles['styles'][$filePath])) {
+                $tag = $tagRenderer->createLinkStylesheetTag(
                     $this->completeURL($filePath, $useAbsoluteUrl),
                     array_merge(['integrity' => $entrypointsLookup->getFileHash($filePath)], $options['attr'] ?? [])
                 );
-                $this->renderedFiles['styles'][] = $filePath;
+
+                $tags[] = $tag;
+
+                $this->renderedFiles['styles'][$filePath] = $tag;
             }
         }
 
@@ -279,9 +290,11 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
-     * @return string|array
+     * @param array<Tag> $tags
+     *
+     * @phpstan-return ($toString is true ? string : array<Tag>)
      */
-    public function renderTags(array $tags, bool $isBuild, bool $toString): mixed
+    public function renderTags(array $tags, bool $isBuild, bool $toString): string|array
     {
         if (null !== $this->eventDispatcher) {
             foreach ($tags as $tag) {
@@ -304,6 +317,6 @@ class EntrypointRenderer implements ResetInterface
 
     public static function pascalToKebab(string $str): string
     {
-        return strtolower(preg_replace('/[A-Z]/', '-\\0', lcfirst($str)));
+        return strtolower((string) preg_replace('/[A-Z]/', '-\\0', lcfirst($str)));
     }
 }

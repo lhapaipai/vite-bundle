@@ -110,7 +110,6 @@ class Configuration implements ConfigurationInterface
                     ->defaultValue(null)
                 ->end()
                 ->arrayNode('configs')
-                    ->setDeprecated('pentatrion/vite-bundle', '6.0.0', 'The "%node%" option is deprecated. Use "configs" instead.')
                     ->useAttributeAsKey('name')
                     ->arrayPrototype()
                         ->children()

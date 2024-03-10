@@ -17,7 +17,7 @@ class ProfilerController
 
     public function info(): Response
     {
-        $viteConfigs = $this->debug->getViteConfigs();
+        $viteConfigs = $this->debug->getViteCompleteConfigs();
 
         $this->twig->addExtension(new TypeExtension());
 

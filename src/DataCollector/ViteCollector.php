@@ -9,12 +9,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ViteCollector extends AbstractDataCollector
 {
-    private EntrypointRenderer $entrypointRenderer;
-
     public function __construct(
-        EntrypointRenderer $entrypointRenderer
+        private EntrypointRenderer $entrypointRenderer
     ) {
-        $this->entrypointRenderer = $entrypointRenderer;
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void

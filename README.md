@@ -13,7 +13,7 @@
 
 # ViteBundle : Symfony integration with Vite
 
-This bundle helps you render all of the dynamic `script` and `link` tags needed.
+This bundle helps you render all the dynamic `script` and `link` tags needed.
 Essentially, it provides two twig functions to load the correct scripts into your templates.
 
 ⚠️ This repository is a "subtree split": a read-only subset of that main repository [symfony-vite-dev](https://github.com/lhapaipai/symfony-vite-dev) which delivers to packagist only the necessary code.
@@ -25,7 +25,7 @@ If you want to contribute, make PRs or consult examples you will have to go to t
 
 ## Installation
 
-Install the bundle with :
+Install the bundle with:
 
 ```console
 composer require pentatrion/vite-bundle
@@ -38,7 +38,7 @@ npm install
 npm run dev
 ```
 
-Add this twig functions in any template or base layout where you need to include a JavaScript entry.
+Add these twig functions in any template or base layout where you need to include a JavaScript entry:
 
 ```twig
 {% block stylesheets %}

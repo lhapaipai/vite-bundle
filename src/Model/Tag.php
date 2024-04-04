@@ -55,10 +55,7 @@ class Tag
         return $this->attributes;
     }
 
-    /**
-     * @return bool|string|null
-     */
-    public function getAttribute(string $key): mixed
+    public function getAttribute(string $key): string|bool|null
     {
         return $this->attributes[$key] ?? null;
     }
@@ -67,7 +64,7 @@ class Tag
      * @param string      $name  The attribute name
      * @param string|bool $value Value can be "true" to have an attribute without a value (e.g. "defer")
      */
-    public function setAttribute(string $name, mixed $value): self
+    public function setAttribute(string $name, string|bool $value): self
     {
         $this->attributes[$name] = $value;
 

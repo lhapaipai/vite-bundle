@@ -43,6 +43,11 @@ class Tag
         return self::LINK_TAG === $this->tagName && 'modulepreload' === $this->getAttribute('rel');
     }
 
+    public function isModule(): bool
+    {
+        return self::SCRIPT_TAG === $this->tagName && 'module' === $this->getAttribute('type');
+    }
+
     /**
      * @return array<string, bool|string|null>
      */

@@ -60,7 +60,7 @@ class Tag
      */
     public function getAttribute(string $key): mixed
     {
-        return key_exists($key, $this->attributes) ? $this->attributes[$key] : null;
+        return $this->attributes[$key] ?? null;
     }
 
     /**

@@ -35,16 +35,12 @@ class Tag
 
     public function isStylesheet(): bool
     {
-        return self::LINK_TAG === $this->tagName
-            && isset($this->attributes['rel'])
-            && 'stylesheet' === $this->attributes['rel'];
+        return self::LINK_TAG === $this->tagName && 'stylesheet' === $this->getAttribute('rel');
     }
 
     public function isModulePreload(): bool
     {
-        return self::LINK_TAG === $this->tagName
-            && isset($this->attributes['rel'])
-            && 'modulepreload' === $this->attributes['rel'];
+        return self::LINK_TAG === $this->tagName && 'modulepreload' === $this->getAttribute('rel');
     }
 
     /**

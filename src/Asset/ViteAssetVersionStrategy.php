@@ -71,10 +71,10 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     private function getAssetPath(string $path): ?string
     {
         if (null === $this->viteMode) {
-            $this->viteMode = $this->fileAccessor->hasFile($this->configName, FileAccessor::MANIFEST) ? 'build' : 'dev';
+            $this->entrypointsData = $this->fileAccessor->getData($this->configName, FileAccessor::ENTRYPOINTS);
+            $this->viteMode = empty($this->entrypointsData['viteServer']) ? 'build' : 'dev';
 
             $this->manifestData = 'build' === $this->viteMode ? $this->fileAccessor->getData($this->configName, FileAccessor::MANIFEST) : null;
-            $this->entrypointsData = $this->fileAccessor->getData($this->configName, FileAccessor::ENTRYPOINTS);
         }
 
         if ('build' === $this->viteMode) {

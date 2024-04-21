@@ -35,16 +35,12 @@ class Tag
 
     public function isStylesheet(): bool
     {
-        return self::LINK_TAG === $this->tagName
-            && isset($this->attributes['rel'])
-            && 'stylesheet' === $this->attributes['rel'];
+        return self::LINK_TAG === $this->tagName && 'stylesheet' === $this->getAttribute('rel');
     }
 
     public function isModulePreload(): bool
     {
-        return self::LINK_TAG === $this->tagName
-            && isset($this->attributes['rel'])
-            && 'modulepreload' === $this->attributes['rel'];
+        return self::LINK_TAG === $this->tagName && 'modulepreload' === $this->getAttribute('rel');
     }
 
     /**
@@ -55,19 +51,16 @@ class Tag
         return $this->attributes;
     }
 
-    /**
-     * @return bool|string|null
-     */
-    public function getAttribute(string $key): mixed
+    public function getAttribute(string $key): string|bool|null
     {
-        return key_exists($key, $this->attributes) ? $this->attributes[$key] : null;
+        return $this->attributes[$key] ?? null;
     }
 
     /**
      * @param string      $name  The attribute name
      * @param string|bool $value Value can be "true" to have an attribute without a value (e.g. "defer")
      */
-    public function setAttribute(string $name, mixed $value): self
+    public function setAttribute(string $name, string|bool $value): self
     {
         $this->attributes[$name] = $value;
 

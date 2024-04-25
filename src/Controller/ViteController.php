@@ -18,6 +18,22 @@ class ViteController
 
     public function proxyBuild(string $path, ?string $configName = null): Response
     {
+        $origin = $this->proxyOrigin ?? resolveDevServer($configName);
+
+        $response = $this->httpClient->request(
+            'GET',
+            $origin.$base.$path
+        );
+
+        $content = $response->getContent();
+        $statusCode = $response->getStatusCode();
+        $headers = $response->getHeaders();
+
+        return new Response($content, $statusCode, $headers);
+    }
+
+    private function resolveDevServer(?string $configName = null): string
+    {
         if (is_null($configName)) {
             $configName = $this->defaultConfig;
         }
@@ -31,17 +47,6 @@ class ViteController
             throw new \Exception('Vite dev server not available');
         }
 
-        $origin = $this->proxyOrigin ?? $viteDevServer;
-
-        $response = $this->httpClient->request(
-            'GET',
-            $origin.$base.$path
-        );
-
-        $content = $response->getContent();
-        $statusCode = $response->getStatusCode();
-        $headers = $response->getHeaders();
-
-        return new Response($content, $statusCode, $headers);
+        return $viteDevServer;
     }
 }

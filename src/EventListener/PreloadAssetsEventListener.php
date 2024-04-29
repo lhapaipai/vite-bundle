@@ -11,7 +11,8 @@ use Symfony\Component\WebLink\Link;
 class PreloadAssetsEventListener implements EventSubscriberInterface
 {
     public function __construct(
-        private EntrypointRenderer $entrypointRenderer
+        private EntrypointRenderer $entrypointRenderer,
+        private string|bool $crossOriginAttribute
     ) {
     }
 
@@ -37,6 +38,10 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
             $rel = $tag->isModule() || $tag->isModulePreload() ? 'modulepreload' : 'preload';
             $link = $this->createLink($rel, $href)->withAttribute('as', 'script');
 
+            if (is_string($this->crossOriginAttribute)) {
+                $link = $link->withAttribute('crossorigin', $this->crossOriginAttribute);
+            }
+
             $linkProvider = $linkProvider->withLink($link);
         }
 
@@ -44,6 +49,11 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
             $href = $tag->getAttribute('href');
             if (is_string($href)) {
                 $link = $this->createLink('preload', $href)->withAttribute('as', 'style');
+
+                if (is_string($this->crossOriginAttribute)) {
+                    $link = $link->withAttribute('crossorigin', $this->crossOriginAttribute);
+                }
+
                 $linkProvider = $linkProvider->withLink($link);
             }
         }

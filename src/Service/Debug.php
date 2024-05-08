@@ -39,6 +39,7 @@ class Debug
             function ($configName) {
                 $entrypointsLookup = $this->entrypointsLookupCollection->getEntrypointsLookup($configName);
                 $viteServer = $entrypointsLookup->getViteServer();
+
                 return [
                     'configName' => $configName,
                     'response' => is_null($viteServer)
@@ -49,18 +50,22 @@ class Debug
             array_keys($this->configs)
         );
 
-
         $viteConfigs = array_map(
             function ($request) {
                 $content = null;
-                if (!is_null($request['response'])) {
-                    /** @var array<mixed> $data */
-                    $data = json_decode($request['response']->getContent(),true);
-                    $content = $this->prepareViteConfig($data);
+                try {
+                    if (!is_null($request['response'])) {
+                        /** @var array<mixed> $data */
+                        $data = json_decode($request['response']->getContent(), true);
+                        $content = $this->prepareViteConfig($data);
+                    }
+                } catch (\Exception) {
+                    // dev server is not running
                 }
+
                 return [
                     'configName' => $request['configName'],
-                    'content' => $content
+                    'content' => $content,
                 ];
             },
             $viteServerRequests
@@ -71,7 +76,7 @@ class Debug
 
     /**
      * @param array<mixed> $config
-     * 
+     *
      * @return array<mixed>
      */
     public function prepareViteConfig($config)
@@ -123,12 +128,12 @@ class Debug
 
                 if (is_string($k)) {
                     $content .= $k.': ';
-                } else if (is_scalar($v)) {
+                } elseif (is_scalar($v)) {
                     $content .= $v.'<br>';
                 } else {
                     $content .= self::stringify($v).'<br>';
                 }
-                
+
                 $content .= '</li>';
             }
             $content .= '</ul>';

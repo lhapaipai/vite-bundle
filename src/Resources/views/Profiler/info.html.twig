@@ -18,7 +18,8 @@
 
       header,
       h1,
-      h2
+      h2,
+      .info
       {
         text-align: center;
       }
@@ -203,8 +204,9 @@
               {% endfor %}
             </tbody>
           </table>
+        {% else %}
+          <p class="info">You're Vite Dev server is not running.</p>
         {% endfor %}
-
         <hr/>
       {% endfor %}
 

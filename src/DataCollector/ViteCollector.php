@@ -2,6 +2,7 @@
 
 namespace Pentatrion\ViteBundle\DataCollector;
 
+use Pentatrion\ViteBundle\Model\Tag;
 use Pentatrion\ViteBundle\Service\EntrypointRenderer;
 use Symfony\Bundle\FrameworkBundle\DataCollector\AbstractDataCollector;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,14 +17,23 @@ class ViteCollector extends AbstractDataCollector
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
-        $this->data = [
-            'foo' => 'bar',
-        ];
+        $this->data = $this->entrypointRenderer->getRenderedFiles();
     }
 
-    public function getFoo(): string
+    /**
+     * @return array<string, Tag>
+     */
+    public function getRenderedStyles(): array
     {
-        return $this->data['foo'];
+        return $this->data['styles'];
+    }
+
+    /**
+     * @return array<string, Tag>
+     */
+    public function getRenderedScripts(): array
+    {
+        return $this->data['scripts'];
     }
 
     public function getName(): string

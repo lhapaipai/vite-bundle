@@ -109,6 +109,14 @@ class EntrypointRenderer implements ResetInterface
     }
 
     /**
+     * @return array<'scripts'|'styles', array<string, Tag>>
+     */
+    public function getRenderedFiles(): array
+    {
+        return $this->renderedFiles;
+    }
+
+    /**
      * @param ViteEntryScriptTagsOptions $options
      *
      * @phpstan-return ($toString is true ? string : array<Tag>)

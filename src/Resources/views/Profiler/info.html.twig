@@ -1,216 +1,187 @@
 <!DOCTYPE html>
 <html lang="lang">
-  <head>
-    <meta charset="charset">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="data:;base64,iBORw0KGgo=">
+    <head>
+        <meta charset="charset">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="icon" href="data:;base64,iBORw0KGgo=">
+        <title>Vite Dev Server Infos</title>
+        <style type="text/css">
+        body {
+            background-color: var(--c-bg);
+            color: var(--c-text);
+            font-family: "Inter", ui-sans-serif, system-ui;
+        }
 
-    <title>Document</title>
+        header,
+        h1,
+        h2,
+        .info {
+            text-align: center;
+        }
 
-    <style type="text/css">
-      body
-      {
-        background-color: var(--c-bg);
-        color: var(--c-text);
-        font-family: "Inter", ui-sans-serif, system-ui;
+        .vite-logo {
+            transition: filter 300ms;
 
-      }
+        }
+        .vite-logo:hover {
+            filter: drop-shadow(0 0 2em #646cffaa);
+        }
 
-      header,
-      h1,
-      h2,
-      .info
-      {
-        text-align: center;
-      }
+        .content {
+            margin: 1em auto;
+            max-width: 1024px;
 
-      .vite-logo
-      {
-        transition: filter 300ms;
-
-      }
-      .vite-logo:hover
-      {
-        filter: drop-shadow(0 0 2em #646cffaa);
-      }
-
-      .content
-      {
-        margin: 1em auto;
-        max-width: 1024px;
-
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
 
 
-      pre
-      {
-        margin: 0;
-        font-family: monospace;
-      }
+        pre {
+            margin: 0;
+            font-family: monospace;
+        }
 
-      a:hover
-      {
-        text-decoration: underline;
-      }
+        a:hover {
+            text-decoration: underline;
+        }
 
-      table
-      {
-        border-collapse: collapse;
-        border: 0;
-        width: 100%;
-        box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
-      }
+        table {
+            border-collapse: collapse;
+            border: 0;
+            width: 100%;
+            box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.2);
+        }
 
 
-      table th
-      {
-        text-align: center;
-        font-weight: 600;
-        background-color: var(--c-bg-soft)
-      }
-
-      td,
-      th
-      {
-        border: 1px solid var(--c-divider);
-        vertical-align: baseline;
-        padding: 0.5rem 1rem;
-      }
-
-      th
-      {
-        position: sticky;
-        top: 0;
-        background: inherit;
-      }
-
-      tbody tr:nth-child(2n)
-      {
-        background-color: var(--c-bg-soft);
-      }
-
-      tr td:first-child
-      {
-        width: 300px;
-      }
-
-      hr
-      {
-        width: 100%;
-        background-color: var(--c-bg-soft);
-        border: 0;
-        height: 1px;
-      }
-
-
-      .value i
-      {
-        color: #999;
-      }
-      .value ul
-      {
-        margin: 0;
-        padding-left: 1rem;
-      }
-
-      @media(max-width: 768px)
-      {
-        table,
-        thead,
-        tbody,
-        tr,
-        td,
-        tr td:first-child,
-        th
-        {
-          display: block;
-          width: auto;
+        table th {
+            text-align: center;
+            font-weight: 600;
+            background-color: var(--c-bg-soft)
         }
 
         td,
-        th
-        {
-          border-bottom: 0;
+        th {
+            border: 1px solid var(--c-divider);
+            vertical-align: baseline;
+            padding: 0.5rem 1rem;
         }
 
-        tr td:nth-child(2)
-        {
-          border-top: 0;
+        th {
+            position: sticky;
+            top: 0;
+            background: inherit;
         }
-      }
 
-      :root
-      {
-        --c-text: #333;
-        --c-bg-soft: #f6f6f6;
-        --c-divider: #e2e2e3;
-        --c-bg: #ffffff;
-      }
+        tbody tr:nth-child(2n) {
+            background-color: var(--c-bg-soft);
+        }
 
-      @media(prefers-color-scheme: dark){:root
-      {
-        --c-bg: #1b1b1f;
-        --c-text: #d0d0ca;
-        --c-bg-soft: #202126;
-        --c-divider: #2e2e31;
-      }
-    }
-    </style>
-  </head>
-  <body>
-    <div class="content">
-      <header>
-        <a class="vite-logo" href="https://vitejs.dev" target="_blank">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="128" height="128" preserveaspectratio="xMidYMid meet" viewbox="0 0 256 256">
-            <defs>
-              <linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%">
-                <stop offset="0%" stop-color="#41D1FF"></stop>
-                <stop offset="100%" stop-color="#BD34FE"></stop>
-              </linearGradient>
-              <linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%">
-                <stop offset="0%" stop-color="#FFEA83"></stop>
-                <stop offset="8.333%" stop-color="#FFDD35"></stop>
-                <stop offset="100%" stop-color="#FFA800"></stop>
-              </linearGradient>
-            </defs>
-            <path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path>
-            <path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path>
-          </svg>
-        </a>
-      </header>
+        tr td:first-child {
+            width: 300px;
+        }
 
-      {% for viteConfig in viteConfigs %}
+        hr {
+            width: 100%;
+            background-color: var(--c-bg-soft);
+            border: 0;
+            height: 1px;
+        }
 
-        {% if loop.length > 1 %}
-          <h2>{{ viteConfig.configName }}</h2>
-        {% endif %}
 
-        {% for groupKey, groupValues in viteConfig.content %}
-          <table>
-            <thead>
-              <tr>
-                <th colspan="2">{{ groupKey }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for key, value in groupValues %}
-                <tr>
-                  <td class="key">{{ key }}</td>
-                  <td class="value">{{ value | stringify }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        {% else %}
-          <p class="info">You're Vite Dev server is not running.</p>
-        {% endfor %}
-        <hr/>
-      {% endfor %}
+        .value i {
+            color: #999;
+        }
+        .value ul {
+            margin: 0;
+            padding-left: 1rem;
+        }
 
-    </div>
+        @media(max-width: 768px) {
+            table,
+            thead,
+            tbody,
+            tr,
+            td,
+            tr td:first-child,
+            th {
+            display: block;
+            width: auto;
+            }
 
-  </body>
+            td,
+            th {
+            border-bottom: 0;
+            }
+
+            tr td:nth-child(2) {
+            border-top: 0;
+            }
+        }
+
+        :root {
+            --c-text: #333;
+            --c-bg-soft: #f6f6f6;
+            --c-divider: #e2e2e3;
+            --c-bg: #ffffff;
+        }
+
+        @media(prefers-color-scheme: dark) {
+            :root {
+                --c-bg: #1b1b1f;
+                --c-text: #d0d0ca;
+                --c-bg-soft: #202126;
+                --c-divider: #2e2e31;
+            }
+        }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <header>
+                <a class="vite-logo" href="https://vitejs.dev" target="_blank">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="128" height="128" preserveaspectratio="xMidYMid meet" viewbox="0 0 256 256">
+                        <defs>
+                            <linearGradient id="IconifyId1813088fe1fbc01fb466" x1="-.828%" x2="57.636%" y1="7.652%" y2="78.411%">
+                                <stop offset="0%" stop-color="#41D1FF"></stop>
+                                <stop offset="100%" stop-color="#BD34FE"></stop>
+                            </linearGradient>
+                            <linearGradient id="IconifyId1813088fe1fbc01fb467" x1="43.376%" x2="50.316%" y1="2.242%" y2="89.03%">
+                                <stop offset="0%" stop-color="#FFEA83"></stop>
+                                <stop offset="8.333%" stop-color="#FFDD35"></stop>
+                                <stop offset="100%" stop-color="#FFA800"></stop>
+                            </linearGradient>
+                        </defs>
+                        <path fill="url(#IconifyId1813088fe1fbc01fb466)" d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"></path>
+                        <path fill="url(#IconifyId1813088fe1fbc01fb467)" d="M185.432.063L96.44 17.501a3.268 3.268 0 0 0-2.634 3.014l-5.474 92.456a3.268 3.268 0 0 0 3.997 3.378l24.777-5.718c2.318-.535 4.413 1.507 3.936 3.838l-7.361 36.047c-.495 2.426 1.782 4.5 4.151 3.78l15.304-4.649c2.372-.72 4.652 1.36 4.15 3.788l-11.698 56.621c-.732 3.542 3.979 5.473 5.943 2.437l1.313-2.028l72.516-144.72c1.215-2.423-.88-5.186-3.54-4.672l-25.505 4.922c-2.396.462-4.435-1.77-3.759-4.114l16.646-57.705c.677-2.35-1.37-4.583-3.769-4.113Z"></path>
+                    </svg>
+                </a>
+            </header>
+            {% for viteConfig in viteConfigs %}
+                {% if loop.length > 1 %}
+                    <h2>{{ viteConfig.configName }}</h2>
+                {% endif %}
+                {% for groupKey, groupValues in viteConfig.content %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="2">{{ groupKey }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for key, value in groupValues %}
+                                <tr>
+                                    <td class="key">{{ key }}</td>
+                                    <td class="value">{{ value | symfonyvite_stringify }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="info">You're Vite Dev server is not running.</p>
+                {% endfor %}
+                <hr/>
+            {% endfor %}
+        </div>
+    </body>
 </html>

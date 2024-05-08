@@ -22,7 +22,7 @@ class Debug
 
     private function getInfoUrl(string $viteServerHost, string $base): string
     {
-        $baseNormalized = '/' !== substr($base, -1) ? $base : substr($base, 0, strlen($base) - 1);
+        $baseNormalized = rtrim($base, '/');
 
         return sprintf('%s%s%s', $viteServerHost, $baseNormalized, '/@vite/info');
     }
@@ -106,10 +106,6 @@ class Debug
             return '<i>null</i>';
         }
 
-        if (is_array($value) && 0 === count($value)) {
-            return '[]';
-        }
-
         if (is_scalar($value)) {
             if (is_bool($value)) {
                 return $value ? 'true' : 'false';
@@ -122,6 +118,9 @@ class Debug
         }
 
         if (is_array($value)) {
+            if (0 === count($value)) {
+                return '[]';
+            }
             $content = '<ul>';
             foreach ($value as $k => $v) {
                 $content .= '<li>';

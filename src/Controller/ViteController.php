@@ -2,6 +2,7 @@
 
 namespace Pentatrion\ViteBundle\Controller;
 
+use Pentatrion\ViteBundle\Service\EntrypointsLookup;
 use Pentatrion\ViteBundle\Service\EntrypointsLookupCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -23,15 +24,8 @@ class ViteController
         }
 
         $entrypointsLookup = $this->entrypointsLookupCollection->getEntrypointsLookup($configName);
-
-        $viteDevServer = $entrypointsLookup->getViteServer();
+        $origin = $this->proxyOrigin ?? $this->resolveDevServer($entrypointsLookup);
         $base = $entrypointsLookup->getBase();
-
-        if (is_null($viteDevServer)) {
-            throw new \Exception('Vite dev server not available');
-        }
-
-        $origin = $this->proxyOrigin ?? $viteDevServer;
 
         $response = $this->httpClient->request(
             'GET',
@@ -43,5 +37,16 @@ class ViteController
         $headers = $response->getHeaders();
 
         return new Response($content, $statusCode, $headers);
+    }
+
+    private function resolveDevServer(EntrypointsLookup $entrypointsLookup): string
+    {
+        $viteDevServer = $entrypointsLookup->getViteServer();
+
+        if (is_null($viteDevServer)) {
+            throw new \Exception('Vite dev server not available');
+        }
+
+        return $viteDevServer;
     }
 }

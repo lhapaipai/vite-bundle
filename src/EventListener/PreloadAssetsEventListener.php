@@ -35,10 +35,11 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
         $linkProvider = $request->attributes->get('_links');
 
         foreach ($this->entrypointRenderer->getRenderedScripts() as $href => $tag) {
-            $link = $this->createLink('preload', $href)->withAttribute('as', 'script');
+            $rel = $tag->isModule() || $tag->isModulePreload() ? 'modulepreload' : 'preload';
+            $link = $this->createLink($rel, $href)->withAttribute('as', 'script');
 
-            if ('module' === $tag->getAttribute('type')) {
-                $link = $link->withAttribute('crossorigin', $this->crossOriginAttribute ?: 'anonymous');
+            if (is_string($this->crossOriginAttribute)) {
+                $link = $link->withAttribute('crossorigin', $this->crossOriginAttribute);
             }
 
             $linkProvider = $linkProvider->withLink($link);
@@ -48,6 +49,11 @@ class PreloadAssetsEventListener implements EventSubscriberInterface
             $href = $tag->getAttribute('href');
             if (is_string($href)) {
                 $link = $this->createLink('preload', $href)->withAttribute('as', 'style');
+
+                if (is_string($this->crossOriginAttribute)) {
+                    $link = $link->withAttribute('crossorigin', $this->crossOriginAttribute);
+                }
+
                 $linkProvider = $linkProvider->withLink($link);
             }
         }

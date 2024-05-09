@@ -20,7 +20,7 @@ class Debug
     ) {
     }
 
-    private function getInfoUrl(string $viteServerHost, string $base): string
+    public static function getInfoUrl(string $viteServerHost, string $base): string
     {
         $baseNormalized = rtrim($base, '/');
 
@@ -44,7 +44,7 @@ class Debug
                     'configName' => $configName,
                     'response' => is_null($viteServer)
                         ? null
-                        : $this->httpClient->request('GET', $this->getInfoUrl($viteServer, $entrypointsLookup->getBase())),
+                        : $this->httpClient->request('GET', self::getInfoUrl($viteServer, $entrypointsLookup->getBase())),
                 ];
             },
             array_keys($this->configs)
@@ -57,9 +57,9 @@ class Debug
                     if (!is_null($request['response'])) {
                         /** @var array<mixed> $data */
                         $data = json_decode($request['response']->getContent(), true);
-                        $content = $this->prepareViteConfig($data);
+                        $content = self::prepareViteConfig($data);
                     }
-                } catch (\Exception) {
+                } catch (\Exception $e) {
                     // dev server is not running
                 }
 
@@ -79,7 +79,7 @@ class Debug
      *
      * @return array<mixed>
      */
-    public function prepareViteConfig($config)
+    public static function prepareViteConfig($config)
     {
         $output = [
             'principal' => [],
@@ -100,6 +100,22 @@ class Debug
         return $output;
     }
 
+    public static function stringifyScalar(mixed $value): string
+    {
+        if (!is_scalar($value)) {
+            throw new \Exception('Unable to stringify no scalar value');
+        }
+
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if ('' === $value) {
+            return '<i>Empty string</i>';
+        }
+
+        return (string) $value;
+    }
+
     public static function stringify(mixed $value): string
     {
         if (is_null($value)) {
@@ -107,14 +123,7 @@ class Debug
         }
 
         if (is_scalar($value)) {
-            if (is_bool($value)) {
-                return $value ? 'true' : 'false';
-            }
-            if ('' === $value) {
-                return '<i>Empty string</i>';
-            }
-
-            return (string) $value;
+            return self::stringifyScalar($value);
         }
 
         if (is_array($value)) {
@@ -127,10 +136,12 @@ class Debug
 
                 if (is_string($k)) {
                     $content .= $k.': ';
-                } elseif (is_scalar($v)) {
-                    $content .= $v.'<br>';
+                }
+
+                if (is_scalar($v)) {
+                    $content .= self::stringifyScalar($v);
                 } else {
-                    $content .= self::stringify($v).'<br>';
+                    $content .= self::stringify($v);
                 }
 
                 $content .= '</li>';

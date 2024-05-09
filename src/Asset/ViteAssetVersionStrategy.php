@@ -68,7 +68,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         return $this->requestStack->getCurrentRequest()->getUriForPath($path);
     }
 
-    private function getAssetPath(string $path): ?string
+    private function getAssetPath(string $path): string
     {
         if (null === $this->viteMode) {
             $this->entrypointsData = $this->fileAccessor->getData($this->configName, FileAccessor::ENTRYPOINTS);
@@ -95,7 +95,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
             throw new AssetNotFoundException($message, $alternatives);
         }
 
-        return null;
+        return $this->basePath.$path;
     }
 
     /**

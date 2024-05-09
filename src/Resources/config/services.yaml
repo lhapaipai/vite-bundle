@@ -47,7 +47,7 @@ services:
             - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
             - "@?request_stack"
-            - true
+            - "%pentatrion_vite.throw_on_missing_asset%"
 
 
     pentatrion_vite.preload_assets_event_listener:

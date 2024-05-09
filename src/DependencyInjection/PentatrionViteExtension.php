@@ -20,6 +20,7 @@ use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
  *  proxy_origin: null|string,
  *  absolute_url: bool,
  *  throw_on_missing_entry: bool,
+ *  throw_on_missing_asset: bool,
  *  cache: bool,
  *  preload: "none"|"link-tag"|"link-header",
  *  crossorigin: false|"anonymous"|"use-credentials",
@@ -78,6 +79,7 @@ class PentatrionViteExtension extends Extension
         $container->setParameter('pentatrion_vite.absolute_url', $bundleConfig['absolute_url']);
         $container->setParameter('pentatrion_vite.proxy_origin', $bundleConfig['proxy_origin']);
         $container->setParameter('pentatrion_vite.throw_on_missing_entry', $bundleConfig['throw_on_missing_entry']);
+        $container->setParameter('pentatrion_vite.throw_on_missing_asset', $bundleConfig['throw_on_missing_asset']);
         $container->setParameter('pentatrion_vite.crossorigin', $bundleConfig['crossorigin']);
 
         if (

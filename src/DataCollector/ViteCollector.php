@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ViteCollector extends AbstractDataCollector
 {
     public function __construct(
-        private readonly EntrypointRenderer $entrypointRenderer
+        private EntrypointRenderer $entrypointRenderer
     ) {
     }
 

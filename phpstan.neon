@@ -2,6 +2,6 @@ parameters:
 	level: max
 	paths:
 		- src
-		- tests/Service/DebugTest.php
+
 includes:
     - vendor/phpstan/phpstan-symfony/extension.neon

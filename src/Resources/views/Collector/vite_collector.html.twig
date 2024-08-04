@@ -1,0 +1,80 @@
+{% extends "@WebProfiler/Profiler/layout.html.twig" %}
+
+{% block toolbar %}
+    {% set icon %}
+    {{ include('@PentatrionVite/Collector/icon.svg') }}
+    <span class="sf-toolbar-value">Vite</span>
+    {% endset %}
+    {% set text %}
+    <div class="sf-toolbar-info-piece">
+        <b>Vite dev Server</b>
+        <span>
+        <a href="{{ path('_profiler_vite') }}">Config</a>
+        </span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Rendered &lt;script /&gt;</b>
+        <span class="sf-toolbar-status">{{ collector.renderedScripts | length }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Rendered &lt;link /&gt;</b>
+        <span class="sf-toolbar-status">{{ collector.renderedStyles | length }}</span>
+    </div>
+    {% endset %}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
+{% endblock %}
+
+{% block menu %}
+    <span class="label">
+    <span class="icon">
+    {{ include('@PentatrionVite/Collector/icon.svg') }}
+    </span>
+    <strong>Vite</strong>
+    </span>
+{% endblock %}
+
+{% block panel %}
+    <h2>Rendered &lt;script /&gt;</h2>
+    {% for _, tag in collector.renderedScripts %}
+        <table>
+            <thead>
+                <tr>
+                    <th class="key">Attribute</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in tag.attributes %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>
+                            <pre class="sf-dump">{{ value }}</pre>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+    <h2>Rendered &lt;link /&gt;</h2>
+    {% for _, tag in collector.renderedStyles %}
+        <table>
+            <thead>
+                <tr>
+                    <th class="key">Attribute</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in tag.attributes %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>
+                            <pre class="sf-dump">{{ value }}</pre>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+{% endblock %}

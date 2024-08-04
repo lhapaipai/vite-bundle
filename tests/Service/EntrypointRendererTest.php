@@ -2,25 +2,23 @@
 
 namespace Pentatrion\ViteBundle\Tests\Service;
 
+use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
 use Pentatrion\ViteBundle\Service\EntrypointRenderer;
 use Pentatrion\ViteBundle\Service\EntrypointsLookup;
 use Pentatrion\ViteBundle\Service\EntrypointsLookupCollection;
 use Pentatrion\ViteBundle\Service\FileAccessor;
-use Pentatrion\ViteBundle\Util\InlineContent;
 use Pentatrion\ViteBundle\Service\TagRenderer;
 use Pentatrion\ViteBundle\Service\TagRendererCollection;
-use Pentatrion\ViteBundle\Event\RenderAssetTagEvent;
+use Pentatrion\ViteBundle\Util\InlineContent;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EntrypointRendererTest extends TestCase
 {
-    private function getBasicTagRendererCollection($scriptAttributes = [], $linkAttributes = []): TagRendererCollection
+    private function getBasicTagRendererCollection(array $scriptAttributes = [], array $linkAttributes = []): TagRendererCollection
     {
         $tagRenderer = new TagRenderer([], $scriptAttributes, $linkAttributes);
         /**
@@ -331,7 +329,7 @@ class EntrypointRendererTest extends TestCase
         $request
             ->method('getUriForPath')
             ->willReturnCallback(function ($path) {
-                return 'http://mydomain.local' . $path;
+                return 'http://mydomain.local'.$path;
             })
         ;
 

@@ -10,7 +10,7 @@ after build
 
 ```html
   <head>
-    <script type="module" crossorigin src="/assets/index-bac46bd1.js"></script>
+
     <link rel="stylesheet" href="/assets/index-824f0ed3.css">
 
     <!-- DETECT_MODERN_BROWSER_CODE -->
@@ -60,9 +60,7 @@ after build
     </script>
 
 
-  </head>
 
-  <body>
 
     <!-- SAFARI10_NO_MODULE_FIX -->
     <script nomodule>
@@ -99,8 +97,15 @@ after build
 
     <script nomodule crossorigin id="vite-legacy-polyfill" src="/assets/polyfills-legacy-40963d34.js"></script>
 
+    <script type="module" crossorigin src="/assets/index-bac46bd1.js"></script>
+    
     <script nomodule crossorigin id="vite-legacy-entry" data-src="/assets/index-legacy-affdb848.js">
       System.import(document.getElementById('vite-legacy-entry').getAttribute('data-src'))
     </script>
+
+  </head>
+
+  <body>
+    <!-- your content -->
   </body>
 ```

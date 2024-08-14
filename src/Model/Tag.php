@@ -17,7 +17,7 @@ class Tag
         private string $tagName,
         private array $attributes = [],
         private string $content = '',
-        private bool $internal = false,
+        private string $origin = '',
         string $preloadOption = 'link-tag'
     ) {
         if (self::LINK_TAG === $tagName && isset($attributes['rel'])) {
@@ -36,12 +36,15 @@ class Tag
         }
     }
 
-    public function setRenderMode(bool $renderAsTag, bool $renderAsLinkHeader): self
+    public function getFilename(): string
     {
-        $this->renderAsTag = $renderAsTag;
-        $this->renderAsLinkHeader = $renderAsLinkHeader;
+        $src = self::SCRIPT_TAG === $this->tagName ? ($this->attributes['src'] ?? null) : ($this->attributes['href'] ?? null);
 
-        return $this;
+        if (is_string($src)) {
+            return basename($src);
+        }
+
+        return 'unknown';
     }
 
     public function getTagName(): string
@@ -138,9 +141,14 @@ class Tag
         return $this;
     }
 
+    public function getOrigin(): string
+    {
+        return $this->origin;
+    }
+
     public function isInternal(): bool
     {
-        return $this->internal;
+        return '_internal' === $this->origin;
     }
 
     public function isRenderAsTag(): bool

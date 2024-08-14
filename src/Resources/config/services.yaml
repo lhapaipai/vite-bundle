@@ -26,6 +26,11 @@ services:
     Pentatrion\ViteBundle\Service\TagRendererCollection:
         alias: pentatrion_vite.tag_renderer_collection
 
+
+    pentatrion_vite.twig_type_extension:
+        class: Pentatrion\ViteBundle\Twig\TypeExtension
+        tags: ["twig.extension"]
+
     pentatrion_vite.twig_entry_files_extension:
         class: Pentatrion\ViteBundle\Twig\EntryFilesTwigExtension
         tags: ["twig.extension"]

@@ -73,7 +73,7 @@ class TagRenderer
             Tag::SCRIPT_TAG,
             $attributes,
             $content,
-            true,
+            '_internal',
             $this->preload
         );
 
@@ -81,7 +81,7 @@ class TagRenderer
     }
 
     /** @param array<string, bool|string|null> $attributes */
-    public function createScriptTag(array $attributes = [], string $content = ''): Tag
+    public function createScriptTag(array $attributes = [], string $content = '', string $origin = ''): Tag
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
@@ -91,7 +91,7 @@ class TagRenderer
                 $attributes
             ),
             $content,
-            false,
+            $origin,
             $this->preload
         );
 
@@ -99,7 +99,7 @@ class TagRenderer
     }
 
     /** @param array<string, bool|string|null> $extraAttributes */
-    public function createLinkStylesheetTag(string $fileName, array $extraAttributes = []): Tag
+    public function createLinkStylesheetTag(string $fileName, array $extraAttributes = [], string $origin = ''): Tag
     {
         $attributes = [
             'rel' => 'stylesheet',
@@ -115,7 +115,7 @@ class TagRenderer
                 $extraAttributes
             ),
             '',
-            false,
+            $origin,
             $this->preload
         );
 
@@ -123,7 +123,7 @@ class TagRenderer
     }
 
     /** @param array<string, bool|string|null> $extraAttributes */
-    public function createModulePreloadLinkTag(string $fileName, array $extraAttributes = []): Tag
+    public function createModulePreloadLinkTag(string $fileName, array $extraAttributes = [], string $origin = ''): Tag
     {
         $attributes = [
             'rel' => 'modulepreload',
@@ -139,7 +139,7 @@ class TagRenderer
                 $extraAttributes
             ),
             '',
-            false,
+            $origin,
             $this->preload
         );
 

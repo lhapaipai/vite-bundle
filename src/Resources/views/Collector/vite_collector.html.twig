@@ -18,10 +18,6 @@
         <span class="sf-toolbar-status">{{ collector.renderedScripts | length }}</span>
     </div>
     <div class="sf-toolbar-info-piece">
-        <b>Rendered scripts preloaded</b>
-        <span class="sf-toolbar-status">{{ collector.renderedPreloads | length }}</span>
-    </div>
-    <div class="sf-toolbar-info-piece">
         <b>Rendered links</b>
         <span class="sf-toolbar-status">{{ collector.renderedStylesheets | length }}</span>
     </div>
@@ -39,72 +35,48 @@
 {% endblock %}
 
 {% block panel %}
-    <h2>Rendered &lt;script /&gt;</h2>
-    {% for tag in collector.renderedScripts %}
+    <h2>Rendered tags</h2>
+    {% for tag in collector.renderedTags %}
         <table>
             <thead>
                 <tr>
-                    <th class="key">Attribute</th>
-                    <th>Value</th>
+                    <th class="key" colspan="2">{{ tag.filename }}</th>
                 </tr>
             </thead>
             <tbody>
+                <tr>
+                    <td>tag</td>
+                    <td>&lt;{{ tag.tagName }}&gt;</td>
+                </tr>
+                <tr>
+                    <td>origin</td>
+                    <td>{{ tag.origin }}</td>
+                </tr>
+                <tr>
+                    <td>renderAsTag</td>
+                    <td>{{ tag.renderAsTag | symfonyvite_stringify }}</td>
+                </tr>
+                <tr>
+                    <td>renderAsLinkHeader</td>
+                    <td>{{ tag.renderAsLinkHeader | symfonyvite_stringify }}</td>
+                </tr>
+                <tr>
+                    <td>content</td>
+                    <td>{{ tag.content | symfonyvite_stringify }}</td>
+                </tr>
+                <tr>
+                    <th class="font-normal" colspan="2">Attributes</th>
+                </tr>
                 {% for key, value in tag.validAttributes %}
                     <tr>
                         <th>{{ key }}</th>
                         <td>
-                            <pre class="sf-dump">{{ value }}</pre>
+                            <pre class="sf-dump">{{ value | symfonyvite_stringify }}</pre>
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% endfor %}
-
-    <h2>Rendered &lt;link rel="stylesheet" /&gt;</h2>
-    {% for tag in collector.renderedStylesheets %}
-        <table>
-            <thead>
-                <tr>
-                    <th class="key">Attribute</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key, value in tag.validAttributes %}
-                    <tr>
-                        <th>{{ key }}</th>
-                        <td>
-                            <pre class="sf-dump">{{ value }}</pre>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endfor %}
-
-
-    <h2>Rendered preloads</h2>
-    {% for tag in collector.renderedPreloads %}
-        <table>
-            <thead>
-                <tr>
-                    <th class="key">Attribute</th>
-                    <th>Value</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for key, value in tag.validAttributes %}
-                    <tr>
-                        <th>{{ key }}</th>
-                        <td>
-                            <pre class="sf-dump">{{ value }}</pre>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% endfor %}
-
 
 {% endblock %}

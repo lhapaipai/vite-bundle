@@ -47,15 +47,6 @@ class ViteCollector extends AbstractDataCollector
         return array_filter($this->data, fn (Tag $tag) => $tag->isStylesheet());
     }
 
-    /**
-     * @return array<Tag>
-     */
-    public function getRenderedPreloads(): array
-    {
-        /* @phpstan-ignore-next-line data is array<Tag> */
-        return array_filter($this->data, fn (Tag $tag) => $tag->isPreload());
-    }
-
     public function getName(): string
     {
         return 'pentatrion_vite.vite_collector';

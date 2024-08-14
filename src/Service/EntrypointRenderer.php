@@ -163,7 +163,9 @@ class EntrypointRenderer implements ResetInterface
                         'crossorigin' => true,
                         'src' => $this->completeURL($url, $useAbsoluteUrl),
                         'id' => 'vite-legacy-polyfill',
-                    ]
+                    ],
+                    '',
+                    '_internal'
                 );
             }
 
@@ -181,7 +183,9 @@ class EntrypointRenderer implements ResetInterface
                             'integrity' => $entrypointsLookup->getFileHash($url),
                         ],
                         $options['attr'] ?? []
-                    )
+                    ),
+                    '',
+                    $entryName
                 );
 
                 $tags[] = $tag;
@@ -205,7 +209,8 @@ class EntrypointRenderer implements ResetInterface
                         'class' => 'vite-legacy-entry',
                         'integrity' => $entrypointsLookup->getFileHash($url),
                     ],
-                    InlineContent::getSystemJSInlineCode($id)
+                    InlineContent::getSystemJSInlineCode($id),
+                    $entryName
                 );
 
                 $tags[] = $tag;
@@ -245,7 +250,8 @@ class EntrypointRenderer implements ResetInterface
             if (!isset($this->renderedTags[$url])) {
                 $tag = $tagRenderer->createLinkStylesheetTag(
                     $this->completeURL($url, $useAbsoluteUrl),
-                    array_merge(['integrity' => $entrypointsLookup->getFileHash($url)], $options['attr'] ?? [])
+                    array_merge(['integrity' => $entrypointsLookup->getFileHash($url)], $options['attr'] ?? []),
+                    $entryName
                 );
 
                 $tags[] = $tag;
@@ -259,7 +265,8 @@ class EntrypointRenderer implements ResetInterface
                 if (!isset($this->renderedTags[$url])) {
                     $tag = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($url, $useAbsoluteUrl),
-                        ['integrity' => $entrypointsLookup->getFileHash($url)]
+                        ['integrity' => $entrypointsLookup->getFileHash($url)],
+                        $entryName
                     );
 
                     $tags[] = $tag;
@@ -274,7 +281,8 @@ class EntrypointRenderer implements ResetInterface
                 if (!isset($this->renderedTags[$url])) {
                     $tag = $tagRenderer->createModulePreloadLinkTag(
                         $this->completeURL($url, $useAbsoluteUrl),
-                        ['integrity' => $entrypointsLookup->getFileHash($url)]
+                        ['integrity' => $entrypointsLookup->getFileHash($url)],
+                        $entryName
                     );
 
                     $tags[] = $tag;

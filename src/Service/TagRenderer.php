@@ -27,6 +27,7 @@ class TagRenderer
             [
                 'type' => 'module',
                 'src' => $src,
+                'crossorigin' => true,
             ]
         );
     }
@@ -68,7 +69,7 @@ class TagRenderer
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
-            array_merge($this->globalDefaultAttributes, $attributes),
+            $attributes,
             $content,
             true
         );

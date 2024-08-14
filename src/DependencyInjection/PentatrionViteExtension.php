@@ -23,7 +23,7 @@ use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
  *  throw_on_missing_asset: bool,
  *  cache: bool,
  *  preload: "none"|"link-tag"|"link-header",
- *  crossorigin: false|"anonymous"|"use-credentials",
+ *  crossorigin: false|true|"anonymous"|"use-credentials",
  *  script_attributes: array<string, bool|string|null>,
  *  link_attributes: array<string, bool|string|null>,
  *  preload_attributes: array<string, bool|string|null>,

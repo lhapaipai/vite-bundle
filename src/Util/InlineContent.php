@@ -10,8 +10,11 @@ class InlineContent
      */
     public const SAFARI10_NO_MODULE_FIX_INLINE_CODE = '!function(){var e=document,t=e.createElement("script");if(!("noModule"in t)&&"onbeforeload"in t){var n=!1;e.addEventListener("beforeload",(function(e){if(e.target===t)n=!0;else if(!e.target.hasAttribute("nomodule")||!n)return;e.preventDefault()}),!0),t.type="module",t.src=".",e.head.appendChild(t),t.remove()}}();';
 
-    /* set or not the __vite_is_modern_browser variable */
-    public const DETECT_MODERN_BROWSER_INLINE_CODE = 'try{import.meta.url;import("_").catch(()=>1);}catch(e){}window.__vite_is_modern_browser=true;';
+    /**
+     * set or not the __vite_is_modern_browser variable
+     * https://github.com/vitejs/vite/pull/15021.
+     */
+    public const DETECT_MODERN_BROWSER_INLINE_CODE = 'import.meta.url;import("_").catch(()=>1);(async function*(){})().next();if(location.protocol!="file:"){window.__vite_is_modern_browser=true}';
 
     /* if your browser understands the modules but not dynamic import,
      * load the legacy entrypoints

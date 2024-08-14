@@ -22,7 +22,7 @@ class EntrypointsLookup
 
     public function hasFile(): bool
     {
-        return $this->fileAccessor->hasFile($this->configName, 'entrypoints');
+        return $this->fileAccessor->hasFile($this->configName, FileAccessor::ENTRYPOINTS);
     }
 
     /**
@@ -31,7 +31,7 @@ class EntrypointsLookup
     private function getFileContent(): array
     {
         if (is_null($this->fileContent)) {
-            $this->fileContent = $this->fileAccessor->getData($this->configName, 'entrypoints');
+            $this->fileContent = $this->fileAccessor->getData($this->configName, FileAccessor::ENTRYPOINTS);
 
             if (!array_key_exists('entryPoints', $this->fileContent)
             || !array_key_exists('viteServer', $this->fileContent)

@@ -26,16 +26,16 @@ class EntrypointsCacheWarmer extends AbstractPhpFileCacheWarmer
 
         foreach ($this->configs as $configName => $config) {
             try {
-                if ($fileAccessor->hasFile($configName, 'entrypoints')) {
-                    $fileAccessor->getData($configName, 'entrypoints');
+                if ($fileAccessor->hasFile($configName, FileAccessor::ENTRYPOINTS)) {
+                    $fileAccessor->getData($configName, FileAccessor::ENTRYPOINTS);
                 }
             } catch (\Exception) {
                 // ignore exception
             }
 
             try {
-                if ($fileAccessor->hasFile($configName, 'manifest')) {
-                    $fileAccessor->getData($configName, 'manifest');
+                if ($fileAccessor->hasFile($configName, FileAccessor::MANIFEST)) {
+                    $fileAccessor->getData($configName, FileAccessor::MANIFEST);
                 }
             } catch (\Exception) {
                 // ignore exception

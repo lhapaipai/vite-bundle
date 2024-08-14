@@ -166,7 +166,7 @@ class TagRendererTest extends TestCase
 
         $tag = $tagRenderer->createViteClientScript('http://127.0.0.1:5173/build/@vite/client');
         $this->assertEquals(
-            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client"></script>',
+            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>',
             $tagRenderer->generateTag($tag)
         );
 
@@ -201,9 +201,9 @@ class TagRendererTest extends TestCase
         );
         $tag = $tagRendererCrossOrigin->createInternalScriptTag(['src' => '/internal.js']);
         $this->assertEquals(
-            '<script crossorigin="anonymous" src="/internal.js"></script>',
+            '<script src="/internal.js"></script>',
             $tagRendererCrossOrigin->generateTag($tag),
-            'internal script tag has global default attributes'
+            'internal script tag has not global default attributes'
         );
     }
 }

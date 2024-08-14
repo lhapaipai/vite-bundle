@@ -132,7 +132,7 @@ class EntrypointRendererTest extends TestCase
                 'app',
                 [
                     'mode' => 'dev',
-                    'scripts' => '<script type="module" src="http://127.0.0.1:5173/build/@vite/client"></script>'
+                    'scripts' => '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>'
                         .'<script type="module" src="http://127.0.0.1:5173/build/assets/app.js"></script>',
                     'links' => '',
                 ],
@@ -142,7 +142,7 @@ class EntrypointRendererTest extends TestCase
                 'theme',
                 [
                     'mode' => 'dev',
-                    'scripts' => '<script type="module" src="http://127.0.0.1:5173/build/@vite/client"></script>',
+                    'scripts' => '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>',
                     'links' => '<link rel="stylesheet" href="http://127.0.0.1:5173/build/assets/theme.scss">',
                 ],
             ],
@@ -222,7 +222,7 @@ class EntrypointRendererTest extends TestCase
         );
 
         $this->assertEquals(
-            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client"></script>'
+            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>'
             .'<script type="module" src="http://127.0.0.1:5173/build/assets/app.js"></script>'
             .'<script type="module" src="http://127.0.0.1:5173/build/assets/other-app.js"></script>',
             $entrypointRenderer->renderScripts('app').$entrypointRenderer->renderScripts('other-app')
@@ -238,7 +238,7 @@ class EntrypointRendererTest extends TestCase
         );
 
         $this->assertEquals(
-            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client"></script>'
+            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>'
             .'<script type="module">'.InlineContent::getReactRefreshInlineCode('http://127.0.0.1:5173/build/').'</script>'
             .'<script type="module" src="http://127.0.0.1:5173/build/assets/app.js"></script>'
             .'<script type="module" src="http://127.0.0.1:5173/build/assets/other-app.js"></script>',
@@ -381,7 +381,7 @@ class EntrypointRendererTest extends TestCase
             null,
         );
         $this->assertEquals(
-            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client">'
+            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin>'
             .'</script><script type="module" src="http://127.0.0.1:5173/build/assets/app.js"></script>',
             $entrypointRenderer->renderScripts('app'),
             'render correct url when absolute_url defined and vite dev server is started'
@@ -568,8 +568,8 @@ class EntrypointRendererTest extends TestCase
                 ['config2-dev', $entrypointsLookupConfig2],
             ]));
 
-        $tagRendererConfig1 = new TagRenderer();
-        $tagRendererConfig2 = new TagRenderer();
+        $tagRendererConfig1 = new TagRenderer(['crossorigin' => true]);
+        $tagRendererConfig2 = new TagRenderer(['crossorigin' => true]);
 
         /**
          * @var TagRendererCollection|Stub $tagRendererCollection
@@ -587,10 +587,10 @@ class EntrypointRendererTest extends TestCase
             $tagRendererCollection
         );
 
-        $expectedScripts = '<script type="module" src="http://127.0.0.1:5173/build-config1/@vite/client"></script>'
-        .'<script type="module" src="http://127.0.0.1:5173/build-config1/assets/app-1.js"></script>'
-        .'<script type="module" src="http://127.0.0.1:5174/build-config2/@vite/client"></script>'
-        .'<script type="module" src="http://127.0.0.1:5174/build-config2/assets/app-2.js"></script>';
+        $expectedScripts = '<script type="module" src="http://127.0.0.1:5173/build-config1/@vite/client" crossorigin></script>'
+        .'<script crossorigin type="module" src="http://127.0.0.1:5173/build-config1/assets/app-1.js"></script>'
+        .'<script type="module" src="http://127.0.0.1:5174/build-config2/@vite/client" crossorigin></script>'
+        .'<script crossorigin type="module" src="http://127.0.0.1:5174/build-config2/assets/app-2.js"></script>';
 
         $this->assertEquals(
             $expectedScripts,

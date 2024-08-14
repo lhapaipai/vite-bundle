@@ -107,7 +107,8 @@ class PentatrionViteExtension extends Extension
                     $container,
                     $defaultAttributes,
                     $configName,
-                    $configPrepared
+                    $configPrepared,
+                    $bundleConfig['preload']
                 );
             }
         } else {
@@ -125,7 +126,8 @@ class PentatrionViteExtension extends Extension
                     $container,
                     $defaultAttributes,
                     $defaultConfigName,
-                    $configPrepared
+                    $configPrepared,
+                    $bundleConfig['preload']
                 ),
             ];
         }
@@ -179,7 +181,8 @@ class PentatrionViteExtension extends Extension
         ContainerBuilder $container,
         array $defaultAttributes,
         string $configName,
-        array $config
+        array $config,
+        string $preload
     ): Reference {
         $id = $this->getServiceId('tag_renderer', $configName);
         $arguments = [
@@ -187,6 +190,7 @@ class PentatrionViteExtension extends Extension
             $config['script_attributes'],
             $config['link_attributes'],
             $config['preload_attributes'],
+            $preload,
         ];
         $definition = new Definition(TagRenderer::class, $arguments);
         $container->setDefinition($id, $definition);

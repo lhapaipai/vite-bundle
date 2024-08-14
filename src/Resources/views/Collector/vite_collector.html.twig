@@ -12,13 +12,18 @@
         <a href="{{ path('_profiler_vite') }}">Config</a>
         </span>
     </div>
+
     <div class="sf-toolbar-info-piece">
-        <b>Rendered &lt;script /&gt;</b>
+        <b>Rendered scripts</b>
         <span class="sf-toolbar-status">{{ collector.renderedScripts | length }}</span>
     </div>
     <div class="sf-toolbar-info-piece">
-        <b>Rendered &lt;link /&gt;</b>
-        <span class="sf-toolbar-status">{{ collector.renderedStyles | length }}</span>
+        <b>Rendered scripts preloaded</b>
+        <span class="sf-toolbar-status">{{ collector.renderedPreloads | length }}</span>
+    </div>
+    <div class="sf-toolbar-info-piece">
+        <b>Rendered links</b>
+        <span class="sf-toolbar-status">{{ collector.renderedStylesheets | length }}</span>
     </div>
     {% endset %}
     {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { 'link': true }) }}
@@ -35,7 +40,7 @@
 
 {% block panel %}
     <h2>Rendered &lt;script /&gt;</h2>
-    {% for _, tag in collector.renderedScripts %}
+    {% for tag in collector.renderedScripts %}
         <table>
             <thead>
                 <tr>
@@ -44,7 +49,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for key, value in tag.attributes %}
+                {% for key, value in tag.validAttributes %}
                     <tr>
                         <th>{{ key }}</th>
                         <td>
@@ -56,8 +61,8 @@
         </table>
     {% endfor %}
 
-    <h2>Rendered &lt;link /&gt;</h2>
-    {% for _, tag in collector.renderedStyles %}
+    <h2>Rendered &lt;link rel="stylesheet" /&gt;</h2>
+    {% for tag in collector.renderedStylesheets %}
         <table>
             <thead>
                 <tr>
@@ -66,7 +71,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for key, value in tag.attributes %}
+                {% for key, value in tag.validAttributes %}
                     <tr>
                         <th>{{ key }}</th>
                         <td>
@@ -77,4 +82,29 @@
             </tbody>
         </table>
     {% endfor %}
+
+
+    <h2>Rendered preloads</h2>
+    {% for tag in collector.renderedPreloads %}
+        <table>
+            <thead>
+                <tr>
+                    <th class="key">Attribute</th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key, value in tag.validAttributes %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>
+                            <pre class="sf-dump">{{ value }}</pre>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+
 {% endblock %}

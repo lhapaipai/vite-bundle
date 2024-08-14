@@ -12,12 +12,14 @@ class TagRenderer
      * @param array<string, bool|string|null> $globalScriptAttributes
      * @param array<string, bool|string|null> $globalLinkAttributes
      * @param array<string, bool|string|null> $globalPreloadAttributes
+     * @param 'none'|'link-tag'|'link-header' $preload
      */
     public function __construct(
         private array $globalDefaultAttributes = [],
         private array $globalScriptAttributes = [],
         private array $globalLinkAttributes = [],
-        private array $globalPreloadAttributes = []
+        private array $globalPreloadAttributes = [],
+        private string $preload = 'link-tag',
     ) {
     }
 
@@ -71,7 +73,8 @@ class TagRenderer
             Tag::SCRIPT_TAG,
             $attributes,
             $content,
-            true
+            true,
+            $this->preload
         );
 
         return $tag;
@@ -87,7 +90,9 @@ class TagRenderer
                 $this->globalScriptAttributes,
                 $attributes
             ),
-            $content
+            $content,
+            false,
+            $this->preload
         );
 
         return $tag;
@@ -108,7 +113,10 @@ class TagRenderer
                 $this->globalLinkAttributes,
                 $attributes,
                 $extraAttributes
-            )
+            ),
+            '',
+            false,
+            $this->preload
         );
 
         return $tag;
@@ -129,7 +137,10 @@ class TagRenderer
                 $this->globalPreloadAttributes,
                 $attributes,
                 $extraAttributes
-            )
+            ),
+            '',
+            false,
+            $this->preload
         );
 
         return $tag;
@@ -140,26 +151,19 @@ class TagRenderer
         return $tag->isLinkTag() ? sprintf(
             '<%s %s>',
             $tag->getTagName(),
-            self::convertArrayToAttributes($tag->getAttributes())
+            self::convertArrayToAttributes($tag)
         ) : sprintf(
             '<%s %s>%s</%s>',
             $tag->getTagName(),
-            self::convertArrayToAttributes($tag->getAttributes()),
+            self::convertArrayToAttributes($tag),
             $tag->getContent(),
             $tag->getTagName()
         );
     }
 
-    /** @param array<string, bool|string|null> $attributes */
-    private static function convertArrayToAttributes(array $attributes): string
+    private static function convertArrayToAttributes(Tag $tag): string
     {
-        $nonNullAttributes = array_filter(
-            $attributes,
-            function ($value, $key) {
-                return null !== $value && false !== $value;
-            },
-            ARRAY_FILTER_USE_BOTH
-        );
+        $validAttributes = $tag->getValidAttributes();
 
         return implode(' ', array_map(
             function ($key, $value) {
@@ -169,8 +173,8 @@ class TagRenderer
                     return sprintf('%s="%s"', $key, htmlentities($value));
                 }
             },
-            array_keys($nonNullAttributes),
-            $nonNullAttributes
+            array_keys($validAttributes),
+            $validAttributes
         ));
     }
 }

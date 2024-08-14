@@ -17,23 +17,43 @@ class ViteCollector extends AbstractDataCollector
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
-        $this->data = $this->entrypointRenderer->getRenderedFiles();
+        $this->data = $this->entrypointRenderer->getRenderedTags();
     }
 
     /**
-     * @return array<string, Tag>
+     * @return array<Tag>
      */
-    public function getRenderedStyles(): array
+    public function getRenderedTags(): array
     {
-        return $this->data['styles'];
+        /* @phpstan-ignore-next-line data is array<Tag> */
+        return $this->data;
     }
 
     /**
-     * @return array<string, Tag>
+     * @return array<Tag>
      */
     public function getRenderedScripts(): array
     {
-        return $this->data['scripts'];
+        /* @phpstan-ignore-next-line data is array<Tag> */
+        return array_filter($this->data, fn (Tag $tag) => $tag->isScriptTag());
+    }
+
+    /**
+     * @return array<Tag>
+     */
+    public function getRenderedStylesheets(): array
+    {
+        /* @phpstan-ignore-next-line data is array<Tag> */
+        return array_filter($this->data, fn (Tag $tag) => $tag->isStylesheet());
+    }
+
+    /**
+     * @return array<Tag>
+     */
+    public function getRenderedPreloads(): array
+    {
+        /* @phpstan-ignore-next-line data is array<Tag> */
+        return array_filter($this->data, fn (Tag $tag) => $tag->isPreload());
     }
 
     public function getName(): string

@@ -18,9 +18,14 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class EntrypointRendererTest extends TestCase
 {
-    private function getBasicTagRendererCollection(array $scriptAttributes = [], array $linkAttributes = []): TagRendererCollection
-    {
-        $tagRenderer = new TagRenderer([], $scriptAttributes, $linkAttributes);
+    private function getBasicTagRendererCollection(
+        array $defaultAttributes = [],
+        array $scriptAttributes = [],
+        array $linkAttributes = [],
+        array $preloadAttributes = [],
+        string $preload = 'link-tag'
+    ): TagRendererCollection {
+        $tagRenderer = new TagRenderer($defaultAttributes, $scriptAttributes, $linkAttributes, $preloadAttributes, $preload);
         /**
          * @var TagRendererCollection|Stub $tagRendererCollection
          */
@@ -347,8 +352,8 @@ class EntrypointRendererTest extends TestCase
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookupBasicBuild),
             $this->getBasicTagRendererCollection(),
+            '_default',
             true,
-            'link-tag',
             $requestStack,
             null,
         );
@@ -361,8 +366,8 @@ class EntrypointRendererTest extends TestCase
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookupBasicBuild),
             $this->getBasicTagRendererCollection(),
+            '_default',
             false,
-            'link-tag',
             $requestStack,
             null,
         );
@@ -375,8 +380,8 @@ class EntrypointRendererTest extends TestCase
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookupBasicDev),
             $this->getBasicTagRendererCollection(),
+            '_default',
             true,
-            'link-tag',
             $requestStack,
             null,
         );
@@ -393,9 +398,7 @@ class EntrypointRendererTest extends TestCase
         $entrypointsLookup = $this->getEntrypointsLookup('basic-build');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            'none'
+            $this->getBasicTagRendererCollection([], [], [], [], 'none')
         );
 
         $this->assertEquals(
@@ -408,9 +411,7 @@ class EntrypointRendererTest extends TestCase
 
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(),
-            false,
-            'link-header'
+            $this->getBasicTagRendererCollection([], [], [], [], 'link-header')
         );
 
         $this->assertEquals(
@@ -464,7 +465,7 @@ class EntrypointRendererTest extends TestCase
                     $tag->setAttribute('nonce', 'custom-nonce');
                 } elseif ($tag->isStylesheet()) {
                     $tag->removeAttribute('referrerpolicy');
-                } elseif ($tag->isModulePreload()) {
+                } elseif ($tag->isPreload()) {
                     $tag->setAttribute('data-foo', 'bar');
                 }
 
@@ -474,7 +475,7 @@ class EntrypointRendererTest extends TestCase
         $entrypointsLookup = $this->getEntrypointsLookup('basic-build');
         $entrypointRenderer = new EntrypointRenderer(
             $this->getEntrypointsLookupCollection($entrypointsLookup),
-            $this->getBasicTagRendererCollection(['defer' => true], ['referrerpolicy' => 'origin']),
+            $this->getBasicTagRendererCollection([], ['defer' => true], ['referrerpolicy' => 'origin']),
             false,
             'link-tag',
             null,

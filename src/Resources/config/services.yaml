@@ -14,7 +14,6 @@ services:
             - "@pentatrion_vite.tag_renderer_collection"
             - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
-            - "%pentatrion_vite.preload%"
             - "@?request_stack"
             - "@?event_dispatcher"
 
@@ -77,7 +76,6 @@ services:
         tags: ["kernel.event_subscriber"]
         arguments:
             - "@pentatrion_vite.entrypoint_renderer"
-            - "%pentatrion_vite.crossorigin%"
 
     pentatrion_vite.file_accessor:
         class: Pentatrion\ViteBundle\Service\FileAccessor

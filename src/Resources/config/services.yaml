@@ -12,6 +12,7 @@ services:
         arguments:
             - "@pentatrion_vite.entrypoints_lookup_collection"
             - "@pentatrion_vite.tag_renderer_collection"
+            - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
             - "%pentatrion_vite.preload%"
             - "@?request_stack"

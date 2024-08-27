@@ -157,7 +157,8 @@ class DebugTest extends TestCase
         $debug = new Debug(
             ['_default' => self::createEmptyConfig()],
             $mockHttpClient,
-            $mockEntrypointsLookupCollection
+            $mockEntrypointsLookupCollection,
+            null,
         );
 
         $configRunning = $debug->getViteCompleteConfigs();
@@ -177,7 +178,8 @@ class DebugTest extends TestCase
         $debug = new Debug(
             ['_default' => self::createEmptyConfig()],
             new MockHttpClient(),
-            $mockEntrypointsLookupCollection
+            $mockEntrypointsLookupCollection,
+            null,
         );
 
         $config = $debug->getViteCompleteConfigs();

@@ -17,6 +17,7 @@ class Debug
         private array $configs,
         private HttpClientInterface $httpClient,
         private EntrypointsLookupCollection $entrypointsLookupCollection,
+        private ?string $proxyOrigin,
     ) {
     }
 
@@ -38,7 +39,7 @@ class Debug
         $viteServerRequests = array_map(
             function ($configName) {
                 $entrypointsLookup = $this->entrypointsLookupCollection->getEntrypointsLookup($configName);
-                $viteServer = $entrypointsLookup->getViteServer();
+                $viteServer = $this->proxyOrigin ?? $entrypointsLookup->getViteServer();
 
                 return [
                     'configName' => $configName,

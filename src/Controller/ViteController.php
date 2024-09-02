@@ -13,7 +13,7 @@ class ViteController
         private string $defaultConfig,
         private HttpClientInterface $httpClient,
         private EntrypointsLookupCollection $entrypointsLookupCollection,
-        private ?string $proxyOrigin
+        private ?string $proxyOrigin,
     ) {
     }
 

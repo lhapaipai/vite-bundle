@@ -10,7 +10,7 @@ class ProfilerController
 {
     public function __construct(
         private Debug $debug,
-        private Environment $twig
+        private Environment $twig,
     ) {
     }
 

@@ -18,7 +18,7 @@ class Tag
         private array $attributes = [],
         private string $content = '',
         private string $origin = '',
-        string $preloadOption = 'link-tag'
+        string $preloadOption = 'link-tag',
     ) {
         if (self::LINK_TAG === $tagName && isset($attributes['rel'])) {
             if (in_array($attributes['rel'], ['modulepreload', 'preload']) && 'link-tag' !== $preloadOption) {

@@ -10,7 +10,7 @@ class TagRendererCollection
     /** @param ServiceLocator<TagRenderer> $tagRendererLocator */
     public function __construct(
         private ServiceLocator $tagRendererLocator,
-        private string $defaultConfigName
+        private string $defaultConfigName,
     ) {
     }
 

@@ -10,7 +10,7 @@ class EntrypointsLookupCollection
     /** @param ServiceLocator<EntrypointsLookup> $entrypointsLookupLocator */
     public function __construct(
         private ServiceLocator $entrypointsLookupLocator,
-        private string $defaultConfigName
+        private string $defaultConfigName,
     ) {
     }
 

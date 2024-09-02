@@ -31,7 +31,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
         private string $configName,
         private bool $useAbsoluteUrl,
         private ?RequestStack $requestStack = null,
-        private bool $strictMode = true
+        private bool $strictMode = true,
     ) {
         $this->setConfig($this->configName);
     }

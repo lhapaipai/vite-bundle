@@ -11,7 +11,7 @@ use Symfony\Component\WebLink\Link;
 class PreloadAssetsEventListener implements EventSubscriberInterface
 {
     public function __construct(
-        private EntrypointRenderer $entrypointRenderer
+        private EntrypointRenderer $entrypointRenderer,
     ) {
     }
 

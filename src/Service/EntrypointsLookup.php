@@ -16,7 +16,7 @@ class EntrypointsLookup
         private FileAccessor $fileAccessor,
         private string $configName,
         // for cache to retrieve content : configName is cache key
-        private bool $throwOnMissingEntry = false
+        private bool $throwOnMissingEntry = false,
     ) {
     }
 

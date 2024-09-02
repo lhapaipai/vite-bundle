@@ -159,7 +159,7 @@ class PentatrionViteExtension extends Extension
 
     private function entrypointsLookupFactory(
         ContainerBuilder $container,
-        string $configName
+        string $configName,
     ): Reference {
         $id = $this->getServiceId('entrypoints_lookup', $configName);
         $arguments = [
@@ -182,7 +182,7 @@ class PentatrionViteExtension extends Extension
         array $defaultAttributes,
         string $configName,
         array $config,
-        string $preload
+        string $preload,
     ): Reference {
         $id = $this->getServiceId('tag_renderer', $configName);
         $arguments = [

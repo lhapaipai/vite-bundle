@@ -15,7 +15,7 @@ final class RenderAssetTagEvent
 {
     public function __construct(
         private bool $build,
-        private Tag $tag
+        private Tag $tag,
     ) {
     }
 

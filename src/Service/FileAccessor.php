@@ -54,7 +54,7 @@ class FileAccessor
     public function __construct(
         private string $publicPath,
         private array $configs,
-        private ?CacheItemPoolInterface $cache = null
+        private ?CacheItemPoolInterface $cache = null,
     ) {
     }
 

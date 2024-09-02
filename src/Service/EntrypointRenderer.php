@@ -44,7 +44,7 @@ class EntrypointRenderer implements ResetInterface
         private string $defaultConfigName = '_default',
         private bool $useAbsoluteUrl = false,
         private ?RequestStack $requestStack = null,
-        private ?EventDispatcherInterface $eventDispatcher = null
+        private ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -113,7 +113,7 @@ class EntrypointRenderer implements ResetInterface
         string $entryName,
         array $options = [],
         ?string $configName = null,
-        bool $toString = true
+        bool $toString = true,
     ): string|array {
         $configName = $configName ?? $this->defaultConfigName;
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
@@ -231,7 +231,7 @@ class EntrypointRenderer implements ResetInterface
         string $entryName,
         array $options = [],
         ?string $configName = null,
-        bool $toString = true
+        bool $toString = true,
     ): string|array {
         $configName = $configName ?? $this->defaultConfigName;
         $entrypointsLookup = $this->getEntrypointsLookup($configName);

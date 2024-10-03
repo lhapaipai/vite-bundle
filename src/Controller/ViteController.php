@@ -29,7 +29,8 @@ class ViteController
 
         $response = $this->httpClient->request(
             'GET',
-            $origin.$base.$path
+            $origin.$base.$path,
+            ['headers' => ['Accept-Encoding' => '']],
         );
 
         $content = $response->getContent();

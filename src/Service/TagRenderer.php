@@ -23,14 +23,16 @@ class TagRenderer
     ) {
     }
 
-    public function createViteClientScript(string $src): Tag
+    public function createViteClientScript(string $src, string $entryName = ''): Tag
     {
         return $this->createInternalScriptTag(
             [
                 'type' => 'module',
                 'src' => $src,
                 'crossorigin' => true,
-            ]
+            ],
+            '',
+            $entryName
         );
     }
 
@@ -67,21 +69,22 @@ class TagRenderer
     }
 
     /** @param array<string, bool|string|null> $attributes */
-    public function createInternalScriptTag(array $attributes = [], string $content = ''): Tag
+    public function createInternalScriptTag(array $attributes = [], string $content = '', string $origin = ''): Tag
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
             $attributes,
             $content,
-            '_internal',
-            $this->preload
+            $origin,
+            $this->preload,
+            true,
         );
 
         return $tag;
     }
 
     /** @param array<string, bool|string|null> $attributes */
-    public function createScriptTag(array $attributes = [], string $content = '', string $origin = ''): Tag
+    public function createScriptTag(array $attributes = [], string $content = '', string $origin = '', bool $internal = false): Tag
     {
         $tag = new Tag(
             Tag::SCRIPT_TAG,
@@ -92,7 +95,8 @@ class TagRenderer
             ),
             $content,
             $origin,
-            $this->preload
+            $this->preload,
+            $internal
         );
 
         return $tag;

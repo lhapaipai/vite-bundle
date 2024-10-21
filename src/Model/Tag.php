@@ -19,6 +19,7 @@ class Tag
         private string $content = '',
         private string $origin = '',
         string $preloadOption = 'link-tag',
+        private bool $internal = false,
     ) {
         if (self::LINK_TAG === $tagName && isset($attributes['rel'])) {
             if (in_array($attributes['rel'], ['modulepreload', 'preload']) && 'link-tag' !== $preloadOption) {
@@ -148,7 +149,7 @@ class Tag
 
     public function isInternal(): bool
     {
-        return '_internal' === $this->origin;
+        return $this->internal;
     }
 
     public function isRenderAsTag(): bool

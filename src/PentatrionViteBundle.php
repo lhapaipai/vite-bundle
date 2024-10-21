@@ -6,5 +6,5 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class PentatrionViteBundle extends Bundle
 {
-    public const VERSION = ['7.0.4', 7, 0, 4];
+    public const VERSION = ['7.0.5', 7, 0, 5];
 }

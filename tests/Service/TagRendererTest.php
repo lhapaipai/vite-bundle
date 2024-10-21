@@ -164,21 +164,13 @@ class TagRendererTest extends TestCase
             'internal script tag has not global script tags'
         );
 
-        $tag = $tagRenderer->createViteClientScript('http://127.0.0.1:5173/build/@vite/client');
+        $tag = $tagRenderer->createViteClientScript('http://127.0.0.1:5173/build/@vite/client', 'app');
         $this->assertEquals(
             '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>',
             $tagRenderer->generateTag($tag)
         );
         $this->assertTrue($tag->isInternal());
-        $this->assertEquals('', $tag->getOrigin());
-
-        $tag = $tagRenderer->createViteClientScript('http://127.0.0.1:5173/build/@vite/client', 'app-foo');
-        $this->assertEquals(
-            '<script type="module" src="http://127.0.0.1:5173/build/@vite/client" crossorigin></script>',
-            $tagRenderer->generateTag($tag)
-        );
-        $this->assertTrue($tag->isInternal());
-        $this->assertEquals('app-foo', $tag->getOrigin());
+        $this->assertEquals('app', $tag->getOrigin());
 
         $tag = $tagRenderer->createReactRefreshScript('http://127.0.0.1:5173');
         $this->assertEquals(

@@ -23,7 +23,7 @@ class TagRenderer
     ) {
     }
 
-    public function createViteClientScript(string $src, string $entryName = ''): Tag
+    public function createViteClientScript(string $src, string $entryName): Tag
     {
         return $this->createInternalScriptTag(
             [

@@ -8,9 +8,9 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\WebLink\EventListener\AddLinkHeaderListener;
 
 /**

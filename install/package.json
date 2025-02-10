@@ -7,6 +7,6 @@
     },
     "devDependencies": {
         "vite": "^6.0",
-        "vite-plugin-symfony": "^7.1"
+        "vite-plugin-symfony": "^8.0"
     }
 }

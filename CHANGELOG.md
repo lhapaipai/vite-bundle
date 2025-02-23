@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.0.2
+
+- vite-bundle fix #62 can't use environment variables for default_config
+
 ## v8.0.1
 
 - vite-plugin-symfony fix #60 move postinstall hook to pre-dev.

@@ -84,10 +84,10 @@ class PentatrionViteExtension extends Extension
 
         if (
             count($bundleConfig['configs']) > 0) {
-            if (is_null($bundleConfig['default_config']) || !isset($bundleConfig['configs'][$bundleConfig['default_config']])) {
+            $defaultConfigName = $container->resolveEnvPlaceholders($bundleConfig['default_config'], true);
+            if (!is_string($defaultConfigName) || !isset($bundleConfig['configs'][$defaultConfigName])) {
                 throw new \Exception('Invalid default_config, choose between : '.join(', ', array_keys($bundleConfig['configs'])));
             }
-            $defaultConfigName = $bundleConfig['default_config'];
             $lookupFactories = [];
             $tagRendererFactories = [];
             /** @var array<string, ResolvedConfig> $configs */

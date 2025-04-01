@@ -89,7 +89,7 @@ class Debug
         /** @var array<string, mixed> $value */
         foreach ($config as $key => $value) {
             if (in_array($key, $groupKeys)) {
-                if(\is_array($value)) {
+                if (\is_array($value)) {
                     ksort($value);
                 }
                 $output[$key] = $value;

@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.1.0
+
+stimulus with svelte : update to svelte 5 ([@faldor20](https://github.com/faldor20))
+
 ## v8.0.2
 
 - vite-bundle fix #62 can't use environment variables for default_config

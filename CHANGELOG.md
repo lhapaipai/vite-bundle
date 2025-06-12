@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.1.1
+
+- vite-plugin-symfony fix #75 allow users to override server.watch.ignored ([@robinsimonklein](https://github.com/robinsimonklein))
+
 ## v8.1.0
 
 stimulus with svelte : update to svelte 5 ([@faldor20](https://github.com/faldor20))

@@ -109,7 +109,7 @@ class EntrypointRenderer implements ResetInterface
         array $options = [],
         string $configName = null,
         bool $toString = true
-    ): mixed {
+    ) {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -215,7 +215,7 @@ class EntrypointRenderer implements ResetInterface
         array $options = [],
         string $configName = null,
         bool $toString = true
-    ): mixed {
+    ) {
         $entrypointsLookup = $this->getEntrypointsLookup($configName);
         $tagRenderer = $this->getTagRenderer($configName);
 
@@ -268,7 +268,7 @@ class EntrypointRenderer implements ResetInterface
     /**
      * @return string|array
      */
-    public function renderTags(array $tags, bool $isBuild, bool $toString): mixed
+    public function renderTags(array $tags, bool $isBuild, bool $toString)
     {
         if (null !== $this->eventDispatcher) {
             foreach ($tags as $tag) {

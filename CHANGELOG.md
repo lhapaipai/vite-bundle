@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.2.0
+
+- add vite 7 support
+
 ## v8.1.1
 
 - vite-plugin-symfony fix #75 allow users to override server.watch.ignored ([@robinsimonklein](https://github.com/robinsimonklein))

@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
     private ?string $viteMode = null;
-    private string $basePath;
     /** @var ManifestFile|null */
     private ?array $manifestData = null;
     /** @var EntryPointsFile */
@@ -40,7 +39,6 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     {
         $this->viteMode = null;
         $this->configName = $configName;
-        $this->basePath = $this->configs[$configName]['base'];
     }
 
     /**
@@ -79,7 +77,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
 
         if ('build' === $this->viteMode) {
             if (isset($this->manifestData[$path])) {
-                return $this->completeURL($this->basePath.$this->manifestData[$path]['file']);
+                return $this->completeURL($this->entrypointsData['base'].$this->manifestData[$path]['file']);
             }
         } else {
             return $this->entrypointsData['viteServer'].$this->entrypointsData['base'].$path;
@@ -95,7 +93,7 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
             throw new AssetNotFoundException($message, $alternatives);
         }
 
-        return $this->basePath.$path;
+        return $this->entrypointsData['base'].$path;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Pentatrion\ViteBundle\Asset;
 
-use Pentatrion\ViteBundle\DependencyInjection\PentatrionViteExtension;
 use Pentatrion\ViteBundle\Service\FileAccessor;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
@@ -11,7 +10,6 @@ use Symfony\Component\HttpFoundation\RequestStack;
 /**
  * @phpstan-import-type EntryPointsFile from FileAccessor
  * @phpstan-import-type ManifestFile from FileAccessor
- * @phpstan-import-type ViteConfigs from PentatrionViteExtension
  */
 class ViteAssetVersionStrategy implements VersionStrategyInterface
 {
@@ -21,12 +19,8 @@ class ViteAssetVersionStrategy implements VersionStrategyInterface
     /** @var EntryPointsFile */
     private array $entrypointsData;
 
-    /**
-     * @param ViteConfigs $configs
-     */
     public function __construct(
         private FileAccessor $fileAccessor,
-        private array $configs,
         private string $configName,
         private bool $useAbsoluteUrl,
         private ?RequestStack $requestStack = null,

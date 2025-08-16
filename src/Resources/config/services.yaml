@@ -71,7 +71,6 @@ services:
     Pentatrion\ViteBundle\Asset\ViteAssetVersionStrategy:
         arguments:
             - "@pentatrion_vite.file_accessor"
-            - "%pentatrion_vite.configs%"
             - "%pentatrion_vite.default_config%"
             - "%pentatrion_vite.absolute_url%"
             - "@?request_stack"

@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.2.1
+
+- fix #83 asset twig method not using entrypoints baseUrl ([@micheh](https://github.com/micheh))
+
 ## v8.2.0
 
 - add vite 7 support

@@ -150,6 +150,21 @@ class EntrypointRenderer implements ResetInterface
             $entrypointsLookup->isLegacyPluginEnabled()
             && !isset($this->returnedViteLegacyScripts[$configName])
         ) {
+            if ($entrypointsLookup->hasModernPolyfillsEntry()) {
+                foreach ($entrypointsLookup->getJSFiles('polyfills') as $url) {
+                    // normally only one js file
+                    $tags[] = $tagRenderer->createScriptTag(
+                        [
+                            'crossorigin' => true,
+                            'src' => $this->completeURL($url, $useAbsoluteUrl),
+                        ],
+                        '',
+                        $entryName,
+                        true,
+                    );
+                }
+            }
+
             /* legacy section when vite server is inactive */
             $tags[] = $tagRenderer->createDetectModernBrowserScript();
             $tags[] = $tagRenderer->createDynamicFallbackScript();

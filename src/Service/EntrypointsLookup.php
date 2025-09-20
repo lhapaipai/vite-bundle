@@ -78,6 +78,11 @@ class EntrypointsLookup
         return $this->getFileContent()['base'];
     }
 
+    public function hasModernPolyfillsEntry(): bool
+    {
+        return isset($this->getFileContent()['entryPoints']['polyfills']);
+    }
+
     /**
      * @return array<string>
      */

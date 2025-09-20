@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.2.2
+
+- vite-plugin-symfony: Support use modernPolyfills option in @vitejs/plugin-legacy ([@twodogwang](https://github.com/twodogwang))
+
 ## v8.2.1
 
 - fix #83 asset twig method not using entrypoints baseUrl ([@micheh](https://github.com/micheh))

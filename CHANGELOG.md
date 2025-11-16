@@ -1,5 +1,9 @@
 # `pentatrion/vite-bundle` / `vite-plugin-symfony` Changelog
 
+## v8.2.3
+
+- Add support for Symfony 8 ([@skmedix](https://github.com/skmedix))
+
 ## v8.2.2
 
 - vite-plugin-symfony: Support use modernPolyfills option in @vitejs/plugin-legacy ([@twodogwang](https://github.com/twodogwang))
